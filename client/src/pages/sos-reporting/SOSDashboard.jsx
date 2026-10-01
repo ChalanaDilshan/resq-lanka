@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import { Search, Filter, Map as MapIcon, LayoutGrid, Clock, Flame, RefreshCw, AlertCircle } from 'lucide-react';
 import { fetchSOSRequests, updateSOSStatus } from '../../services/sosService';
@@ -8,7 +8,7 @@ const mapContainerStyle = { width: '100%', height: '520px', borderRadius: '0.5re
 const srilankaCenter = { lat: 7.8731, lng: 80.7718 };
 
 export default function SOSDashboard() {
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
   });
@@ -26,37 +26,49 @@ export default function SOSDashboard() {
 
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [isAutoPolling, setIsAutoPolling] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const loadIncidents = useCallback(async () => {
-    try {
-      const data = await fetchSOSRequests({
-        status: statusFilter,
-        hazard: hazardFilter,
-        urgency: urgencyFilter
-      });
-      setRequests(data);
-      setError(null);
-      setLastRefreshed(new Date());
-    } catch (err) {
-      setError(err.message || 'Failed to fetch live emergency incidents.');
-    } finally {
-      setLoading(false);
+  // Initial load and filter change trigger with cleanup
+  useEffect(() => {
+    let isCancelled = false;
+
+    const executeFetch = async () => {
+      try {
+        const data = await fetchSOSRequests({
+          status: statusFilter,
+          hazard: hazardFilter,
+          urgency: urgencyFilter
+        });
+        if (!isCancelled) {
+          setRequests(data);
+          setError(null);
+          setLastRefreshed(new Date());
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          setError(err.message || 'Failed to fetch live emergency incidents.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    executeFetch();
+
+    if (!isAutoPolling) {
+      return () => {
+        isCancelled = true;
+      };
     }
-  }, [statusFilter, hazardFilter, urgencyFilter]);
 
-  // Initial load and filter change trigger
-  useEffect(() => {
-    loadIncidents();
-  }, [loadIncidents]);
-
-  // 10-second polling interval
-  useEffect(() => {
-    if (!isAutoPolling) return;
-    const interval = setInterval(() => {
-      loadIncidents();
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [isAutoPolling, loadIncidents]);
+    const interval = setInterval(executeFetch, 10000);
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, [statusFilter, hazardFilter, urgencyFilter, isAutoPolling, refreshTrigger]);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -115,6 +127,15 @@ export default function SOSDashboard() {
 
         <div className="flex items-center space-x-3">
           <button
+            onClick={() => setRefreshTrigger((c) => c + 1)}
+            title="Refresh incident list now"
+            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded border bg-white hover:bg-gray-50 text-gray-700 transition shadow-sm"
+          >
+            <RefreshCw size={13} />
+            <span>Refresh</span>
+          </button>
+
+          <button
             onClick={() => setIsAutoPolling((prev) => !prev)}
             className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded border transition ${
               isAutoPolling ? 'bg-green-50 text-green-700 border-green-300' : 'bg-gray-100 text-gray-600'
@@ -139,6 +160,32 @@ export default function SOSDashboard() {
               <MapIcon size={15} />
               <span>Live Map</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI Summary Overview */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Reports</div>
+          <div className="text-2xl font-bold text-gray-800 mt-1">{requests.length}</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-red-200 bg-red-50/40">
+          <div className="text-xs font-semibold text-red-600 uppercase tracking-wider">Pending</div>
+          <div className="text-2xl font-bold text-red-600 mt-1">
+            {requests.filter((r) => r.status === 'Pending').length}
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-yellow-200 bg-yellow-50/40">
+          <div className="text-xs font-semibold text-yellow-600 uppercase tracking-wider">In Progress</div>
+          <div className="text-2xl font-bold text-yellow-600 mt-1">
+            {requests.filter((r) => r.status === 'In Progress').length}
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-green-200 bg-green-50/40">
+          <div className="text-xs font-semibold text-green-600 uppercase tracking-wider">Resolved</div>
+          <div className="text-2xl font-bold text-green-600 mt-1">
+            {requests.filter((r) => r.status === 'Resolved').length}
           </div>
         </div>
       </div>
@@ -214,7 +261,15 @@ export default function SOSDashboard() {
         <div className="text-center py-16 text-gray-400">Loading incident data from MongoDB...</div>
       ) : viewMode === 'map' ? (
         <div className="bg-white p-3 rounded-lg shadow-sm border">
-          {isLoaded ? (
+          {loadError ? (
+            <div className="h-96 flex flex-col items-center justify-center text-red-500 p-6 text-center">
+              <AlertCircle size={32} className="mb-2" />
+              <p className="font-semibold text-sm">Google Maps failed to load.</p>
+              <p className="text-xs text-gray-500 mt-1 max-w-md">
+                Please ensure a valid VITE_GOOGLE_MAPS_API_KEY is configured in your .env file, or switch to Cards view.
+              </p>
+            </div>
+          ) : isLoaded ? (
             <GoogleMap mapContainerStyle={mapContainerStyle} center={srilankaCenter} zoom={8}>
               {filteredRequests.map((req) => (
                 <Marker
@@ -246,18 +301,37 @@ export default function SOSDashboard() {
                     <p className="text-xs font-semibold mt-1">Tel: {selectedIncident.contactNumber}</p>
                     <div className="mt-2 pt-2 border-t flex gap-1">
                       <button
+                        onClick={() => handleStatusChange(selectedIncident._id, 'Pending')}
+                        disabled={selectedIncident.status === 'Pending'}
+                        className={`text-xs px-2 py-1 rounded transition ${
+                          selectedIncident.status === 'Pending'
+                            ? 'bg-red-600 text-white font-bold opacity-100'
+                            : 'bg-gray-100 text-gray-700 hover:bg-red-50'
+                        }`}
+                      >
+                        Pending
+                      </button>
+                      <button
                         onClick={() => handleStatusChange(selectedIncident._id, 'In Progress')}
                         disabled={selectedIncident.status === 'In Progress'}
-                        className="bg-yellow-500 text-white text-xs px-2 py-1 rounded disabled:opacity-40"
+                        className={`text-xs px-2 py-1 rounded transition ${
+                          selectedIncident.status === 'In Progress'
+                            ? 'bg-yellow-500 text-white font-bold opacity-100'
+                            : 'bg-gray-100 text-gray-700 hover:bg-yellow-50'
+                        }`}
                       >
                         In Progress
                       </button>
                       <button
                         onClick={() => handleStatusChange(selectedIncident._id, 'Resolved')}
                         disabled={selectedIncident.status === 'Resolved'}
-                        className="bg-green-600 text-white text-xs px-2 py-1 rounded disabled:opacity-40"
+                        className={`text-xs px-2 py-1 rounded transition ${
+                          selectedIncident.status === 'Resolved'
+                            ? 'bg-green-600 text-white font-bold opacity-100'
+                            : 'bg-gray-100 text-gray-700 hover:bg-green-50'
+                        }`}
                       >
-                        Resolve
+                        Resolved
                       </button>
                     </div>
                   </div>
@@ -295,27 +369,49 @@ export default function SOSDashboard() {
                 <p className="text-xs bg-gray-50 border p-2.5 rounded text-gray-700 mb-4">{req.description}</p>
               </div>
 
-              <div className="border-t pt-3 flex items-center justify-between text-xs gap-2">
-                <button
-                  onClick={() => handleStatusChange(req._id, 'In Progress')}
-                  disabled={req.status === 'In Progress'}
-                  className="flex-1 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded font-medium disabled:opacity-40 transition"
-                >
-                  In Progress
-                </button>
-                <button
-                  onClick={() => handleStatusChange(req._id, 'Resolved')}
-                  disabled={req.status === 'Resolved'}
-                  className="flex-1 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded font-medium disabled:opacity-40 transition"
-                >
-                  Resolve
-                </button>
+              <div>
+                <div className="text-[11px] text-gray-400 font-semibold mb-1 uppercase tracking-wider">Update Status:</div>
+                <div className="border-t pt-2 flex items-center justify-between text-xs gap-1.5">
+                  <button
+                    onClick={() => handleStatusChange(req._id, 'Pending')}
+                    disabled={req.status === 'Pending'}
+                    className={`flex-1 py-1.5 rounded font-medium transition ${
+                      req.status === 'Pending'
+                        ? 'bg-red-600 text-white font-bold cursor-default shadow-sm'
+                        : 'bg-gray-100 hover:bg-red-50 text-gray-700'
+                    }`}
+                  >
+                    Pending
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange(req._id, 'In Progress')}
+                    disabled={req.status === 'In Progress'}
+                    className={`flex-1 py-1.5 rounded font-medium transition ${
+                      req.status === 'In Progress'
+                        ? 'bg-yellow-500 text-white font-bold cursor-default shadow-sm'
+                        : 'bg-gray-100 hover:bg-yellow-50 text-gray-700'
+                    }`}
+                  >
+                    In Progress
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange(req._id, 'Resolved')}
+                    disabled={req.status === 'Resolved'}
+                    className={`flex-1 py-1.5 rounded font-medium transition ${
+                      req.status === 'Resolved'
+                        ? 'bg-green-600 text-white font-bold cursor-default shadow-sm'
+                        : 'bg-gray-100 hover:bg-green-50 text-gray-700'
+                    }`}
+                  >
+                    Resolved
+                  </button>
+                </div>
               </div>
             </div>
           ))}
           {filteredRequests.length === 0 && (
             <div className="col-span-full text-center py-10 bg-white rounded border text-gray-500">
-              No emergency reports found in the database.
+              No emergency reports found matching your criteria.
             </div>
           )}
         </div>

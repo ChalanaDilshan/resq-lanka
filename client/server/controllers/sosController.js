@@ -10,13 +10,16 @@ export const createSOS = async (req, res) => {
       return res.status(400).json({ message: 'Location, contact number, and description are required.' });
     }
 
+    // Clean phone number (strip whitespace and hyphens for reliable validation)
+    const cleanedContactNumber = contactNumber.toString().replace(/[\s-]+/g, '');
+
     const newRequest = await SOSRequest.create({
       hazardType,
       urgency,
-      locationText,
+      locationText: locationText.trim(),
       coordinates,
-      contactNumber,
-      description,
+      contactNumber: cleanedContactNumber,
+      description: description.trim(),
       status: 'Pending',
     });
 
@@ -59,7 +62,7 @@ export const updateSOSStatus = async (req, res) => {
     const updatedRequest = await SOSRequest.findByIdAndUpdate(
       id,
       { status },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updatedRequest) {

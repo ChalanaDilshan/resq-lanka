@@ -1,54 +1,38 @@
+import axios from 'axios';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/sos';
 
-
 export const createSOSRequest = async (formData) => {
-  const response = await fetch(API_BASE_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(formData),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to submit SOS request');
+  try {
+    const response = await axios.post(API_BASE_URL, formData);
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to submit SOS request';
+    throw new Error(message, { cause: error });
   }
-
-  return response.json();
 };
-
 
 export const fetchSOSRequests = async (filters = {}) => {
-  const queryParams = new URLSearchParams();
-  if (filters.status && filters.status !== 'All') queryParams.append('status', filters.status);
-  if (filters.hazard && filters.hazard !== 'All') queryParams.append('hazard', filters.hazard);
-  if (filters.urgency && filters.urgency !== 'All') queryParams.append('urgency', filters.urgency);
+  try {
+    const params = {};
+    if (filters.status && filters.status !== 'All') params.status = filters.status;
+    if (filters.hazard && filters.hazard !== 'All') params.hazard = filters.hazard;
+    if (filters.urgency && filters.urgency !== 'All') params.urgency = filters.urgency;
 
-  const url = queryParams.toString() ? `${API_BASE_URL}?${queryParams}` : API_BASE_URL;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error('Failed to retrieve emergency incidents');
+    const response = await axios.get(API_BASE_URL, { params });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to retrieve emergency incidents';
+    throw new Error(message, { cause: error });
   }
-
-  return response.json();
 };
 
-
 export const updateSOSStatus = async (id, status) => {
-  const response = await fetch(`${API_BASE_URL}/${id}/status`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to update incident status');
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/${id}/status`, { status });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Failed to update incident status';
+    throw new Error(message, { cause: error });
   }
-
-  return response.json();
 };
