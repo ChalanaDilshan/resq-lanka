@@ -6,20 +6,26 @@ export const createSOS = async (req, res) => {
   try {
     const { hazardType, urgency, locationText, coordinates, contactNumber, description } = req.body;
 
-    if (!locationText || !contactNumber || !description) {
-      return res.status(400).json({ message: 'Location, contact number, and description are required.' });
+    if (!locationText || !locationText.trim()) {
+      return res.status(400).json({ message: 'Location address or landmark is required.' });
     }
 
-    // Clean phone number (strip whitespace and hyphens for reliable validation)
-    const cleanedContactNumber = contactNumber.toString().replace(/[\s-]+/g, '');
+    // Clean phone number if provided, otherwise default to emergency hotline / anonymous
+    const cleanedContactNumber = contactNumber
+      ? contactNumber.toString().replace(/[\s-]+/g, '')
+      : '0770000000';
+
+    const cleanDescription = (description && description.trim()) 
+      ? description.trim() 
+      : 'Emergency assistance requested';
 
     const newRequest = await SOSRequest.create({
-      hazardType,
-      urgency,
+      hazardType: hazardType || 'Flood',
+      urgency: urgency || 'Critical',
       locationText: locationText.trim(),
-      coordinates,
+      coordinates: coordinates || { lat: 6.9271, lng: 79.8612 },
       contactNumber: cleanedContactNumber,
-      description: description.trim(),
+      description: cleanDescription,
       status: 'Pending',
     });
 
