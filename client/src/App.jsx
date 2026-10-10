@@ -6,9 +6,9 @@ import SOSDashboard from './pages/sos-reporting/SOSDashboard';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-[#f6f8fa] flex flex-col text-slate-800 antialiased selection:bg-red-500 selection:text-white">
         <Navbar />
-        <main className="container mx-auto p-4 flex-grow">
+        <main className="flex-grow flex flex-col">
           <Routes>
             <Route path="/" element={<Navigate to="/sos" replace />} />
             <Route path="/sos" element={<SOSRequestForm />} />

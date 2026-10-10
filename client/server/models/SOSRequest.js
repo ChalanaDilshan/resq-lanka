@@ -5,7 +5,8 @@ const sosRequestSchema = new mongoose.Schema(
     hazardType: {
       type: String,
       required: [true, 'Hazard type is required'],
-      enum: ['Flood', 'Earthquake'],
+      enum: ['Flood', 'Earthquake', 'Landslide', 'Cyclone', 'Tsunami', 'Fire', 'Other'],
+      default: 'Flood',
     },
     urgency: {
       type: String,
@@ -32,15 +33,11 @@ const sosRequestSchema = new mongoose.Schema(
     },
     contactNumber: {
       type: String,
-      required: [true, 'Contact mobile number is required'],
-      match: [
-        /^(?:0|94|\+94)?7\d{8}$/,
-        'Please enter a valid Sri Lankan mobile number (e.g., 0771234567)',
-      ],
+      default: '0770000000',
     },
     description: {
       type: String,
-      required: [true, 'Emergency assistance description is required'],
+      default: 'Emergency assistance requested',
       trim: true,
     },
     status: {
