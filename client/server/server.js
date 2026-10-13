@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import sosRoutes from './routes/sosRoutes.js';
+<<<<<<< HEAD
+=======
+import supplyRoutes from './routes/supplyRoutes.js';
+>>>>>>> d15a3db (Add module 3 and login files)
 
 dotenv.config();
 
@@ -20,6 +24,10 @@ app.use(express.json());
 
 // API Routes
 app.use('/api/sos', sosRoutes);
+<<<<<<< HEAD
+=======
+app.use('/api/supplies', supplyRoutes);
+>>>>>>> d15a3db (Add module 3 and login files)
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
