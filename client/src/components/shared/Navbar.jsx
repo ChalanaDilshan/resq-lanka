@@ -1,38 +1,411 @@
-import { Link, useLocation } from 'react-router-dom';
-import { ShieldAlert, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search, X, ShieldAlert, ArrowRight, User, Lock, Mail } from 'lucide-react';
+import ResQLogo from './ResQLogo';
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [authModal, setAuthModal] = useState(null); // 'login' | 'register' | null
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '', role: 'citizen' });
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Shelters', path: '/#shelters' },
+    { name: 'Alerts', path: '/#alerts' },
+    { name: 'Donate', path: '/#donate' },
+    { name: 'Volunteer', path: '/#volunteer' },
+    { name: 'About', path: '/#about' },
+  ];
+
+  const handleNavClick = (path) => {
+    setMobileMenuOpen(false);
+    if (path.startsWith('/#')) {
+      const elementId = path.replace('/#', '');
+      if (location.pathname === '/') {
+        const el = document.getElementById(elementId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        navigate('/');
+        setTimeout(() => {
+          const el = document.getElementById(elementId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setSearchOpen(false);
+    navigate('/');
+    setTimeout(() => {
+      const searchInput = document.getElementById('shelter-search-input');
+      if (searchInput) {
+        searchInput.value = searchQuery;
+        searchInput.focus();
+        const event = new Event('input', { bubbles: true });
+        searchInput.dispatchEvent(event);
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+  };
 
   return (
-    <nav className="bg-red-700 text-white shadow-md">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2 font-black text-xl tracking-wide">
-          <ShieldAlert size={28} />
-          <span>ResQ-Lanka</span>
-        </Link>
+    <>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          {/* Brand / Logo */}
+          <Link to="/" className="flex items-center group py-2">
+            <ResQLogo />
+          </Link>
 
-        <div className="flex space-x-3">
-          <Link
-            to="/sos"
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition ${
-              location.pathname === '/sos' ? 'bg-red-900 text-white' : 'hover:bg-red-800 text-red-100'
-            }`}
-          >
-            <AlertTriangle size={16} />
-            <span>Report SOS</span>
-          </Link>
-          <Link
-            to="/sos-dashboard"
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition ${
-              location.pathname === '/sos-dashboard' ? 'bg-red-900 text-white' : 'hover:bg-red-800 text-red-100'
-            }`}
-          >
-            <LayoutDashboard size={16} />
-            <span>Dashboard</span>
-          </Link>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            {navLinks.map((link) => {
+              const isHome = link.name === 'Home';
+              const isActive = isHome ? location.pathname === '/' : false;
+
+              return (
+                <div key={link.name} className="relative py-2">
+                  {link.path.startsWith('/#') ? (
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick(link.path)}
+                      className={`text-[15px] font-semibold transition-colors duration-150 ${
+                        isActive
+                          ? 'text-blue-600 font-bold'
+                          : 'text-slate-700 hover:text-blue-600'
+                      }`}
+                    >
+                      {link.name}
+                    </button>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className={`text-[15px] font-semibold transition-colors duration-150 ${
+                        isActive
+                          ? 'text-blue-600 font-bold'
+                          : 'text-slate-700 hover:text-blue-600'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  )}
+                  {/* Active Indicator Underline */}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+
+          {/* Right Header Actions */}
+          <div className="hidden sm:flex items-center space-x-3.5">
+            {/* Search Button */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search disasters, shelters, or alerts"
+              className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-full transition focus:outline-none"
+            >
+              <Search size={19} className="stroke-[2.2]" />
+            </button>
+
+            {/* Login Button */}
+            <button
+              type="button"
+              onClick={() => setAuthModal('login')}
+              className="px-4 py-2 text-[14px] font-semibold text-slate-700 border border-slate-300 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm"
+            >
+              Login
+            </button>
+
+            {/* Register Button */}
+            <button
+              type="button"
+              onClick={() => setAuthModal('register')}
+              className="px-4 py-2 text-[14px] font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-sm hover:shadow"
+            >
+              Register
+            </button>
+
+            {/* Emergency SOS Shortcut Pill */}
+            <Link
+              to="/sos"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-xl text-xs font-bold transition ml-1"
+            >
+              <ShieldAlert size={14} className="stroke-[2.5]" />
+              <span>SOS Hotline</span>
+            </Link>
+          </div>
+
+          {/* Mobile Menu & Search Buttons */}
+          <div className="flex sm:hidden items-center space-x-2">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              aria-label="Search"
+            >
+              <Search size={20} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 focus:outline-none"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? (
+                <X size={22} className="stroke-[2.2]" />
+              ) : (
+                <svg className="w-6 h-6 stroke-slate-700" fill="none" viewBox="0 0 24 24" strokeWidth="2.2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 shadow-lg animate-fadeIn">
+            <div className="flex flex-col space-y-2">
+              {navLinks.map((link) => (
+                <button
+                  key={link.name}
+                  type="button"
+                  onClick={() => handleNavClick(link.path)}
+                  className="text-left px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition"
+                >
+                  {link.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+              <Link
+                to="/sos"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm shadow-sm"
+              >
+                <ShieldAlert size={16} />
+                <span>Report Emergency SOS</span>
+              </Link>
+
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setAuthModal('login');
+                  }}
+                  className="w-full py-2 border border-slate-300 font-semibold text-sm text-slate-700 rounded-xl text-center"
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setAuthModal('register');
+                  }}
+                  className="w-full py-2 bg-blue-600 font-semibold text-sm text-white rounded-xl text-center"
+                >
+                  Register
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Global Search Dialog Modal */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-800 font-bold text-base">
+                <Search size={18} className="text-blue-600" />
+                <span>Search ResQ-Lanka Platform</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSearchOpen(false)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <form onSubmit={handleSearchSubmit} className="p-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search shelters, disaster alerts, districts (e.g. Ampara, Colombo)..."
+                  className="w-full pl-11 pr-24 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800"
+                />
+                <Search size={18} className="absolute left-3.5 top-3.5 text-slate-400" />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-2 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+                >
+                  Search
+                </button>
+              </div>
+
+              <div className="mt-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                  Quick Suggestions
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {['Ampara Central College', 'Kalmunai', 'Heavy Rainfall Warning', 'Earthquake Shelters'].map(
+                    (tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery(tag);
+                        }}
+                        className="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition"
+                      >
+                        {tag}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Auth Modal (Login / Register) */}
+      {authModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden relative">
+            <button
+              type="button"
+              onClick={() => setAuthModal(null)}
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="p-6 sm:p-8">
+              <div className="flex justify-center mb-4">
+                <ResQLogo subtitle="Disaster Relief Network" />
+              </div>
+
+              <h3 className="text-xl font-bold text-center text-slate-900">
+                {authModal === 'login' ? 'Welcome Back' : 'Create an Account'}
+              </h3>
+              <p className="text-xs text-center text-slate-500 mt-1 mb-6">
+                {authModal === 'login'
+                  ? 'Access emergency responder, coordinator, or volunteer tools'
+                  : 'Join Sri Lanka’s unified community disaster response network'}
+              </p>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  alert(`${authModal === 'login' ? 'Login' : 'Registration'} demo action successful!`);
+                  setAuthModal(null);
+                }}
+                className="space-y-4"
+              >
+                {authModal === 'register' && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                    <div className="relative">
+                      <User size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                      <input
+                        type="text"
+                        required
+                        value={authForm.name}
+                        onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                        placeholder="e.g. Kasun Perera"
+                        className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                    <input
+                      type="email"
+                      required
+                      value={authForm.email}
+                      onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                      placeholder="name@example.lk"
+                      className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                  <div className="relative">
+                    <Lock size={16} className="absolute left-3.5 top-3 text-slate-400" />
+                    <input
+                      type="password"
+                      required
+                      value={authForm.password}
+                      onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                      placeholder="••••••••"
+                      className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition shadow-md shadow-blue-500/20 flex items-center justify-center gap-2"
+                >
+                  <span>{authModal === 'login' ? 'Sign In' : 'Create Account'}</span>
+                  <ArrowRight size={16} />
+                </button>
+              </form>
+
+              <div className="mt-5 text-center text-xs text-slate-600">
+                {authModal === 'login' ? (
+                  <span>
+                    Don't have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setAuthModal('register')}
+                      className="text-blue-600 font-bold hover:underline"
+                    >
+                      Register here
+                    </button>
+                  </span>
+                ) : (
+                  <span>
+                    Already registered?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setAuthModal('login')}
+                      className="text-blue-600 font-bold hover:underline"
+                    >
+                      Login here
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
