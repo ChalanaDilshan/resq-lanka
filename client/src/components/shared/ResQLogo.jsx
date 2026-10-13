@@ -1,52 +1,52 @@
-export default function ResQLogo({ className = '' }) {
+export default function ResQLogo({ className = '', subtitle = 'Together for a Safer Sri Lanka' }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {/* ResQ Shield Icon */}
+      {/* ResQ Sri Lanka Map Silhouette + Caring Hands & Heart */}
       <div className="relative w-10 h-10 flex-shrink-0 drop-shadow-sm transition-transform hover:scale-105">
         <svg
-          viewBox="0 0 100 115"
+          viewBox="0 0 100 120"
           className="w-full h-full"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Shield Base */}
+          {/* Sri Lanka Landmass Silhouette */}
           <path
-            d="M50 0C50 0 85 10 96 24C97 48 95 80 50 114C5 80 3 48 4 24C15 10 50 0 50 0Z"
-            fill="url(#shieldGradient)"
+            d="M52 4 C58 7 60 13 58 18 C56 22 53 25 55 30 C58 36 67 44 71 55 C76 68 77 82 72 95 C66 107 53 116 41 116 C30 116 22 108 20 97 C18 84 21 72 26 60 C30 50 33 41 35 31 C36 21 40 12 45 6 C48 2 50 2 52 4 Z"
+            fill="#0f2b5c"
           />
-          {/* Inner Golden Border / Accent */}
+          {/* Sri Lanka subtle outline */}
           <path
-            d="M50 6C50 6 81 15 90 27C91 48 89 75 50 106C11 75 9 48 10 27C19 15 50 6 50 6Z"
-            stroke="#fbbf24"
-            strokeWidth="3"
-            strokeOpacity="0.85"
-            fill="none"
+            d="M52 4 C58 7 60 13 58 18 C56 22 53 25 55 30 C58 36 67 44 71 55 C76 68 77 82 72 95 C66 107 53 116 41 116 C30 116 22 108 20 97 C18 84 21 72 26 60 C30 50 33 41 35 31 C36 21 40 12 45 6 C48 2 50 2 52 4 Z"
+            stroke="#1d4ed8"
+            strokeWidth="1.2"
           />
-          {/* Golden Lion Silhouette / Emblem */}
+
+          {/* Caring Hands cupping the heart */}
           <path
-            d="M50 24C44 24 38 28 36 34C34 40 37 46 35 52C33 58 28 62 30 68C32 74 38 77 44 76C47 80 52 83 58 82C64 81 68 76 68 70C72 68 75 64 74 59C73 54 69 51 68 46C67 40 64 35 59 31C58 26 55 24 50 24ZM48 37C50.2 37 52 38.8 52 41C52 43.2 50.2 45 48 45C45.8 45 44 43.2 44 41C44 38.8 45.8 37 48 37ZM41 55C43.2 55 45 56.8 45 59C45 61.2 43.2 63 41 63C38.8 63 37 61.2 37 59C37 56.8 38.8 55 41 55ZM58 55C60.2 55 62 56.8 62 59C62 61.2 60.2 63 58 63C55.8 63 54 61.2 54 59C54 56.8 55.8 55 58 55Z"
-            fill="#fef08a"
-            fillOpacity="0.95"
+            d="M32 77 C34 83 40 88 47 89 C45 85 44 80 45 74 C42 75 37 76 32 77 Z"
+            fill="#ffffff"
           />
-          {/* Gradients */}
-          <defs>
-            <linearGradient id="shieldGradient" x1="10" y1="5" x2="90" y2="110" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#e11d48" />
-              <stop offset="0.5" stopColor="#dc2626" />
-              <stop offset="1" stopColor="#991b1b" />
-            </linearGradient>
-          </defs>
+          <path
+            d="M60 77 C58 83 52 88 45 89 C47 85 48 80 47 74 C50 75 55 76 60 77 Z"
+            fill="#ffffff"
+          />
+
+          {/* Central Compassionate Red Heart */}
+          <path
+            d="M46 63 C42 59 36 60 35 65 C34 70 38 75 46 82 C54 75 58 70 57 65 C56 60 50 59 46 63 Z"
+            fill="#ef4444"
+          />
         </svg>
       </div>
 
       {/* Typography */}
       <div className="flex flex-col">
         <div className="flex items-center text-xl font-black tracking-tight leading-none">
-          <span className="text-red-600">ResQ</span>
-          <span className="text-slate-900">-Lanka</span>
+          <span className="text-[#0f172a]">ResQ</span>
+          <span className="text-red-600">-Lanka</span>
         </div>
-        <span className="text-[10.5px] font-medium text-slate-500 tracking-tight mt-0.5">
-          Safer Communities, Stronger Sri Lanka
+        <span className="text-[11px] font-medium text-slate-500 tracking-tight mt-1">
+          {subtitle}
         </span>
       </div>
     </div>
