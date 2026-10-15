@@ -3,6 +3,11 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import sosRoutes from './routes/sosRoutes.js';
+<<<<<<< Updated upstream
+=======
+import supplyRoutes from './routes/supplyRoutes.js';
+import shelterRoutes from './routes/shelter.routes.js';
+>>>>>>> Stashed changes
 
 dotenv.config();
 
@@ -20,6 +25,11 @@ app.use(express.json());
 
 // API Routes
 app.use('/api/sos', sosRoutes);
+<<<<<<< Updated upstream
+=======
+app.use('/api/supplies', supplyRoutes);
+app.use('/api/shelters', shelterRoutes);
+>>>>>>> Stashed changes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
