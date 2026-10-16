@@ -1,4 +1,3 @@
-```javascript
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -7,6 +6,7 @@ import dotenv from 'dotenv';
 import sosRoutes from './routes/sosRoutes.js';
 import shelterRoutes from './routes/shelter.routes.js';
 import supplyRoutes from './routes/supplyRoutes.js';
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 
@@ -24,6 +24,7 @@ app.use(
 app.use(express.json());
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/sos', sosRoutes);
 app.use('/api/shelters', shelterRoutes);
 app.use('/api/supplies', supplyRoutes);
@@ -51,4 +52,3 @@ mongoose
   .catch((err) => {
     console.error('MongoDB connection failure:', err.message);
   });
-```
