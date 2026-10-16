@@ -2,7 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import sosRoutes from './routes/sosRoutes.js';
+import shelterRoutes from './routes/shelter.routes.js';
+import supplyRoutes from './routes/supplyRoutes.js';
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 
@@ -16,23 +20,31 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/sos', sosRoutes);
+app.use('/api/shelters', shelterRoutes);
+app.use('/api/supplies', supplyRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ResQ-Lanka API operational' });
+  res.status(200).json({
+    status: 'ResQ-Lanka API operational',
+  });
 });
 
 // Connect MongoDB and Launch Server
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/resq-lanka';
+const MONGO_URI =
+  process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/resq-lanka';
 
 mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB database');
+
     app.listen(PORT, () => {
       console.log(`ResQ-Lanka Server running on port ${PORT}`);
     });
