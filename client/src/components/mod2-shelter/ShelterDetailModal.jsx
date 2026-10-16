@@ -26,10 +26,11 @@ export default function ShelterDetailModal({
 }) {
   if (!shelter) return null;
 
+  const isClosed = shelter.status === 'Closed';
   const current = shelter.capacityCurrent || 0;
   const total = shelter.capacityTotal || 1;
-  const available = Math.max(0, total - current);
-  const percentage = Math.round((current / total) * 100);
+  const available = isClosed ? 0 : Math.max(0, total - current);
+  const percentage = Math.min(100, Math.round((current / total) * 100));
 
   const isFlood = shelter.hazardType === 'flood';
   const isEarthquake = shelter.hazardType === 'earthquake';
@@ -70,8 +71,14 @@ export default function ShelterDetailModal({
               <CheckCircle2 size={14} className="text-emerald-600 fill-emerald-100" />
               <span>Verified Safe Haven</span>
             </span>
-            <span className="text-xs font-bold text-white/90 bg-slate-900/70 px-2.5 py-1 rounded-full backdrop-blur-md">
-              DMC Protocol
+            <span
+              className={`text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-md ${
+                isClosed
+                  ? 'bg-red-500/90 text-white'
+                  : 'bg-slate-900/70 text-white/90'
+              }`}
+            >
+              {isClosed ? 'Facility Closed' : 'DMC Protocol'}
             </span>
           </div>
 
@@ -97,6 +104,17 @@ export default function ShelterDetailModal({
 
         {/* Modal scrollable body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-slate-700">
+          {/* Facility Closed Notice Banner */}
+          {isClosed && (
+            <div className="p-4 bg-slate-100 border border-slate-300 rounded-2xl text-slate-800 text-xs flex items-center gap-3">
+              <Info size={18} className="text-slate-600 shrink-0" />
+              <div>
+                <strong className="block font-bold">Facility Currently Closed</strong>
+                <span>New emergency admissions to this safe haven are suspended by relief coordinators.</span>
+              </div>
+            </div>
+          )}
+
           {/* Real-time Occupancy & Capacity Meter */}
           <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80">
             <div className="flex items-center justify-between mb-2">
@@ -115,7 +133,9 @@ export default function ShelterDetailModal({
             <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className={`h-full ${
-                  percentage >= 100
+                  isClosed
+                    ? 'bg-slate-400'
+                    : percentage >= 100
                     ? 'bg-red-500'
                     : percentage >= 85
                     ? 'bg-amber-500'
@@ -126,9 +146,23 @@ export default function ShelterDetailModal({
             </div>
 
             <div className="flex items-center justify-between mt-2 text-xs font-semibold">
-              <span className="text-slate-500">{percentage}% Occupied</span>
-              <span className={available > 0 ? 'text-emerald-700 font-bold' : 'text-red-600 font-bold'}>
-                {available > 0 ? `${available} spaces available` : 'Full capacity reached'}
+              <span className="text-slate-500">
+                {isClosed ? 'Intake Closed' : `${percentage}% Occupied`}
+              </span>
+              <span
+                className={
+                  isClosed
+                    ? 'text-slate-600 font-bold'
+                    : available > 0
+                    ? 'text-emerald-700 font-bold'
+                    : 'text-red-600 font-bold'
+                }
+              >
+                {isClosed
+                  ? 'Intake Suspended'
+                  : available > 0
+                  ? `${available} spaces available`
+                  : 'Full capacity reached'}
               </span>
             </div>
           </div>

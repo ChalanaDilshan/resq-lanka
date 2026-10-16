@@ -17,20 +17,24 @@ import { timeAgo } from '../../utils/timeAgo';
 export default function OccupancyEditorModal({ shelter, onClose, onSave, coordinatorUser }) {
   const [occupancy, setOccupancy] = useState(shelter.capacityCurrent || 0);
   const [capacity, setCapacity] = useState(shelter.capacityTotal || 100);
+  const [status, setStatus] = useState(shelter.status || 'Available');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const availableSpaces = Math.max(0, capacity - occupancy);
-  const percentage = capacity > 0 ? Math.round((occupancy / capacity) * 100) : 0;
+  const isClosed = status === 'Closed';
+  const availableSpaces = isClosed ? 0 : Math.max(0, capacity - occupancy);
+  const percentage = capacity > 0 ? Math.min(100, Math.round((occupancy / capacity) * 100)) : 0;
 
   const getStatusColor = () => {
+    if (isClosed) return 'text-slate-700 bg-slate-100 border-slate-300';
     if (percentage >= 100) return 'text-red-600 bg-red-50 border-red-200';
     if (percentage >= 85) return 'text-amber-700 bg-amber-50 border-amber-200';
     return 'text-emerald-700 bg-emerald-50 border-emerald-200';
   };
 
   const getProgressBarColor = () => {
+    if (isClosed) return 'bg-slate-400';
     if (percentage >= 100) return 'bg-red-500';
     if (percentage >= 85) return 'bg-amber-500';
     return 'bg-emerald-500';
@@ -48,24 +52,33 @@ export default function OccupancyEditorModal({ shelter, onClose, onSave, coordin
     e.preventDefault();
     setErrorMsg('');
 
-    if (capacity <= 0) {
+    const parsedOcc = parseInt(occupancy, 10);
+    const parsedCap = parseInt(capacity, 10);
+
+    if (isNaN(parsedCap) || parsedCap <= 0) {
       setErrorMsg('Total capacity must be at least 1 person.');
       return;
     }
 
-    if (occupancy < 0) {
+    if (isNaN(parsedOcc) || parsedOcc < 0) {
       setErrorMsg('Occupancy cannot be negative.');
+      return;
+    }
+
+    if (parsedOcc > parsedCap) {
+      setErrorMsg(`Current occupancy (${parsedOcc}) cannot exceed total capacity (${parsedCap}).`);
       return;
     }
 
     try {
       setSaving(true);
       await onSave(shelter._id || shelter.id, {
-        capacityCurrent: parseInt(occupancy, 10),
-        capacityTotal: parseInt(capacity, 10),
+        capacityCurrent: parsedOcc,
+        capacityTotal: parsedCap,
+        status,
         note: note.trim() || undefined,
         updatedBy: coordinatorUser?.name
-          ? `${coordinatorUser.name} (${coordinatorUser.roleLabel || 'Coordinator'})`
+          ? `${coordinatorUser.name} (${coordinatorUser.roleLabel || coordinatorUser.role || 'Administrator'})`
           : 'Authorized Coordinator',
       });
       onClose();
@@ -237,6 +250,26 @@ export default function OccupancyEditorModal({ shelter, onClose, onSave, coordin
             </div>
             <p className="text-[11px] text-slate-500">
               Increase total capacity if relief tents or school annex halls are made operational.
+            </p>
+          </div>
+
+          {/* Operational Status Control */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+              Operational Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-bold text-slate-800"
+            >
+              <option value="Available">Available (Open & accepting evacuees)</option>
+              <option value="Nearly Full">Nearly Full (Occupancy ≥ 85%)</option>
+              <option value="At Capacity">At Capacity (100% full)</option>
+              <option value="Closed">Closed (Intake suspended / facility deactivated)</option>
+            </select>
+            <p className="text-[11px] text-slate-500">
+              Marking as Closed designates the facility as inactive and prevents incoming evacuees.
             </p>
           </div>
 

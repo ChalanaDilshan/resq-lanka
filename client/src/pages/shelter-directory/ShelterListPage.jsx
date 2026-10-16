@@ -30,7 +30,9 @@ import ShelterDetailModal from '../../components/mod2-shelter/ShelterDetailModal
 export default function ShelterListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, activeRole, switchRole } = useAuth();
-  const isCoordinator = activeRole === 'coordinator';
+  const isAuthorizedManager = Boolean(
+    user && ['administrator', 'coordinator'].includes(activeRole || user.role)
+  );
 
   const [shelters, setShelters] = useState([]);
   const [stats, setStats] = useState(null);
@@ -73,7 +75,7 @@ export default function ShelterListPage() {
       setStats(shelterStats);
     } catch (err) {
       console.error('Failed to load shelter directory:', err);
-      setError('Unable to fetch shelter records. Using offline cached data.');
+      setError('Unable to fetch live shelter records from server. Showing cached directory.');
     } finally {
       setLoading(false);
     }
@@ -159,11 +161,15 @@ export default function ShelterListPage() {
 
             {/* Coordinator Actions Banner */}
             <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              {isCoordinator ? (
+              {isAuthorizedManager ? (
                 <>
                   <div className="px-3.5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-bold flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Coordinator Mode Active</span>
+                    <span>
+                      {activeRole === 'administrator' || user?.role === 'administrator'
+                        ? 'Administrator Mode Active'
+                        : 'Coordinator Mode Active'}
+                    </span>
                   </div>
                   <button
                     type="button"
@@ -177,14 +183,14 @@ export default function ShelterListPage() {
               ) : (
                 <div className="p-3 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between gap-3 text-xs">
                   <div className="text-slate-300 text-[11px]">
-                    Are you a shelter administrator?
+                    Are you a shelter coordinator or admin?
                   </div>
                   <button
                     type="button"
-                    onClick={() => switchRole('coordinator')}
+                    onClick={() => switchRole('administrator')}
                     className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition shadow-xs"
                   >
-                    Switch to Coordinator
+                    Switch to Administrator
                   </button>
                 </div>
               )}
@@ -195,6 +201,23 @@ export default function ShelterListPage() {
 
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+        {/* Error Notification Banner */}
+        {error && (
+          <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={16} className="text-amber-600 shrink-0" />
+              <span>{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={loadData}
+              className="px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-xl font-bold text-[11px] transition"
+            >
+              Retry Sync
+            </button>
+          </div>
+        )}
+
         {/* Statistics Banner */}
         <ShelterStatsBanner stats={stats} />
 
@@ -325,10 +348,11 @@ export default function ShelterListPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-700"
               >
-                <option value="all">All Capacities</option>
+                <option value="all">All Capacities & Statuses</option>
                 <option value="Available">Available Spaces Only</option>
                 <option value="Nearly Full">Nearly Full (≥85%)</option>
                 <option value="At Capacity">At Maximum Capacity</option>
+                <option value="Closed">Closed Shelters</option>
               </select>
             </div>
           </div>
@@ -349,7 +373,7 @@ export default function ShelterListPage() {
             </p>
           </div>
 
-          {isCoordinator && (
+          {isAuthorizedManager && (
             <div className="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200 flex items-center gap-1.5">
               <Sliders size={13} />
               <span>You have permissions to update capacities & occupancies</span>
@@ -402,10 +426,10 @@ export default function ShelterListPage() {
               <ShelterCard
                 key={shelter._id || shelter.id}
                 shelter={shelter}
-                isCoordinator={isCoordinator}
+                isCoordinator={isAuthorizedManager}
                 onOpenOccupancyModal={(sh) => setEditingShelter(sh)}
                 onSelectShelter={(sh) => setSelectedShelter(sh)}
-                onSwitchToCoordinator={() => switchRole('coordinator')}
+                onSwitchToCoordinator={() => switchRole('administrator')}
               />
             ))}
           </div>
@@ -428,8 +452,8 @@ export default function ShelterListPage() {
           shelter={selectedShelter}
           onClose={() => setSelectedShelter(null)}
           onOpenOccupancyModal={(sh) => setEditingShelter(sh)}
-          isCoordinator={isCoordinator}
-          onSwitchToCoordinator={() => switchRole('coordinator')}
+          isCoordinator={isAuthorizedManager}
+          onSwitchToCoordinator={() => switchRole('administrator')}
         />
       )}
 

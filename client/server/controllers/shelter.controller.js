@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Shelter from '../models/Shelter.model.js';
 
 // Initial verified shelters matching Sri Lanka disaster relief context
@@ -232,7 +233,8 @@ export const getAllShelters = async (req, res) => {
     }
 
     if (district && district !== 'all') {
-      filter.district = new RegExp(district, 'i');
+      const sanitizedDistrict = district.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.district = new RegExp(sanitizedDistrict, 'i');
     }
 
     if (status && status !== 'all') {
@@ -240,7 +242,7 @@ export const getAllShelters = async (req, res) => {
     }
 
     if (search && search.trim()) {
-      const q = search.trim();
+      const q = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.$or = [
         { name: { $regex: q, $options: 'i' } },
         { address: { $regex: q, $options: 'i' } },
@@ -286,8 +288,9 @@ export const getShelterStats = async (req, res) => {
     const floodShelters = shelters.filter((s) => s.hazardType === 'flood').length;
     const earthquakeShelters = shelters.filter((s) => s.hazardType === 'earthquake').length;
     const nearlyFullCount = shelters.filter(
-      (s) => (s.capacityCurrent / s.capacityTotal) >= 0.85
+      (s) => s.status !== 'Closed' && (s.capacityCurrent / s.capacityTotal) >= 0.85
     ).length;
+    const closedCount = shelters.filter((s) => s.status === 'Closed').length;
 
     res.status(200).json({
       success: true,
@@ -300,6 +303,7 @@ export const getShelterStats = async (req, res) => {
         floodShelters,
         earthquakeShelters,
         nearlyFullCount,
+        closedCount,
       },
     });
   } catch (error) {
@@ -318,7 +322,15 @@ export const getShelterStats = async (req, res) => {
  */
 export const getShelterById = async (req, res) => {
   try {
-    const shelter = await Shelter.findById(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid shelter identifier format',
+      });
+    }
+
+    const shelter = await Shelter.findById(id);
     if (!shelter) {
       return res.status(404).json({
         success: false,
@@ -342,14 +354,22 @@ export const getShelterById = async (req, res) => {
 
 /**
  * PATCH /api/shelters/:id/occupancy
- * Coordinator endpoint to edit shelter capacities and update occupancy numbers
+ * Coordinator / Admin endpoint to edit shelter capacities, occupancies, and operational status
  */
 export const updateShelterOccupancyAndCapacity = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid shelter identifier format',
+      });
+    }
+
     const {
       capacityCurrent,
       capacityTotal,
+      status,
       note,
       updatedBy,
     } = req.body;
@@ -365,6 +385,8 @@ export const updateShelterOccupancyAndCapacity = async (req, res) => {
     const prevOccupancy = shelter.capacityCurrent;
     const prevCapacity = shelter.capacityTotal;
 
+    let targetOccupancy = prevOccupancy;
+    let targetTotal = prevCapacity;
     let hasChange = false;
 
     if (capacityCurrent !== undefined && capacityCurrent !== null) {
@@ -372,10 +394,10 @@ export const updateShelterOccupancyAndCapacity = async (req, res) => {
       if (isNaN(parsedOccupancy) || parsedOccupancy < 0) {
         return res.status(400).json({
           success: false,
-          message: 'Current occupancy must be a valid non-negative number',
+          message: 'Current occupancy must be a valid non-negative integer',
         });
       }
-      shelter.capacityCurrent = parsedOccupancy;
+      targetOccupancy = parsedOccupancy;
       hasChange = true;
     }
 
@@ -384,40 +406,75 @@ export const updateShelterOccupancyAndCapacity = async (req, res) => {
       if (isNaN(parsedCapacity) || parsedCapacity <= 0) {
         return res.status(400).json({
           success: false,
-          message: 'Total capacity must be a positive number greater than 0',
+          message: 'Total capacity must be a positive integer greater than 0',
         });
       }
-      shelter.capacityTotal = parsedCapacity;
+      targetTotal = parsedCapacity;
+      hasChange = true;
+    }
+
+    if (status !== undefined && status !== null && status !== shelter.status) {
+      const allowedStatuses = ['Available', 'Nearly Full', 'At Capacity', 'Closed'];
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status. Must be one of: ${allowedStatuses.join(', ')}`,
+        });
+      }
+      shelter.status = status;
       hasChange = true;
     }
 
     if (!hasChange) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide either capacityCurrent or capacityTotal to update',
+        message: 'Please provide capacityCurrent, capacityTotal, or status to update',
       });
     }
 
-    // Recalculate status
-    const occupancyRatio = shelter.capacityCurrent / shelter.capacityTotal;
-    if (occupancyRatio >= 1.0) {
-      shelter.status = 'At Capacity';
-    } else if (occupancyRatio >= 0.85) {
-      shelter.status = 'Nearly Full';
-    } else {
-      shelter.status = 'Available';
+    // Strict Cross-Field Invariant Enforcement: 0 <= targetOccupancy <= targetTotal
+    if (targetOccupancy > targetTotal) {
+      return res.status(400).json({
+        success: false,
+        message: `Current occupancy (${targetOccupancy}) cannot exceed total capacity (${targetTotal})`,
+      });
     }
 
+    shelter.capacityCurrent = targetOccupancy;
+    shelter.capacityTotal = targetTotal;
+
+    // Operational Status Handling:
+    // If explicitly set to 'Closed' or already 'Closed' and not explicitly changed, preserve 'Closed'
+    if (status === 'Closed') {
+      shelter.status = 'Closed';
+    } else if (!status && shelter.status === 'Closed') {
+      shelter.status = 'Closed';
+    } else {
+      const occupancyRatio = shelter.capacityCurrent / shelter.capacityTotal;
+      if (occupancyRatio >= 1.0) {
+        shelter.status = 'At Capacity';
+      } else if (occupancyRatio >= 0.85) {
+        shelter.status = 'Nearly Full';
+      } else {
+        shelter.status = 'Available';
+      }
+    }
+
+    // Derive actor from authenticated middleware (req.user)
+    const actorName = req.user?.name
+      ? `${req.user.name} (${req.user.role || 'administrator'})`
+      : (updatedBy || 'Authorized Coordinator');
+
     // Create log record
-    const changeDelta = shelter.capacityCurrent - prevOccupancy;
+    const changeDelta = targetOccupancy - prevOccupancy;
     shelter.occupancyHistory.unshift({
       timestamp: new Date(),
       previousOccupancy: prevOccupancy,
-      newOccupancy: shelter.capacityCurrent,
+      newOccupancy: targetOccupancy,
       previousCapacity: prevCapacity,
-      newCapacity: shelter.capacityTotal,
+      newCapacity: targetTotal,
       changeDelta,
-      updatedBy: updatedBy || 'Relief Coordinator',
+      updatedBy: actorName,
       note: note || (changeDelta >= 0 ? `Admitted ${changeDelta} persons` : `Released ${Math.abs(changeDelta)} persons`),
     });
 
@@ -437,7 +494,7 @@ export const updateShelterOccupancyAndCapacity = async (req, res) => {
     console.error('Error updating shelter capacity/occupancy:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update shelter capacity and occupancy',
+      message: error.message || 'Failed to update shelter capacity and occupancy',
       error: error.message,
     });
   }
@@ -463,30 +520,70 @@ export const createShelter = async (req, res) => {
       notes,
     } = req.body;
 
-    if (!name || !hazardType || !capacityTotal || !district || !address) {
+    if (!name || !hazardType || capacityTotal === undefined || !district || !address) {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields: name, hazardType, capacityTotal, district, address',
       });
     }
 
+    const parsedTotal = parseInt(capacityTotal, 10);
+    const parsedCurrent = parseInt(capacityCurrent, 10) || 0;
+
+    if (isNaN(parsedTotal) || parsedTotal <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Total capacity must be a positive integer greater than 0',
+      });
+    }
+
+    if (isNaN(parsedCurrent) || parsedCurrent < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Initial occupancy must be a non-negative integer',
+      });
+    }
+
+    if (parsedCurrent > parsedTotal) {
+      return res.status(400).json({
+        success: false,
+        message: `Initial occupancy (${parsedCurrent}) cannot exceed total capacity (${parsedTotal})`,
+      });
+    }
+
+    const creatorName = req.user?.name
+      ? `${req.user.name} (${req.user.role || 'administrator'})`
+      : (coordinator?.name || 'Authorized Coordinator');
+
     const shelter = new Shelter({
-      name,
+      name: name.trim(),
       hazardType,
-      capacityTotal: parseInt(capacityTotal, 10),
-      capacityCurrent: parseInt(capacityCurrent, 10) || 0,
-      district,
-      address,
+      capacityTotal: parsedTotal,
+      capacityCurrent: parsedCurrent,
+      district: district.trim(),
+      address: address.trim(),
       elevationMeters: elevationMeters ? parseFloat(elevationMeters) : 30,
       clearanceRadiusMeters: clearanceRadiusMeters ? parseFloat(clearanceRadiusMeters) : 75,
       coordinator: coordinator || {
-        name: 'Authorized Relief Coordinator',
+        name: creatorName,
         phone: '+94 11 267 0001',
-        email: 'coordinator@resqlanka.lk',
+        email: req.user?.email || 'coordinator@resqlanka.lk',
       },
       facilities: Array.isArray(facilities) && facilities.length > 0 ? facilities : ['Clean Drinking Water', 'First Aid Station'],
       notes: notes || 'Verified shelter designated under DMC guidelines.',
       isVerified: true,
+      occupancyHistory: [
+        {
+          timestamp: new Date(),
+          previousOccupancy: 0,
+          newOccupancy: parsedCurrent,
+          previousCapacity: parsedTotal,
+          newCapacity: parsedTotal,
+          changeDelta: parsedCurrent,
+          updatedBy: creatorName,
+          note: 'Initial shelter registration and capacity setup.',
+        },
+      ],
     });
 
     const savedShelter = await shelter.save();
@@ -500,7 +597,7 @@ export const createShelter = async (req, res) => {
     console.error('Error creating shelter:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to register new shelter',
+      message: error.message || 'Failed to register new shelter',
       error: error.message,
     });
   }
@@ -512,7 +609,15 @@ export const createShelter = async (req, res) => {
  */
 export const deleteShelter = async (req, res) => {
   try {
-    const deleted = await Shelter.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid shelter identifier format',
+      });
+    }
+
+    const deleted = await Shelter.findByIdAndDelete(id);
     if (!deleted) {
       return res.status(404).json({
         success: false,

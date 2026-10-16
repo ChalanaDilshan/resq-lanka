@@ -381,19 +381,35 @@ export const fetchShelterById = async (id) => {
 /**
  * Update shelter capacity and occupancy (Coordinator Action)
  */
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('resq_jwt_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+/**
+ * Update shelter capacity, occupancy, and status (Coordinator / Admin Action)
+ */
 export const updateShelterOccupancyAndCapacity = async (id, {
   capacityCurrent,
   capacityTotal,
+  status,
   note = '',
-  updatedBy = 'Relief Coordinator',
+  updatedBy = 'Authorized Coordinator',
 }) => {
   try {
-    const response = await axios.patch(`${API_BASE_URL}/${id}/occupancy`, {
-      capacityCurrent,
-      capacityTotal,
-      note,
-      updatedBy,
-    });
+    const response = await axios.patch(
+      `${API_BASE_URL}/${id}/occupancy`,
+      {
+        capacityCurrent,
+        capacityTotal,
+        status,
+        note,
+        updatedBy,
+      },
+      {
+        headers: getAuthHeaders(),
+      }
+    );
     if (response.data?.success && response.data.data) {
       // Update local storage
       const list = getLocalData();
@@ -403,11 +419,15 @@ export const updateShelterOccupancyAndCapacity = async (id, {
       saveLocalData(updated);
       return response.data.data;
     }
-  } catch {
-    // fallback offline edit
+  } catch (error) {
+    // If server responded with validation or auth error, throw honest server message
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    console.warn('Network unreachable, attempting local fallback:', error.message);
   }
 
-  // Update in localStorage
+  // Update in localStorage fallback
   const list = getLocalData();
   const index = list.findIndex((s) => String(s._id) === String(id) || String(s.id) === String(id));
   if (index === -1) throw new Error('Shelter not found');
@@ -416,20 +436,28 @@ export const updateShelterOccupancyAndCapacity = async (id, {
   const prevOcc = target.capacityCurrent;
   const prevCap = target.capacityTotal;
 
-  if (capacityCurrent !== undefined && capacityCurrent !== null) {
-    target.capacityCurrent = Math.max(0, parseInt(capacityCurrent, 10));
-  }
   if (capacityTotal !== undefined && capacityTotal !== null) {
     target.capacityTotal = Math.max(1, parseInt(capacityTotal, 10));
   }
+  if (capacityCurrent !== undefined && capacityCurrent !== null) {
+    target.capacityCurrent = Math.max(0, parseInt(capacityCurrent, 10));
+  }
 
-  const ratio = target.capacityCurrent / target.capacityTotal;
-  if (ratio >= 1.0) {
-    target.status = 'At Capacity';
-  } else if (ratio >= 0.85) {
-    target.status = 'Nearly Full';
-  } else {
-    target.status = 'Available';
+  if (target.capacityCurrent > target.capacityTotal) {
+    throw new Error(`Current occupancy (${target.capacityCurrent}) cannot exceed total capacity (${target.capacityTotal})`);
+  }
+
+  if (status) {
+    target.status = status;
+  } else if (target.status !== 'Closed') {
+    const ratio = target.capacityCurrent / target.capacityTotal;
+    if (ratio >= 1.0) {
+      target.status = 'At Capacity';
+    } else if (ratio >= 0.85) {
+      target.status = 'Nearly Full';
+    } else {
+      target.status = 'Available';
+    }
   }
 
   const delta = target.capacityCurrent - prevOcc;
@@ -456,15 +484,27 @@ export const updateShelterOccupancyAndCapacity = async (id, {
  */
 export const createShelter = async (shelterData) => {
   try {
-    const response = await axios.post(API_BASE_URL, shelterData);
+    const response = await axios.post(API_BASE_URL, shelterData, {
+      headers: getAuthHeaders(),
+    });
     if (response.data?.success && response.data.data) {
       const list = getLocalData();
       list.unshift(response.data.data);
       saveLocalData(list);
       return response.data.data;
     }
-  } catch {
-    // fallback offline add
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    console.warn('Network unreachable, attempting local fallback:', error.message);
+  }
+
+  const parsedTotal = parseInt(shelterData.capacityTotal, 10) || 100;
+  const parsedCurrent = parseInt(shelterData.capacityCurrent, 10) || 0;
+
+  if (parsedCurrent > parsedTotal) {
+    throw new Error(`Initial occupancy (${parsedCurrent}) cannot exceed total capacity (${parsedTotal})`);
   }
 
   const list = getLocalData();
@@ -474,12 +514,12 @@ export const createShelter = async (shelterData) => {
     isVerified: true,
     verificationAgency: 'Disaster Management Centre (DMC) Sri Lanka',
     verifiedDate: new Date().toISOString(),
-    capacityTotal: parseInt(shelterData.capacityTotal, 10) || 100,
-    capacityCurrent: parseInt(shelterData.capacityCurrent, 10) || 0,
+    capacityTotal: parsedTotal,
+    capacityCurrent: parsedCurrent,
     status:
-      (parseInt(shelterData.capacityCurrent, 10) || 0) >= (parseInt(shelterData.capacityTotal, 10) || 100)
+      parsedCurrent >= parsedTotal
         ? 'At Capacity'
-        : (parseInt(shelterData.capacityCurrent, 10) || 0) / (parseInt(shelterData.capacityTotal, 10) || 100) >= 0.85
+        : parsedCurrent / parsedTotal >= 0.85
         ? 'Nearly Full'
         : 'Available',
     hazardCategoryLabel:
@@ -494,10 +534,10 @@ export const createShelter = async (shelterData) => {
         id: `log-${Date.now()}`,
         timestamp: new Date().toISOString(),
         previousOccupancy: 0,
-        newOccupancy: parseInt(shelterData.capacityCurrent, 10) || 0,
-        previousCapacity: parseInt(shelterData.capacityTotal, 10) || 100,
-        newCapacity: parseInt(shelterData.capacityTotal, 10) || 100,
-        changeDelta: parseInt(shelterData.capacityCurrent, 10) || 0,
+        newOccupancy: parsedCurrent,
+        previousCapacity: parsedTotal,
+        newCapacity: parsedTotal,
+        changeDelta: parsedCurrent,
         updatedBy: shelterData.coordinator?.name || 'Authorized Coordinator',
         note: 'Initial shelter registration and capacity setup.',
       },
@@ -507,4 +547,33 @@ export const createShelter = async (shelterData) => {
   list.unshift(newShelter);
   saveLocalData(list);
   return newShelter;
+};
+
+/**
+ * Delete a shelter (Coordinator / Admin)
+ */
+export const deleteShelter = async (id) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    if (response.data?.success) {
+      const list = getLocalData().filter(
+        (s) => String(s._id) !== String(id) && String(s.id) !== String(id)
+      );
+      saveLocalData(list);
+      return true;
+    }
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    console.warn('Network unreachable, deleting from local cache:', error.message);
+  }
+
+  const list = getLocalData().filter(
+    (s) => String(s._id) !== String(id) && String(s.id) !== String(id)
+  );
+  saveLocalData(list);
+  return true;
 };
