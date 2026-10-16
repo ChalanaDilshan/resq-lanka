@@ -10,6 +10,7 @@ import SupplyBoardPage from './pages/supply-board/SupplyBoardPage';
 
 import SOSRequestForm from './pages/sos-reporting/SOSRequestForm';
 import SOSDashboard from './pages/sos-reporting/SOSDashboard';
+import ProtectedRoute from './components/shared/ProtectedRoute';
 
 function App() {
   return (
@@ -36,7 +37,14 @@ function App() {
               {/* Module 3: Relief Supplies & Donor Pledges */}
               <Route path="/supplies" element={<SupplyBoardPage />} />
               <Route path="/donate" element={<SupplyBoardPage />} />
-              <Route path="/coordinator" element={<SupplyBoardPage />} />
+              <Route
+                path="/coordinator"
+                element={
+                  <ProtectedRoute allowedRoles={['administrator', 'coordinator']}>
+                    <SupplyBoardPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Module 1: SOS Reporting */}
               <Route path="/sos" element={<SOSRequestForm />} />

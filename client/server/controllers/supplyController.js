@@ -306,7 +306,27 @@ export const getAllPledges = async (req, res) => {
     if (status && status !== 'All') query.status = status;
 
     const pledges = await DonorPledge.find(query).sort({ createdAt: -1 });
-    res.status(200).json(pledges);
+
+    const isAdmin =
+      req.user &&
+      ['administrator', 'coordinator'].includes(req.user.role);
+
+    // If caller is administrator, return full pledge records with contact details
+    if (isAdmin) {
+      return res.status(200).json(pledges);
+    }
+
+    // Public / non-admin safe view: mask sensitive donor contact details
+    const safePledges = pledges.map((p) => {
+      const obj = p.toObject();
+      return {
+        ...obj,
+        donorEmail: obj.donorEmail ? '***@***.***' : '',
+        donorPhone: obj.donorPhone ? '***-***-****' : '',
+      };
+    });
+
+    res.status(200).json(safePledges);
   } catch (error) {
     res.status(500).json({
       message: 'Failed to retrieve donor pledges',

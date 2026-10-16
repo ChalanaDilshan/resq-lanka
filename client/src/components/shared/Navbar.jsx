@@ -68,7 +68,7 @@ export default function Navbar() {
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
-  const roleOptions = ['citizen', 'volunteer', 'coordinator'];
+  const roleOptions = ['citizen', 'volunteer', 'administrator'];
 
   return (
     <>
@@ -131,7 +131,7 @@ export default function Navbar() {
                 >
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs ${
-                      activeRole === 'coordinator'
+                      activeRole === 'coordinator' || activeRole === 'administrator'
                         ? 'bg-emerald-600 text-white'
                         : activeRole === 'volunteer'
                         ? 'bg-amber-500 text-white'
@@ -145,7 +145,7 @@ export default function Navbar() {
                       {user?.name || 'User'}
                     </div>
                     <div className="text-[10px] font-semibold text-slate-400 capitalize">
-                      {activeRole} Role
+                      {activeRole === 'administrator' ? 'Admin' : activeRole} Role
                     </div>
                   </div>
                   <ChevronDown size={14} className="text-slate-400" />
@@ -180,7 +180,7 @@ export default function Navbar() {
                         <PackageCheck size={15} className="text-blue-600" />
                         <span>Supply &amp; Donation Board</span>
                       </Link>
-                      {activeRole === 'coordinator' && (
+                      {(activeRole === 'coordinator' || activeRole === 'administrator') && (
                         <Link
                           to="/coordinator"
                           onClick={() => setUserDropdownOpen(false)}
@@ -249,7 +249,7 @@ export default function Navbar() {
                   Login
                 </Link>
                 <Link
-                  to="/login"
+                  to="/register"
                   className="px-4 py-2 text-[14px] font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-sm hover:shadow"
                 >
                   Register
