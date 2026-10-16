@@ -18,12 +18,20 @@ export default function ShelterCard({
   isCoordinator,
   onSwitchToCoordinator,
 }) {
+  const isClosed = shelter.status === 'Closed';
   const current = shelter.capacityCurrent || 0;
   const total = shelter.capacityTotal || 1;
-  const available = Math.max(0, total - current);
-  const percentage = Math.round((current / total) * 100);
+  const available = isClosed ? 0 : Math.max(0, total - current);
+  const percentage = Math.min(100, Math.round((current / total) * 100));
 
   const getStatusBadge = () => {
+    if (isClosed) {
+      return {
+        label: 'Shelter Closed',
+        classes: 'bg-slate-500/10 text-slate-800 border-slate-300',
+        dot: 'bg-slate-500',
+      };
+    }
     if (percentage >= 100) {
       return {
         label: 'At Maximum Capacity',
@@ -46,6 +54,7 @@ export default function ShelterCard({
   };
 
   const getProgressColor = () => {
+    if (isClosed) return 'bg-slate-400';
     if (percentage >= 100) return 'bg-red-500';
     if (percentage >= 85) return 'bg-amber-500';
     return 'bg-emerald-500';
@@ -142,9 +151,23 @@ export default function ShelterCard({
           </div>
 
           <div className="flex items-center justify-between text-[11px] mt-2 font-semibold">
-            <span className="text-slate-500">{percentage}% Occupied</span>
-            <span className={available > 0 ? 'text-emerald-700 font-bold' : 'text-red-600 font-bold'}>
-              {available > 0 ? `${available} spaces free` : 'No spaces free'}
+            <span className="text-slate-500">
+              {isClosed ? 'Facility Closed' : `${percentage}% Occupied`}
+            </span>
+            <span
+              className={
+                isClosed
+                  ? 'text-slate-600 font-bold'
+                  : available > 0
+                  ? 'text-emerald-700 font-bold'
+                  : 'text-red-600 font-bold'
+              }
+            >
+              {isClosed
+                ? 'Intake Suspended'
+                : available > 0
+                ? `${available} spaces free`
+                : 'No spaces free'}
             </span>
           </div>
         </div>

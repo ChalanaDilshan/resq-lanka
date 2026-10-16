@@ -140,27 +140,48 @@ shelterSchema.virtual('occupancyPercentage').get(function () {
   return Math.round((this.capacityCurrent / this.capacityTotal) * 100);
 });
 
-// Compute status automatically before saving
-shelterSchema.pre('save', function (next) {
+// Cross-field capacity validation hook
+shelterSchema.pre('validate', function () {
+  if (typeof this.capacityTotal === 'number' && this.capacityTotal < 1) {
+    throw new Error('Total capacity must be at least 1 person');
+  }
+  if (typeof this.capacityCurrent === 'number' && this.capacityCurrent < 0) {
+    throw new Error('Current occupancy cannot be negative');
+  }
+  if (
+    typeof this.capacityCurrent === 'number' &&
+    typeof this.capacityTotal === 'number' &&
+    this.capacityCurrent > this.capacityTotal
+  ) {
+    throw new Error(`Current occupancy (${this.capacityCurrent}) cannot exceed total capacity (${this.capacityTotal})`);
+  }
+});
+
+// Compute status automatically before saving (preserving explicit 'Closed' status)
+shelterSchema.pre('save', function () {
   if (this.hazardType === 'flood') {
     this.hazardCategoryLabel = 'High-Ground Facilities (Floods)';
   } else if (this.hazardType === 'earthquake') {
     this.hazardCategoryLabel = 'Open Assembly Grounds (Earthquakes)';
   } else if (this.hazardType === 'cyclone') {
     this.hazardCategoryLabel = 'Reinforced Cyclone Haven';
+  } else if (this.hazardType === 'landslide') {
+    this.hazardCategoryLabel = 'Stable Ground Shelter (Landslides)';
   } else {
     this.hazardCategoryLabel = 'Multi-Hazard Emergency Shelter';
   }
 
-  const percentage = (this.capacityCurrent / this.capacityTotal) * 100;
-  if (percentage >= 100) {
-    this.status = 'At Capacity';
-  } else if (percentage >= 85) {
-    this.status = 'Nearly Full';
-  } else {
-    this.status = 'Available';
+  // Preserve Closed status: an explicitly closed shelter must not be reopened by occupancy calculation
+  if (this.status !== 'Closed') {
+    const percentage = (this.capacityCurrent / this.capacityTotal) * 100;
+    if (percentage >= 100) {
+      this.status = 'At Capacity';
+    } else if (percentage >= 85) {
+      this.status = 'Nearly Full';
+    } else {
+      this.status = 'Available';
+    }
   }
-  next();
 });
 
 shelterSchema.set('toJSON', { virtuals: true });

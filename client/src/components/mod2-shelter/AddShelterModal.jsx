@@ -79,8 +79,21 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
       return;
     }
 
-    if (formData.capacityTotal <= 0) {
-      setErrorMsg('Total capacity must be greater than zero.');
+    const parsedTotal = parseInt(formData.capacityTotal, 10);
+    const parsedCurrent = parseInt(formData.capacityCurrent, 10) || 0;
+
+    if (isNaN(parsedTotal) || parsedTotal <= 0) {
+      setErrorMsg('Total capacity must be a positive number greater than zero.');
+      return;
+    }
+
+    if (isNaN(parsedCurrent) || parsedCurrent < 0) {
+      setErrorMsg('Initial occupancy cannot be negative.');
+      return;
+    }
+
+    if (parsedCurrent > parsedTotal) {
+      setErrorMsg(`Initial occupancy (${parsedCurrent}) cannot exceed total capacity (${parsedTotal}).`);
       return;
     }
 
@@ -93,8 +106,8 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
           formData.hazardType === 'flood'
             ? 'High-Ground Facilities (Floods)'
             : 'Open Assembly Grounds (Earthquakes)',
-        capacityTotal: parseInt(formData.capacityTotal, 10),
-        capacityCurrent: parseInt(formData.capacityCurrent, 10) || 0,
+        capacityTotal: parsedTotal,
+        capacityCurrent: parsedCurrent,
         district: formData.district,
         address: formData.address.trim(),
         elevationMeters:
