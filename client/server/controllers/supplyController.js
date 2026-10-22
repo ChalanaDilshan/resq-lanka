@@ -112,6 +112,7 @@ const defaultSupplies = [
 const ensureSeedData = async () => {
   try {
     const count = await SupplyItem.countDocuments();
+
     if (count === 0) {
       await SupplyItem.insertMany(defaultSupplies);
       console.log('Seeded default disaster relief supply items');
@@ -132,17 +133,22 @@ export const getSupplyItems = async (req, res) => {
     if (category && category !== 'All') {
       query.category = category;
     }
+
     if (urgency && urgency !== 'All') {
       query.urgency = urgency;
     }
+
     if (status && status !== 'All') {
       query.status = status;
     }
+
     if (district && district !== 'All') {
       query.district = district;
     }
+
     if (search && search.trim() !== '') {
       const searchRegex = new RegExp(search.trim(), 'i');
+
       query.$or = [
         { itemName: searchRegex },
         { shelterLocation: searchRegex },
@@ -154,9 +160,9 @@ export const getSupplyItems = async (req, res) => {
       createdAt: -1,
     });
 
-    res.status(200).json(items);
+    return res.status(200).json(items);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to retrieve supply items',
       error: error.message,
@@ -189,17 +195,24 @@ export const createSupplyItem = async (req, res) => {
     }
 
     const parsedTarget = Number(targetQuantity);
-    if (isNaN(parsedTarget) || parsedTarget < 1 || !Number.isInteger(parsedTarget)) {
+
+    if (
+      isNaN(parsedTarget) ||
+      parsedTarget < 1 ||
+      !Number.isInteger(parsedTarget)
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Target quantity must be a positive whole integer greater than zero.',
+        message:
+          'Target quantity must be a positive whole integer greater than zero.',
       });
     }
 
     if (parsedTarget > 1000000) {
       return res.status(400).json({
         success: false,
-        message: 'Target quantity exceeds the maximum allowable limit of 1,000,000.',
+        message:
+          'Target quantity exceeds the maximum allowable limit of 1,000,000.',
       });
     }
 
@@ -220,6 +233,7 @@ export const createSupplyItem = async (req, res) => {
       'Clothing',
       'Other',
     ];
+
     if (category && !allowedCategories.includes(category)) {
       return res.status(400).json({
         success: false,
@@ -227,7 +241,16 @@ export const createSupplyItem = async (req, res) => {
       });
     }
 
-    const allowedUnits = ['bottles', 'packs', 'kg', 'boxes', 'sets', 'liters', 'units'];
+    const allowedUnits = [
+      'bottles',
+      'packs',
+      'kg',
+      'boxes',
+      'sets',
+      'liters',
+      'units',
+    ];
+
     if (unit && !allowedUnits.includes(unit)) {
       return res.status(400).json({
         success: false,
@@ -236,6 +259,7 @@ export const createSupplyItem = async (req, res) => {
     }
 
     const allowedUrgencies = ['Immediate', 'High', 'Medium', 'Low'];
+
     if (urgency && !allowedUrgencies.includes(urgency)) {
       return res.status(400).json({
         success: false,
@@ -245,9 +269,14 @@ export const createSupplyItem = async (req, res) => {
 
     // Determine coordinator name from session if available
     const effectiveCoordinator =
-      req.user?.name || coordinatorName?.trim() || 'Shelter Relief Coordinator';
+      req.user?.name ||
+      coordinatorName?.trim() ||
+      'Shelter Relief Coordinator';
+
     const effectiveContact =
-      coordinatorContact?.trim() || req.user?.email || '+94 11 000 0000';
+      coordinatorContact?.trim() ||
+      req.user?.email ||
+      '+94 11 000 0000';
 
     const newItem = new SupplyItem({
       itemName: itemName.trim(),
@@ -262,16 +291,19 @@ export const createSupplyItem = async (req, res) => {
       district: district?.trim() || 'Ampara',
       coordinatorName: effectiveCoordinator,
       coordinatorContact: effectiveContact,
-      dropOffLocation: dropOffLocation?.trim() || 'Shelter reception / relief storage facility',
+      dropOffLocation:
+        dropOffLocation?.trim() ||
+        'Shelter reception / relief storage facility',
       status: 'Open',
       notes: notes?.trim() || '',
       createdBy: req.user?._id || null,
     });
 
     const savedItem = await newItem.save();
-    res.status(201).json(savedItem);
+
+    return res.status(201).json(savedItem);
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: 'Failed to create supply item',
       error: error.message,
@@ -279,10 +311,11 @@ export const createSupplyItem = async (req, res) => {
   }
 };
 
-// POST /api/supplies/:id/pledge - Implement donor pledge with atomic validation and duplicate prevention
+// POST /api/supplies/:id/pledge - Create a donor pledge
 export const makeDonorPledge = async (req, res) => {
   try {
     const { id } = req.params;
+
     const {
       donorName,
       donorEmail,
@@ -315,6 +348,7 @@ export const makeDonorPledge = async (req, res) => {
     }
 
     const emailRegex = /^\S+@\S+\.\S+$/;
+
     if (!emailRegex.test(donorEmail.trim())) {
       return res.status(400).json({
         success: false,
@@ -330,7 +364,12 @@ export const makeDonorPledge = async (req, res) => {
     }
 
     const pledgeAmount = Number(pledgedQuantity);
-    if (isNaN(pledgeAmount) || pledgeAmount <= 0 || !Number.isInteger(pledgeAmount)) {
+
+    if (
+      isNaN(pledgeAmount) ||
+      pledgeAmount <= 0 ||
+      !Number.isInteger(pledgeAmount)
+    ) {
       return res.status(400).json({
         success: false,
         message: 'Pledged quantity must be a positive whole integer.',
@@ -339,6 +378,7 @@ export const makeDonorPledge = async (req, res) => {
 
     // Find the supply item
     const item = await SupplyItem.findById(id);
+
     if (!item) {
       return res.status(404).json({
         success: false,
@@ -350,7 +390,8 @@ export const makeDonorPledge = async (req, res) => {
     if (item.remainingQuantity <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'This supply item is already fully pledged! Thank you for your support.',
+        message:
+          'This supply item is already fully pledged! Thank you for your support.',
       });
     }
 
@@ -361,9 +402,10 @@ export const makeDonorPledge = async (req, res) => {
       });
     }
 
-    // Duplicate submission mitigation: check for identical pledge in the last 15 seconds
+    // Prevent identical submissions within 15 seconds
     const normalizedEmail = donorEmail.trim().toLowerCase();
     const fifteenSecondsAgo = new Date(Date.now() - 15000);
+
     const recentDuplicate = await DonorPledge.findOne({
       supplyItemId: item._id,
       donorEmail: normalizedEmail,
@@ -374,16 +416,22 @@ export const makeDonorPledge = async (req, res) => {
     if (recentDuplicate) {
       return res.status(409).json({
         success: false,
-        message: 'A duplicate pledge with identical details was recently recorded. Please wait before pledging again.',
+        message:
+          'A duplicate pledge with identical details was recently recorded. Please wait before pledging again.',
         pledge: recentDuplicate,
       });
     }
 
     // Increment pledged quantity and recalculate remaining
     item.pledgedQuantity += pledgeAmount;
-    item.remainingQuantity = Math.max(0, item.targetQuantity - item.pledgedQuantity);
+
+    item.remainingQuantity = Math.max(
+      0,
+      item.targetQuantity - item.pledgedQuantity
+    );
 
     const received = item.receivedQuantity || 0;
+
     if (received >= item.targetQuantity) {
       item.status = 'Fulfilled';
     } else if (item.pledgedQuantity >= item.targetQuantity) {
@@ -406,21 +454,23 @@ export const makeDonorPledge = async (req, res) => {
       unit: item.unit,
       deliveryMethod: deliveryMethod || 'Direct Drop-off',
       estimatedDeliveryDate:
-        estimatedDeliveryDate || new Date(Date.now() + 24 * 60 * 60 * 1000),
+        estimatedDeliveryDate ||
+        new Date(Date.now() + 24 * 60 * 60 * 1000),
       status: 'Pledged',
       donorNotes: donorNotes?.trim() || '',
     });
 
     const savedPledge = await pledge.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      message: 'Pledge successfully recorded! Thank you for supporting affected communities.',
+      message:
+        'Pledge successfully recorded! Thank you for supporting affected communities.',
       supplyItem: item,
       pledge: savedPledge,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to record donor pledge',
       error: error.message,
@@ -428,7 +478,7 @@ export const makeDonorPledge = async (req, res) => {
   }
 };
 
-// GET /api/supplies/pledges - List donor pledges with role-based privacy masking
+// GET /api/supplies/pledges - List donor pledges with privacy masking
 export const getAllPledges = async (req, res) => {
   try {
     const { supplyItemId, status } = req.query;
@@ -437,35 +487,39 @@ export const getAllPledges = async (req, res) => {
     if (supplyItemId && mongoose.Types.ObjectId.isValid(supplyItemId)) {
       query.supplyItemId = supplyItemId;
     }
+
     if (status && status !== 'All') {
       query.status = status;
     }
 
-    const pledges = await DonorPledge.find(query).sort({ createdAt: -1 });
+    const pledges = await DonorPledge.find(query).sort({
+      createdAt: -1,
+    });
 
     const isAdmin =
       req.user &&
       ['administrator', 'coordinator'].includes(req.user.role);
 
-    // If caller is administrator, return full pledge records with contact details and audit info
+    // Administrators and coordinators can view full pledge records
     if (isAdmin) {
       return res.status(200).json(pledges);
     }
 
-    // Public / non-admin safe view: mask sensitive donor contact details to protect donor privacy
+    // Hide sensitive donor details from public users
     const safePledges = pledges.map((p) => {
       const obj = p.toObject();
+
       return {
         ...obj,
         donorEmail: obj.donorEmail ? '***@***.***' : '',
         donorPhone: obj.donorPhone ? '***-***-****' : '',
-        donorNotes: undefined, // Hide internal/private notes from public view
+        donorNotes: undefined,
       };
     });
 
-    res.status(200).json(safePledges);
+    return res.status(200).json(safePledges);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to retrieve donor pledges',
       error: error.message,
@@ -473,7 +527,8 @@ export const getAllPledges = async (req, res) => {
   }
 };
 
-// PATCH /api/supplies/pledges/:pledgeId/status - Verified status transitions and physical stock receipt
+// PATCH /api/supplies/pledges/:pledgeId/status
+// Update pledge status and received stock
 export const updatePledgeStatus = async (req, res) => {
   try {
     const { pledgeId } = req.params;
@@ -486,7 +541,13 @@ export const updatePledgeStatus = async (req, res) => {
       });
     }
 
-    const allowedStatuses = ['Pledged', 'In Transit', 'Received & Verified', 'Cancelled'];
+    const allowedStatuses = [
+      'Pledged',
+      'In Transit',
+      'Received & Verified',
+      'Cancelled',
+    ];
+
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -495,6 +556,7 @@ export const updatePledgeStatus = async (req, res) => {
     }
 
     const pledge = await DonorPledge.findById(pledgeId);
+
     if (!pledge) {
       return res.status(404).json({
         success: false,
@@ -509,172 +571,6 @@ export const updatePledgeStatus = async (req, res) => {
       return res.status(200).json(pledge);
     }
 
-    // Validate lifecycle transitions
-    // Disallow arbitrary reactivation of a cancelled pledge directly into received
-    if (oldStatus === 'Cancelled' && status === 'Received & Verified') {
-      return res.status(400).json({
-        success: false,
-        message: 'A cancelled pledge cannot be moved directly to Received & Verified. Reinstate to Pledged first.',
-      });
-    }
-
-    const item = await SupplyItem.findById(pledge.supplyItemId);
-
-    // Adjust SupplyItem quantities based on transition
-    if (item) {
-      // 1. Transitioning to Cancelled: revert pledged and received quantities
-      if (status === 'Cancelled') {
-        if (oldStatus === 'Received & Verified') {
-          item.receivedQuantity = Math.max(0, (item.receivedQuantity || 0) - pledge.pledgedQuantity);
-        }
-        item.pledgedQuantity = Math.max(0, item.pledgedQuantity - pledge.pledgedQuantity);
-        item.remainingQuantity = Math.max(0, item.targetQuantity - item.pledgedQuantity);
-      }
-
-      // 2. Transitioning from Cancelled back to active
-      else if (oldStatus === 'Cancelled') {
-        item.pledgedQuantity = (item.pledgedQuantity || 0) + pledge.pledgedQuantity;
-        item.remainingQuantity = Math.max(0, item.targetQuantity - item.pledgedQuantity);
-        if (status === 'Received & Verified') {
-          item.receivedQuantity = (item.receivedQuantity || 0) + pledge.pledgedQuantity;
-        }
-      }
-
-      // 3. Transitioning to Received & Verified from an active status
-      else if (status === 'Received & Verified' && oldStatus !== 'Received & Verified') {
-        item.receivedQuantity = (item.receivedQuantity || 0) + pledge.pledgedQuantity;
-      }
-
-      // 4. Transitioning away from Received & Verified to another active status (reversal)
-      else if (oldStatus === 'Received & Verified' && status !== 'Received & Verified') {
-        item.receivedQuantity = Math.max(0, (item.receivedQuantity || 0) - pledge.pledgedQuantity);
-      }
-
-      // Recalculate item status
-      const received = item.receivedQuantity || 0;
-      if (received >= item.targetQuantity) {
-        item.status = 'Fulfilled';
-      } else if (item.pledgedQuantity >= item.targetQuantity) {
-        item.status = 'Fully Pledged';
-      } else if (item.pledgedQuantity > 0) {
-        item.status = 'Partially Pledged';
-      } else {
-        item.status = 'Open';
-      }
-
-      await item.save();
-    }
-
-    // Update pledge record
-    pledge.status = status;
-    if (status === 'Received & Verified') {
-      pledge.verifiedBy = req.user?.name || req.user?.email || 'Authorized Administrator';
-      pledge.verifiedAt = new Date();
-    } else if (oldStatus === 'Received & Verified') {
-      pledge.verifiedBy = null;
-      pledge.verifiedAt = null;
-    }
-
-    const updatedPledge = await pledge.save();
-
-    res.status(200).json({
-      success: true,
-      pledge: updatedPledge,
-      supplyItem: item,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update pledge status',
-      error: error.message,
-    });
-  }
-};
-
-// DELETE /api/supplies/:id - Coordinator/Administrator deletes a supply item
-export const deleteSupplyItem = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid supply item ID format.',
-      });
-    }
-
-    const deleted = await SupplyItem.findByIdAndDelete(id);
-    if (!deleted) {
-      return res.status(404).json({
-        success: false,
-        message: 'Supply item not found.',
-      });
-    }
-
-    // Clean up associated pledges
-    await DonorPledge.deleteMany({ supplyItemId: id });
-
-    res.status(200).json({
-      success: true,
-      message: 'Supply item and associated pledges removed successfully.',
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete supply item',
-      error: error.message,
-    });
-  }
-};
-
-// GET /api/supplies/stats - Metrics overview distinguishing pledged from physically received stock
-export const getSupplyStats = async (req, res) => {
-  try {
-    await ensureSeedData();
-
-    const totalRequests = await SupplyItem.countDocuments();
-    const fulfilledRequests = await SupplyItem.countDocuments({ status: 'Fulfilled' });
-    const fullyPledgedRequests = await SupplyItem.countDocuments({ status: 'Fully Pledged' });
-    const pledgesCount = await DonorPledge.countDocuments({ status: { $ne: 'Cancelled' } });
-
-    const items = await SupplyItem.find();
-    let totalTargetUnits = 0;
-    let totalPledgedUnits = 0;
-    let totalReceivedUnits = 0;
-
-    items.forEach((item) => {
-      totalTargetUnits += item.targetQuantity || 0;
-      totalPledgedUnits += item.pledgedQuantity || 0;
-      totalReceivedUnits += item.receivedQuantity || 0;
-    });
-
-    const percentPledged =
-      totalTargetUnits > 0
-        ? Math.min(100, Math.round((totalPledgedUnits / totalTargetUnits) * 100))
-        : 0;
-
-    const percentFulfilled =
-      totalTargetUnits > 0
-        ? Math.min(100, Math.round((totalReceivedUnits / totalTargetUnits) * 100))
-        : 0;
-
-    res.status(200).json({
-      totalRequests,
-      fulfilledRequests,
-      fullyPledgedRequests,
-      pledgesCount,
-      totalTargetUnits,
-      totalPledgedUnits,
-      totalReceivedUnits,
-      percentPledged,
-      percentFulfilled,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve supply stats',
-      error: error.message,
-    });
-  }
-};
-
+    // A cancelled pledge cannot move directly to received
+    if (
+      oldStatus === 'Cancelled
