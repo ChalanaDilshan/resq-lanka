@@ -6,6 +6,7 @@ const supplyItemSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Item name is required'],
       trim: true,
+      maxlength: [200, 'Item name cannot exceed 200 characters'],
     },
     category: {
       type: String,
@@ -31,17 +32,23 @@ const supplyItemSchema = new mongoose.Schema(
     targetQuantity: {
       type: Number,
       required: [true, 'Target quantity is required'],
-      min: [1, 'Quantity must be at least 1'],
+      min: [1, 'Target quantity must be at least 1'],
+      max: [1000000, 'Target quantity exceeds maximum allowed bound of 1,000,000'],
     },
     pledgedQuantity: {
       type: Number,
       default: 0,
-      min: 0,
+      min: [0, 'Pledged quantity cannot be negative'],
+    },
+    receivedQuantity: {
+      type: Number,
+      default: 0,
+      min: [0, 'Received quantity cannot be negative'],
     },
     remainingQuantity: {
       type: Number,
       required: true,
-      min: 0,
+      min: [0, 'Remaining quantity cannot be negative'],
     },
     unit: {
       type: String,
@@ -53,6 +60,7 @@ const supplyItemSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Shelter / delivery location is required'],
       trim: true,
+      maxlength: [250, 'Location cannot exceed 250 characters'],
     },
     district: {
       type: String,
@@ -77,12 +85,18 @@ const supplyItemSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Open', 'Partially Pledged', 'Fulfilled'],
+      enum: ['Open', 'Partially Pledged', 'Fully Pledged', 'Fulfilled'],
       default: 'Open',
     },
     notes: {
       type: String,
       trim: true,
+      maxlength: [1000, 'Notes cannot exceed 1000 characters'],
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
   },
   {
@@ -90,12 +104,22 @@ const supplyItemSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save hook: ensure remainingQuantity = targetQuantity - pledgedQuantity
+// Indexes for high-frequency queries
+supplyItemSchema.index({ category: 1, urgency: 1, status: 1 });
+supplyItemSchema.index({ district: 1 });
+supplyItemSchema.index({ createdAt: -1 });
+
+// Pre-validate hook: calculate remaining quantity and set status based on actual receipts vs pledges
 supplyItemSchema.pre('validate', function () {
   if (this.targetQuantity !== undefined && this.pledgedQuantity !== undefined) {
     this.remainingQuantity = Math.max(0, this.targetQuantity - this.pledgedQuantity);
-    if (this.remainingQuantity === 0) {
+    const received = this.receivedQuantity || 0;
+    
+    // Status reflects physical fulfillment when stock arrives, or pledge status beforehand
+    if (received >= this.targetQuantity) {
       this.status = 'Fulfilled';
+    } else if (this.pledgedQuantity >= this.targetQuantity) {
+      this.status = 'Fully Pledged';
     } else if (this.pledgedQuantity > 0) {
       this.status = 'Partially Pledged';
     } else {
