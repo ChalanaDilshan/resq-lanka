@@ -1,6 +1,13 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_SUPPLY_URL || 'http://localhost:5000/api/supplies';
+const TOKEN_KEY = 'resq_jwt_token';
+
+// Helper to get authenticated header for privileged actions
+const getAuthHeaders = () => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 // Initial fallback mock data matching Sri Lanka disaster context
 const fallbackSupplies = [
@@ -11,6 +18,7 @@ const fallbackSupplies = [
     urgency: 'Immediate',
     targetQuantity: 500,
     pledgedQuantity: 260,
+    receivedQuantity: 0,
     remainingQuantity: 240,
     unit: 'bottles',
     shelterLocation: 'Ampara Central College Relief Center',
@@ -29,6 +37,7 @@ const fallbackSupplies = [
     urgency: 'Immediate',
     targetQuantity: 350,
     pledgedQuantity: 140,
+    receivedQuantity: 0,
     remainingQuantity: 210,
     unit: 'packs',
     shelterLocation: 'Akkaraipattu Public Ground Staging Area',
@@ -47,6 +56,7 @@ const fallbackSupplies = [
     urgency: 'Immediate',
     targetQuantity: 150,
     pledgedQuantity: 45,
+    receivedQuantity: 0,
     remainingQuantity: 105,
     unit: 'packs',
     shelterLocation: 'Kalmunai National School High-Ground Shelter',
@@ -65,6 +75,7 @@ const fallbackSupplies = [
     urgency: 'High',
     targetQuantity: 250,
     pledgedQuantity: 100,
+    receivedQuantity: 0,
     remainingQuantity: 150,
     unit: 'sets',
     shelterLocation: 'Ampara Central College Relief Center',
@@ -83,6 +94,7 @@ const fallbackSupplies = [
     urgency: 'High',
     targetQuantity: 200,
     pledgedQuantity: 200,
+    receivedQuantity: 0,
     remainingQuantity: 0,
     unit: 'boxes',
     shelterLocation: 'Kalmunai National School High-Ground Shelter',
@@ -90,7 +102,7 @@ const fallbackSupplies = [
     coordinatorName: 'Dr. S. Pathirana',
     coordinatorContact: '+94 67 222 1456',
     dropOffLocation: 'Red Cross Mobile Clinic Desk',
-    status: 'Fulfilled',
+    status: 'Fully Pledged',
     notes: 'Fully pledged by Government Medical Officers Association.',
     createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
   },
@@ -101,6 +113,7 @@ const fallbackSupplies = [
     urgency: 'Medium',
     targetQuantity: 300,
     pledgedQuantity: 80,
+    receivedQuantity: 0,
     remainingQuantity: 220,
     unit: 'packs',
     shelterLocation: 'Akkaraipattu Public Ground Staging Area',
@@ -122,12 +135,13 @@ const fallbackPledges = [
     itemName: 'Bottled Drinking Water (5L Bottles)',
     shelterLocation: 'Ampara Central College Relief Center',
     donorName: 'Dr. Rohan Perera',
-    donorEmail: 'rohan.perera@gmail.com',
-    donorPhone: '077 123 4567',
+    donorEmail: '***@***.***',
+    donorPhone: '***-***-****',
     pledgedQuantity: 100,
     unit: 'bottles',
     deliveryMethod: 'Direct Drop-off',
     status: 'Received & Verified',
+    verifiedBy: 'Mr. N. Senanayake (Coordinator)',
     createdAt: new Date(Date.now() - 3600000 * 3).toISOString(),
   },
   {
@@ -136,8 +150,8 @@ const fallbackPledges = [
     itemName: 'Dry Ration Survival Packs',
     shelterLocation: 'Akkaraipattu Public Ground Staging Area',
     donorName: 'Colombo Lions Club',
-    donorEmail: 'colombo.lions@relief.org',
-    donorPhone: '071 987 6543',
+    donorEmail: '***@***.***',
+    donorPhone: '***-***-****',
     pledgedQuantity: 140,
     unit: 'packs',
     deliveryMethod: 'Courier / Dispatch',
@@ -146,7 +160,7 @@ const fallbackPledges = [
   },
 ];
 
-// Helper to access LocalStorage cache for resilient offline capability
+// Helper to access LocalStorage cache
 const getLocalData = (key, defaultVal) => {
   try {
     const item = localStorage.getItem(key);
@@ -164,30 +178,22 @@ const setLocalData = (key, val) => {
   }
 };
 
-// Initialize LocalStorage if empty
-if (!localStorage.getItem('resq_supplies')) {
-  setLocalData('resq_supplies', fallbackSupplies);
-}
-if (!localStorage.getItem('resq_pledges')) {
-  setLocalData('resq_pledges', fallbackPledges);
-}
-
 // 1. Fetch Supply Items
 export const fetchSupplyItems = async (filters = {}) => {
   try {
     const response = await axios.get(API_BASE_URL, {
       params: filters,
-      timeout: 3000,
+      timeout: 5000,
     });
-    if (Array.isArray(response.data) && response.data.length > 0) {
+    if (Array.isArray(response.data)) {
       setLocalData('resq_supplies', response.data);
       return response.data;
     }
-  } catch {
-    // Graceful fallback to client storage
+  } catch (err) {
+    console.warn('Backend API unreachable for fetchSupplyItems, checking local cache:', err.message);
   }
 
-  // Use localStorage with filtering
+  // Graceful fallback to client storage
   let items = getLocalData('resq_supplies', fallbackSupplies);
   if (filters.category && filters.category !== 'All') {
     items = items.filter((i) => i.category === filters.category);
@@ -197,6 +203,9 @@ export const fetchSupplyItems = async (filters = {}) => {
   }
   if (filters.status && filters.status !== 'All') {
     items = items.filter((i) => i.status === filters.status);
+  }
+  if (filters.district && filters.district !== 'All') {
+    items = items.filter((i) => i.district === filters.district);
   }
   if (filters.search && filters.search.trim()) {
     const s = filters.search.toLowerCase();
@@ -210,26 +219,37 @@ export const fetchSupplyItems = async (filters = {}) => {
   return items;
 };
 
-// 2. Create Supply Item (Coordinator Action)
+// 2. Create Supply Item (Coordinator/Admin Action)
 export const createSupplyRequest = async (itemData) => {
   try {
-    const response = await axios.post(API_BASE_URL, itemData, { timeout: 3000 });
+    const response = await axios.post(API_BASE_URL, itemData, {
+      headers: getAuthHeaders(),
+      timeout: 5000,
+    });
     return response.data;
-  } catch {
-    // Local fallback
-    const items = getLocalData('resq_supplies', fallbackSupplies);
-    const newItem = {
-      _id: `sup-${Date.now()}`,
-      ...itemData,
-      targetQuantity: Number(itemData.targetQuantity),
-      pledgedQuantity: 0,
-      remainingQuantity: Number(itemData.targetQuantity),
-      status: 'Open',
-      createdAt: new Date().toISOString(),
-    };
-    items.unshift(newItem);
-    setLocalData('resq_supplies', items);
-    return newItem;
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message, { cause: error });
+    }
+    // Only fall back to local if network totally disconnected
+    if (!error.response) {
+      const items = getLocalData('resq_supplies', fallbackSupplies);
+      const parsedTarget = Number(itemData.targetQuantity);
+      const newItem = {
+        _id: `sup-${Date.now()}`,
+        ...itemData,
+        targetQuantity: parsedTarget,
+        pledgedQuantity: 0,
+        receivedQuantity: 0,
+        remainingQuantity: parsedTarget,
+        status: 'Open',
+        createdAt: new Date().toISOString(),
+      };
+      items.unshift(newItem);
+      setLocalData('resq_supplies', items);
+      return newItem;
+    }
+    throw new Error(error.message || 'Failed to publish supply request', { cause: error });
   }
 };
 
@@ -237,56 +257,61 @@ export const createSupplyRequest = async (itemData) => {
 export const submitDonorPledge = async (itemId, pledgeData) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/${itemId}/pledge`, pledgeData, {
-      timeout: 3000,
+      timeout: 5000,
     });
     return response.data;
-  } catch {
-    // Local fallback with exact decrement calculation
-    const items = getLocalData('resq_supplies', fallbackSupplies);
-    const index = items.findIndex((i) => i._id === itemId);
-
-    if (index === -1) {
-      throw new Error('Supply item not found');
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message, { cause: error });
     }
+    // If totally offline, perform safe local decrement
+    if (!error.response) {
+      const items = getLocalData('resq_supplies', fallbackSupplies);
+      const index = items.findIndex((i) => i._id === itemId);
 
-    const item = items[index];
-    const pledgeAmount = Number(pledgeData.pledgedQuantity);
+      if (index === -1) {
+        throw new Error('Supply item not found in local cache', { cause: error });
+      }
 
-    if (pledgeAmount > item.remainingQuantity) {
-      throw new Error(`Maximum pledge allowed is ${item.remainingQuantity} ${item.unit}`);
+      const item = items[index];
+      const pledgeAmount = Number(pledgeData.pledgedQuantity);
+
+      if (pledgeAmount > item.remainingQuantity) {
+        throw new Error(`Maximum pledge allowed is ${item.remainingQuantity} ${item.unit}`, { cause: error });
+      }
+
+      item.pledgedQuantity += pledgeAmount;
+      item.remainingQuantity = Math.max(0, item.targetQuantity - item.pledgedQuantity);
+      item.status = item.remainingQuantity === 0 ? 'Fully Pledged' : 'Partially Pledged';
+      items[index] = item;
+      setLocalData('resq_supplies', items);
+
+      const pledges = getLocalData('resq_pledges', fallbackPledges);
+      const newPledge = {
+        _id: `plg-${Date.now()}`,
+        supplyItemId: item._id,
+        itemName: item.itemName,
+        shelterLocation: item.shelterLocation,
+        donorName: pledgeData.donorName,
+        donorEmail: pledgeData.donorEmail,
+        donorPhone: pledgeData.donorPhone,
+        pledgedQuantity: pledgeAmount,
+        unit: item.unit,
+        deliveryMethod: pledgeData.deliveryMethod || 'Direct Drop-off',
+        status: 'Pledged',
+        createdAt: new Date().toISOString(),
+      };
+      pledges.unshift(newPledge);
+      setLocalData('resq_pledges', pledges);
+
+      return {
+        success: true,
+        message: 'Pledge successfully recorded locally (offline mode)!',
+        supplyItem: item,
+        pledge: newPledge,
+      };
     }
-
-    // Decrement remaining item count
-    item.pledgedQuantity += pledgeAmount;
-    item.remainingQuantity = Math.max(0, item.targetQuantity - item.pledgedQuantity);
-    item.status = item.remainingQuantity === 0 ? 'Fulfilled' : 'Partially Pledged';
-    items[index] = item;
-    setLocalData('resq_supplies', items);
-
-    // Record pledge
-    const pledges = getLocalData('resq_pledges', fallbackPledges);
-    const newPledge = {
-      _id: `plg-${Date.now()}`,
-      supplyItemId: item._id,
-      itemName: item.itemName,
-      shelterLocation: item.shelterLocation,
-      donorName: pledgeData.donorName,
-      donorEmail: pledgeData.donorEmail,
-      donorPhone: pledgeData.donorPhone,
-      pledgedQuantity: pledgeAmount,
-      unit: item.unit,
-      deliveryMethod: pledgeData.deliveryMethod || 'Direct Drop-off',
-      status: 'Pledged',
-      createdAt: new Date().toISOString(),
-    };
-    pledges.unshift(newPledge);
-    setLocalData('resq_pledges', pledges);
-
-    return {
-      message: 'Pledge successfully recorded!',
-      supplyItem: item,
-      pledge: newPledge,
-    };
+    throw new Error(error.message || 'Failed to submit donor pledge', { cause: error });
   }
 };
 
@@ -295,14 +320,15 @@ export const fetchAllPledges = async (filters = {}) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/pledges`, {
       params: filters,
-      timeout: 3000,
+      headers: getAuthHeaders(),
+      timeout: 5000,
     });
     if (Array.isArray(response.data)) {
       setLocalData('resq_pledges', response.data);
       return response.data;
     }
-  } catch {
-    // Local fallback
+  } catch (err) {
+    console.warn('Backend API unreachable for fetchAllPledges, checking local cache:', err.message);
   }
 
   let pledges = getLocalData('resq_pledges', fallbackPledges);
@@ -312,65 +338,94 @@ export const fetchAllPledges = async (filters = {}) => {
   return pledges;
 };
 
-// 5. Update Pledge Status (Coordinator verification)
+// 5. Update Pledge Status (Coordinator verification & physical stock receipt)
 export const updatePledgeStatus = async (pledgeId, status) => {
   try {
     const response = await axios.patch(
       `${API_BASE_URL}/pledges/${pledgeId}/status`,
       { status },
-      { timeout: 3000 }
+      {
+        headers: getAuthHeaders(),
+        timeout: 5000,
+      }
     );
     return response.data;
-  } catch {
-    const pledges = getLocalData('resq_pledges', fallbackPledges);
-    const idx = pledges.findIndex((p) => p._id === pledgeId);
-    if (idx !== -1) {
-      pledges[idx].status = status;
-      setLocalData('resq_pledges', pledges);
-      return pledges[idx];
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message, { cause: error });
     }
-    throw new Error('Pledge not found');
+    if (!error.response) {
+      const pledges = getLocalData('resq_pledges', fallbackPledges);
+      const idx = pledges.findIndex((p) => p._id === pledgeId);
+      if (idx !== -1) {
+        pledges[idx].status = status;
+        setLocalData('resq_pledges', pledges);
+        return { success: true, pledge: pledges[idx] };
+      }
+      throw new Error('Pledge not found in offline cache', { cause: error });
+    }
+    throw new Error(error.message || 'Failed to update pledge status', { cause: error });
   }
 };
 
 // 6. Delete Supply Request
 export const deleteSupplyItem = async (itemId) => {
   try {
-    await axios.delete(`${API_BASE_URL}/${itemId}`, { timeout: 3000 });
-  } catch {
-    // Local fallback
-    let items = getLocalData('resq_supplies', fallbackSupplies);
-    items = items.filter((i) => i._id !== itemId);
-    setLocalData('resq_supplies', items);
+    const response = await axios.delete(`${API_BASE_URL}/${itemId}`, {
+      headers: getAuthHeaders(),
+      timeout: 5000,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message, { cause: error });
+    }
+    if (!error.response) {
+      let items = getLocalData('resq_supplies', fallbackSupplies);
+      items = items.filter((i) => i._id !== itemId);
+      setLocalData('resq_supplies', items);
+      return { success: true, message: 'Item deleted from local storage' };
+    }
+    throw new Error(error.message || 'Failed to delete supply item', { cause: error });
   }
 };
 
 // 7. Get Supply Metrics
 export const fetchSupplyStats = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/stats`, { timeout: 3000 });
+    const response = await axios.get(`${API_BASE_URL}/stats`, { timeout: 5000 });
     return response.data;
-  } catch {
+  } catch (err) {
+    console.warn('Backend API unreachable for fetchSupplyStats, computing from cache:', err.message);
     const items = getLocalData('resq_supplies', fallbackSupplies);
     const pledges = getLocalData('resq_pledges', fallbackPledges);
     let totalTargetUnits = 0;
     let totalPledgedUnits = 0;
+    let totalReceivedUnits = 0;
     let fulfilledCount = 0;
+    let fullyPledgedCount = 0;
 
     items.forEach((i) => {
       totalTargetUnits += i.targetQuantity || 0;
       totalPledgedUnits += i.pledgedQuantity || 0;
+      totalReceivedUnits += i.receivedQuantity || 0;
       if (i.status === 'Fulfilled') fulfilledCount++;
+      if (i.status === 'Fully Pledged') fullyPledgedCount++;
     });
 
     return {
       totalRequests: items.length,
       fulfilledRequests: fulfilledCount,
-      pledgesCount: pledges.length,
+      fullyPledgedRequests: fullyPledgedCount,
+      pledgesCount: pledges.filter((p) => p.status !== 'Cancelled').length,
       totalTargetUnits,
       totalPledgedUnits,
+      totalReceivedUnits,
+      percentPledged:
+        totalTargetUnits > 0 ? Math.min(100, Math.round((totalPledgedUnits / totalTargetUnits) * 100)) : 0,
       percentFulfilled:
-        totalTargetUnits > 0 ? Math.round((totalPledgedUnits / totalTargetUnits) * 100) : 0,
+        totalTargetUnits > 0 ? Math.min(100, Math.round((totalReceivedUnits / totalTargetUnits) * 100)) : 0,
     };
   }
 };
+
