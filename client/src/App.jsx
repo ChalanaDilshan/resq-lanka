@@ -16,6 +16,10 @@ import TaskBoardPage from './pages/volunteer-tasks/TaskBoardPage';
 import TaskDetailPage from './pages/volunteer-tasks/TaskDetailPage';
 import PostTaskPage from './pages/volunteer-tasks/PostTaskPage';
 
+import NoticeBoardPage from './pages/noticeboard/NoticeBoardPage';
+import AlertDetailPage from './pages/noticeboard/AlertDetailPage';
+import PostAlertPage from './pages/noticeboard/PostAlertPage';
+
 function App() {
   return (
     <Router>
@@ -27,8 +31,15 @@ function App() {
             <Routes>
               {/* Home & General */}
               <Route path="/" element={<HomePage />} />
-              <Route path="/alerts" element={<HomePage />} />
               <Route path="/about" element={<HomePage />} />
+
+              {/* Module 5: Emergency Alerts & Noticeboard */}
+              <Route path="/alerts" element={<NoticeBoardPage />} />
+              <Route path="/notices" element={<NoticeBoardPage />} />
+              <Route path="/alerts/new" element={<PostAlertPage />} />
+              <Route path="/notices/new" element={<PostAlertPage />} />
+              <Route path="/alerts/:id" element={<AlertDetailPage />} />
+              <Route path="/notices/:id" element={<AlertDetailPage />} />
 
               {/* Module 4: Volunteer Task Board */}
               <Route path="/tasks" element={<TaskBoardPage />} />

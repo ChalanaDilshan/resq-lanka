@@ -8,6 +8,7 @@ import shelterRoutes from './routes/shelter.routes.js';
 import supplyRoutes from './routes/supplyRoutes.js';
 import authRoutes from './routes/auth.routes.js';
 import taskRoutes from './routes/task.routes.js';
+import noticeRoutes from './routes/notice.routes.js';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use('/api/sos', sosRoutes);
 app.use('/api/shelters', shelterRoutes);
 app.use('/api/supplies', supplyRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/notices', noticeRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
