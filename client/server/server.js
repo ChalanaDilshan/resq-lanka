@@ -7,6 +7,7 @@ import sosRoutes from './routes/sosRoutes.js';
 import shelterRoutes from './routes/shelter.routes.js';
 import supplyRoutes from './routes/supplyRoutes.js';
 import authRoutes from './routes/auth.routes.js';
+import taskRoutes from './routes/task.routes.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/sos', sosRoutes);
 app.use('/api/shelters', shelterRoutes);
 app.use('/api/supplies', supplyRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -40,15 +42,27 @@ app.get('/api/health', (req, res) => {
 const MONGO_URI =
   process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/resq-lanka';
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
+const startServer = async () => {
+  try {
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 });
     console.log('Connected to MongoDB database');
+  } catch (err) {
+    console.warn('Primary MongoDB connection failure:', err.message);
+    const localUri = 'mongodb://127.0.0.1:27017/resq-lanka';
+    if (MONGO_URI !== localUri) {
+      console.log('Falling back to local MongoDB instance...');
+      try {
+        await mongoose.connect(localUri);
+        console.log('Connected to local MongoDB database');
+      } catch (localErr) {
+        console.error('Local MongoDB connection failure:', localErr.message);
+      }
+    }
+  }
 
-    app.listen(PORT, () => {
-      console.log(`ResQ-Lanka Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('MongoDB connection failure:', err.message);
+  app.listen(PORT, () => {
+    console.log(`ResQ-Lanka Server running on port ${PORT}`);
   });
+};
+
+startServer();
