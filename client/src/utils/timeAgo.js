@@ -12,3 +12,6 @@ export function formatTimeAgo(timestamp) {
   const diffInDays = Math.floor(diffInHours / 24);
   return `${diffInDays}d ago`;
 }
+
+export const timeAgo = formatTimeAgo;
+export default formatTimeAgo;
