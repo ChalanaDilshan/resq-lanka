@@ -239,12 +239,8 @@ export default function HomePage() {
           </Link>
 
           {/* Card 2: Find Safe Shelters */}
-          <a
-            href="#shelters"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('shelters')?.scrollIntoView({ behavior: 'smooth' });
-            }}
+          <Link
+            to="/shelters"
             className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl border border-slate-100 hover:border-blue-200 flex items-start gap-4 transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#2563eb] text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
@@ -257,10 +253,10 @@ export default function HomePage() {
                 Find Safe Shelters
               </h3>
               <p className="text-xs text-slate-500 leading-snug mt-1">
-                View nearby verified shelters with real-time capacity information.
+                View verified directory categorized by flood & earthquake hazards.
               </p>
             </div>
-          </a>
+          </Link>
 
           {/* Card 3: Support with Donations */}
           <div
@@ -391,17 +387,13 @@ export default function HomePage() {
                 <MapPin size={20} className="text-blue-600 stroke-[2.5]" />
                 <h2 className="text-lg font-bold text-slate-900">Find Nearby Shelters</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShelterFilter('All');
-                  setSearchLocation('');
-                }}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+              <Link
+                to="/shelters"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors font-bold"
               >
-                <span>View All</span>
+                <span>Full Directory</span>
                 <ArrowRight size={14} className="stroke-[2.2]" />
-              </button>
+              </Link>
             </div>
 
             {/* Search Input Row */}
@@ -533,12 +525,8 @@ export default function HomePage() {
             </Link>
 
             {/* Stat Row 2: Active Shelters */}
-            <a
-              href="#shelters"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('shelters')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            <Link
+              to="/shelters"
               className="p-3.5 bg-white hover:bg-slate-50/80 border border-slate-100 hover:border-blue-200 rounded-2xl flex items-center justify-between transition-all group cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-3">
@@ -557,7 +545,7 @@ export default function HomePage() {
                 </div>
               </div>
               <ChevronRight size={18} className="text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
-            </a>
+            </Link>
 
             {/* Stat Row 3: Urgent Supply Needs */}
             <div
