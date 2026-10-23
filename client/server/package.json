@@ -9,7 +9,8 @@
     "seed:admin": "node scripts/bootstrapAdmin.js",
     "test:supplies": "node scripts/testSupplyInvariants.js",
     "test:shelters": "node scripts/testShelterInvariants.js",
-    "test": "node scripts/testSupplyInvariants.js && node scripts/testShelterInvariants.js"
+    "test:tasks": "node scripts/testTaskInvariants.js",
+    "test": "node scripts/testSupplyInvariants.js && node scripts/testShelterInvariants.js && node scripts/testTaskInvariants.js"
   },
   "keywords": [],
   "author": "",
