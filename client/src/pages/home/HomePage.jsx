@@ -321,14 +321,13 @@ export default function HomePage() {
                 <AlertTriangle size={20} className="text-red-500 stroke-[2.5]" />
                 <h2 className="text-lg font-bold text-slate-900">Latest Emergency Alerts</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => setSelectedAlert(alertsList[0])}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+              <Link
+                to="/alerts"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors font-bold"
               >
-                <span>View All</span>
+                <span>Full Noticeboard</span>
                 <ArrowRight size={14} className="stroke-[2.2]" />
-              </button>
+              </Link>
             </div>
 
             {/* Alerts List */}

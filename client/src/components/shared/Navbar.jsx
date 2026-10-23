@@ -10,6 +10,9 @@ import {
   Building2,
   PackageCheck,
   ClipboardList,
+  Users,
+  PlusCircle,
+  Bell,
 } from 'lucide-react';
 import ResQLogo from './ResQLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -27,9 +30,9 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Shelters', path: '/shelters' },
-    { name: 'Alerts', path: '/#alerts' },
+    { name: 'Alerts', path: '/alerts' },
     { name: 'Donate', path: '/supplies' },
-    { name: 'Volunteer', path: '/#volunteer' },
+    { name: 'Volunteer', path: '/tasks' },
     { name: 'About', path: '/#about' },
   ];
 
@@ -60,8 +63,20 @@ export default function Navbar() {
   const isLinkActive = (link) => {
     if (link.path === '/') return location.pathname === '/';
     if (link.path === '/shelters') return location.pathname === '/shelters';
+    if (link.path === '/alerts') {
+      return (
+        location.pathname.startsWith('/alerts') ||
+        location.pathname.startsWith('/notices')
+      );
+    }
     if (link.path === '/supplies') {
       return ['/supplies', '/donate', '/coordinator'].includes(location.pathname);
+    }
+    if (link.path === '/tasks') {
+      return (
+        location.pathname.startsWith('/tasks') ||
+        location.pathname === '/volunteer'
+      );
     }
     return false;
   };
@@ -180,15 +195,49 @@ export default function Navbar() {
                         <PackageCheck size={15} className="text-blue-600" />
                         <span>Supply &amp; Donation Board</span>
                       </Link>
+                      <Link
+                        to="/tasks"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50"
+                      >
+                        <Users size={15} className="text-amber-600" />
+                        <span>Volunteer Task Board</span>
+                      </Link>
+                      <Link
+                        to="/alerts"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50"
+                      >
+                        <Bell size={15} className="text-rose-600" />
+                        <span>Emergency Alerts &amp; Notices</span>
+                      </Link>
                       {(activeRole === 'coordinator' || activeRole === 'administrator') && (
-                        <Link
-                          to="/coordinator"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
-                        >
-                          <ClipboardList size={15} />
-                          <span>Coordinator Inventory</span>
-                        </Link>
+                        <>
+                          <Link
+                            to="/alerts/new"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50"
+                          >
+                            <PlusCircle size={15} className="text-rose-600" />
+                            <span>Post Disaster Alert</span>
+                          </Link>
+                          <Link
+                            to="/tasks/new"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                          >
+                            <PlusCircle size={15} className="text-emerald-600" />
+                            <span>Post Volunteer Task</span>
+                          </Link>
+                          <Link
+                            to="/coordinator"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                          >
+                            <ClipboardList size={15} />
+                            <span>Coordinator Inventory</span>
+                          </Link>
+                        </>
                       )}
                       <Link
                         to="/sos-dashboard"

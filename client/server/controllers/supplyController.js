@@ -572,5 +572,142 @@ export const updatePledgeStatus = async (req, res) => {
     }
 
     // A cancelled pledge cannot move directly to received
-    if (
-      oldStatus === 'Cancelled
+    if (oldStatus === 'Cancelled' && status === 'Received & Verified') {
+      return res.status(400).json({
+        success: false,
+        message: 'A cancelled pledge cannot be directly marked as received.',
+      });
+    }
+
+    const item = await SupplyItem.findById(pledge.supplyItemId);
+
+    if (item) {
+      if (status === 'Received & Verified' && oldStatus !== 'Received & Verified') {
+        item.receivedQuantity = (item.receivedQuantity || 0) + pledge.pledgedQuantity;
+      }
+      if (oldStatus === 'Received & Verified' && status !== 'Received & Verified') {
+        item.receivedQuantity = Math.max(0, (item.receivedQuantity || 0) - pledge.pledgedQuantity);
+      }
+      if (status === 'Cancelled' && oldStatus !== 'Cancelled') {
+        item.pledgedQuantity = Math.max(0, (item.pledgedQuantity || 0) - pledge.pledgedQuantity);
+      }
+      if (oldStatus === 'Cancelled' && status !== 'Cancelled') {
+        item.pledgedQuantity = (item.pledgedQuantity || 0) + pledge.pledgedQuantity;
+      }
+
+      item.remainingQuantity = Math.max(0, item.targetQuantity - item.pledgedQuantity);
+      if (item.receivedQuantity >= item.targetQuantity) {
+        item.status = 'Fulfilled';
+      } else if (item.pledgedQuantity >= item.targetQuantity) {
+        item.status = 'Fully Pledged';
+      } else if (item.pledgedQuantity > 0) {
+        item.status = 'Partially Pledged';
+      } else {
+        item.status = 'Open';
+      }
+
+      await item.save();
+    }
+
+    pledge.status = status;
+    if (req.user) {
+      pledge.verifiedBy = req.user.name || req.user.email;
+    }
+    await pledge.save();
+
+    return res.status(200).json(pledge);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update pledge status',
+      error: error.message,
+    });
+  }
+};
+
+// DELETE /api/supplies/:id - Coordinator deletes a supply item
+export const deleteSupplyItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid supply item ID format.',
+      });
+    }
+
+    const deleted = await SupplyItem.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'Supply item not found.',
+      });
+    }
+
+    // Clean up associated pledges
+    await DonorPledge.deleteMany({ supplyItemId: id });
+
+    res.status(200).json({
+      success: true,
+      message: 'Supply item and associated pledges removed successfully.',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete supply item',
+      error: error.message,
+    });
+  }
+};
+
+// GET /api/supplies/stats - Metrics overview distinguishing pledged from physically received stock
+export const getSupplyStats = async (req, res) => {
+  try {
+    await ensureSeedData();
+
+    const totalRequests = await SupplyItem.countDocuments();
+    const fulfilledRequests = await SupplyItem.countDocuments({ status: 'Fulfilled' });
+    const fullyPledgedRequests = await SupplyItem.countDocuments({ status: 'Fully Pledged' });
+    const pledgesCount = await DonorPledge.countDocuments({ status: { $ne: 'Cancelled' } });
+
+    const items = await SupplyItem.find();
+    let totalTargetUnits = 0;
+    let totalPledgedUnits = 0;
+    let totalReceivedUnits = 0;
+
+    items.forEach((item) => {
+      totalTargetUnits += item.targetQuantity || 0;
+      totalPledgedUnits += item.pledgedQuantity || 0;
+      totalReceivedUnits += item.receivedQuantity || 0;
+    });
+
+    const percentPledged =
+      totalTargetUnits > 0
+        ? Math.min(100, Math.round((totalPledgedUnits / totalTargetUnits) * 100))
+        : 0;
+
+    const percentFulfilled =
+      totalTargetUnits > 0
+        ? Math.min(100, Math.round((totalReceivedUnits / totalTargetUnits) * 100))
+        : 0;
+
+    res.status(200).json({
+      totalRequests,
+      fulfilledRequests,
+      fullyPledgedRequests,
+      pledgesCount,
+      totalTargetUnits,
+      totalPledgedUnits,
+      totalReceivedUnits,
+      percentPledged,
+      percentFulfilled,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve supply stats',
+      error: error.message,
+    });
+  }
+};
