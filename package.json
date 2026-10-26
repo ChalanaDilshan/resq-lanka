@@ -1,0 +1,27 @@
+{
+  "name": "resq-lanka-workspace",
+  "version": "1.0.0",
+  "description": "ResQ-Lanka — Community Disaster Response & Relief Coordination System",
+  "scripts": {
+    "dev": "npm run dev:server",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "start:client": "npm --prefix client run dev",
+    "start:server": "npm --prefix server run start",
+    "build:client": "npm --prefix client run build",
+    "test:server": "npm --prefix server run test",
+    "test:client": "npm --prefix client run build",
+    "test": "npm --prefix server run test",
+    "seed": "npm --prefix server run seed"
+  },
+  "keywords": [
+    "disaster-response",
+    "resqlanka",
+    "express",
+    "react",
+    "vite",
+    "mongodb"
+  ],
+  "author": "ResQ-Lanka Team",
+  "license": "ISC"
+}
