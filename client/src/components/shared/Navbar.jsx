@@ -38,7 +38,7 @@ export default function Navbar() {
     { name: 'Alerts', path: '/alerts' },
     { name: 'Donate', path: '/supplies' },
     { name: 'Volunteer', path: '/tasks' },
-    { name: 'About', path: '/#about' },
+    { name: 'About', path: '/about' },
   ];
 
   const handleNavClick = (path) => {
@@ -67,6 +67,7 @@ export default function Navbar() {
 
   const isLinkActive = (link) => {
     if (link.path === '/') return location.pathname === '/';
+    if (link.path === '/about') return location.pathname === '/about';
     if (link.path === '/shelters') return location.pathname === '/shelters';
     if (link.path === '/alerts') {
       return (

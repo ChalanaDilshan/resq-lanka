@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/shared/Navbar';
 
 import HomePage from './pages/home/HomePage';
+import AboutPage from './pages/about/AboutPage';
 import ShelterListPage from './pages/shelter-directory/ShelterListPage';
 import LoginPage from './pages/auth/LoginPage';
 import SupplyBoardPage from './pages/supply-board/SupplyBoardPage';
@@ -37,7 +38,7 @@ function App() {
             <Routes>
               {/* Home & General */}
               <Route path="/" element={<HomePage />} />
-              <Route path="/about" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
 
               {/* Module 5: Emergency Alerts & Noticeboard */}
               <Route path="/alerts" element={<NoticeBoardPage />} />
