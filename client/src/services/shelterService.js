@@ -422,7 +422,7 @@ export const updateShelterOccupancyAndCapacity = async (id, {
   } catch (error) {
     // If server responded with validation or auth error, throw honest server message
     if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
+      throw new Error(error.response.data.message, { cause: error });
     }
     console.warn('Network unreachable, attempting local fallback:', error.message);
   }
@@ -495,7 +495,7 @@ export const createShelter = async (shelterData) => {
     }
   } catch (error) {
     if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
+      throw new Error(error.response.data.message, { cause: error });
     }
     console.warn('Network unreachable, attempting local fallback:', error.message);
   }
@@ -566,7 +566,7 @@ export const deleteShelter = async (id) => {
     }
   } catch (error) {
     if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
+      throw new Error(error.response.data.message, { cause: error });
     }
     console.warn('Network unreachable, deleting from local cache:', error.message);
   }

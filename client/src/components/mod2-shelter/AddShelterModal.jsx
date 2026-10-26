@@ -2,8 +2,6 @@ import { useState } from 'react';
 import {
   X,
   PlusCircle,
-  Building,
-  MapPin,
   Waves,
   TreePine,
   ShieldCheck,

@@ -7,11 +7,12 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "seed:admin": "node scripts/bootstrapAdmin.js",
+    "test:sos": "node scripts/testSOSInvariants.js",
     "test:supplies": "node scripts/testSupplyInvariants.js",
     "test:shelters": "node scripts/testShelterInvariants.js",
     "test:tasks": "node scripts/testTaskInvariants.js",
     "test:notices": "node scripts/testNoticeInvariants.js",
-    "test": "node scripts/testSupplyInvariants.js && node scripts/testShelterInvariants.js && node scripts/testTaskInvariants.js && node scripts/testNoticeInvariants.js"
+    "test": "node scripts/testSOSInvariants.js && node scripts/testSupplyInvariants.js && node scripts/testShelterInvariants.js && node scripts/testTaskInvariants.js && node scripts/testNoticeInvariants.js"
   },
   "keywords": [],
   "author": "",

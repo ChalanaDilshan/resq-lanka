@@ -23,14 +23,14 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, activeRole, switchRole } = useAuth();
 
-  if (location.pathname.startsWith('/dashboard')) {
-    return null;
-  }
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+  if (location.pathname.startsWith('/dashboard')) {
+    return null;
+  }
 
   const navLinks = [
     { name: 'Home', path: '/' },

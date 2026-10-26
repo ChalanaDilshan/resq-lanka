@@ -93,30 +93,47 @@ export default function SupplyBoardPage() {
     user?.role === 'coordinator' ||
     user?.role === 'administrator';
 
-  // Load all initial data from backend API
-  const loadData = async () => {
-    setLoading(true);
-    setFetchError(null);
-    try {
-      const [itemsData, pledgesData, statsData] = await Promise.all([
-        fetchSupplyItems(),
-        fetchAllPledges(),
-        fetchSupplyStats(),
-      ]);
-      setSupplies(itemsData);
-      setPledges(pledgesData);
-      setStats(statsData);
-    } catch (err) {
-      console.error('Error loading supply data:', err);
-      setFetchError(err.message || 'Unable to load relief supply data.');
-    } finally {
-      setLoading(false);
-    }
+  const [reloadTrigger, setReloadTrigger] = useState(0);
+
+  const refreshData = () => {
+    setReloadTrigger((prev) => prev + 1);
   };
 
   useEffect(() => {
+    let isCancelled = false;
+
+    const loadData = async () => {
+      setLoading(true);
+      setFetchError(null);
+      try {
+        const [itemsData, pledgesData, statsData] = await Promise.all([
+          fetchSupplyItems(),
+          fetchAllPledges(),
+          fetchSupplyStats(),
+        ]);
+        if (!isCancelled) {
+          setSupplies(itemsData);
+          setPledges(pledgesData);
+          setStats(statsData);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.error('Error loading supply data:', err);
+          setFetchError(err.message || 'Unable to load relief supply data.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadData();
-  }, [activeRole]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeRole, reloadTrigger]);
 
   const handleTabChange = (newTab) => {
     setSearchParams({ tab: newTab });
@@ -125,7 +142,7 @@ export default function SupplyBoardPage() {
   // Handle donor pledge submission
   const handlePledgeSuccess = async (itemId, pledgePayload) => {
     const result = await submitDonorPledge(itemId, pledgePayload);
-    await loadData();
+    refreshData();
     return result;
   };
 
@@ -171,7 +188,7 @@ export default function SupplyBoardPage() {
         dropOffLocation: 'Shelter relief reception desk',
         notes: '',
       });
-      await loadData();
+      refreshData();
       setTimeout(() => setCreateSuccess(false), 4000);
     } catch (err) {
       setCreateError(err.message || 'Failed to publish supply request.');
@@ -390,7 +407,7 @@ export default function SupplyBoardPage() {
               <span>{fetchError} Showing cached relief catalog data.</span>
             </div>
             <button
-              onClick={loadData}
+              onClick={refreshData}
               className="px-3 py-1.5 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition"
             >
               Retry
@@ -822,7 +839,7 @@ export default function SupplyBoardPage() {
                               if (confirm(`Remove "${item.itemName}" and its associated pledges from the relief board?`)) {
                                 try {
                                   await deleteSupplyItem(item._id);
-                                  await loadData();
+                                  refreshData();
                                 } catch (err) {
                                   alert(err.message || 'Failed to delete supply item');
                                 }
@@ -853,7 +870,7 @@ export default function SupplyBoardPage() {
             isCoordinatorOrAdmin={isCoordinatorOrAdmin}
             onUpdateStatus={async (pledgeId, newStatus) => {
               await updatePledgeStatus(pledgeId, newStatus);
-              await loadData();
+              refreshData();
             }}
             filterStatus={pledgeStatusFilter}
             onFilterChange={(st) => setPledgeStatusFilter(st)}

@@ -4,9 +4,7 @@ import {
   Phone,
   ShieldCheck,
   CheckCircle2,
-  Navigation,
   Sliders,
-  AlertCircle,
   ExternalLink,
 } from 'lucide-react';
 import HazardBadge from './HazardBadge';

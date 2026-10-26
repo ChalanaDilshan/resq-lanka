@@ -4,14 +4,11 @@ import {
   Users,
   Phone,
   Mail,
-  ShieldCheck,
   CheckCircle2,
   Navigation,
   Sliders,
   ExternalLink,
   History,
-  TrendingUp,
-  TrendingDown,
   Info,
 } from 'lucide-react';
 import HazardBadge from './HazardBadge';

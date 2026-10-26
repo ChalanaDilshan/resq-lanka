@@ -3,7 +3,6 @@ import {
   X,
   Users,
   Building,
-  CheckCircle2,
   AlertTriangle,
   History,
   TrendingUp,

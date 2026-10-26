@@ -56,10 +56,13 @@ export const authenticate = async (req, res, next) => {
  * Also accepts legacy 'coordinator' as an alias for 'administrator'
  */
 export const requireRole = (...allowedRoles) => {
-  // Normalize roles: if coordinator is passed, allow administrator
+  // Normalize roles: allow bidirectional alias between coordinator and administrator
   const expandedRoles = new Set(allowedRoles);
   if (expandedRoles.has('coordinator')) {
     expandedRoles.add('administrator');
+  }
+  if (expandedRoles.has('administrator')) {
+    expandedRoles.add('coordinator');
   }
 
   return (req, res, next) => {

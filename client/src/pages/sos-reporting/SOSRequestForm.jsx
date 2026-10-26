@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import {
   AlertTriangle,
@@ -59,12 +59,16 @@ export default function SOSRequestForm() {
   const [locating, setLocating] = useState(false);
   const mapRef = useRef(null);
 
-  // Pre-fill user contact if user changes/logs in
-  useEffect(() => {
-    if (user?.phone && !formData.contactNumber) {
-      setFormData((prev) => ({ ...prev, contactNumber: user.phone }));
+  // Pre-fill user contact if user identity resolves after initial render
+  const userPhone = user?.phone;
+  const [prevUserPhone, setPrevUserPhone] = useState(userPhone);
+
+  if (userPhone && userPhone !== prevUserPhone) {
+    setPrevUserPhone(userPhone);
+    if (!formData.contactNumber) {
+      setFormData((prev) => ({ ...prev, contactNumber: userPhone }));
     }
-  }, [user]);
+  }
 
   const handleMapLoad = useCallback((map) => {
     mapRef.current = map;

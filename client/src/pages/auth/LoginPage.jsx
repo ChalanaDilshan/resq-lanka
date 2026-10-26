@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail,
   Lock,
@@ -17,16 +17,15 @@ import {
 } from 'lucide-react';
 import ResQLogo from '../../components/shared/ResQLogo';
 import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
-import { useAuth, ROLE_CONFIGS } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, register, switchRole } = useAuth();
 
-  // Mode: 'login' or 'register'
-  const isRegisterInitial = location.pathname === '/register';
-  const [mode, setMode] = useState(isRegisterInitial ? 'register' : 'login');
+  // Mode: derived directly from current route URL
+  const mode = location.pathname === '/register' ? 'register' : 'login';
 
   // Form Fields
   const [email, setEmail] = useState('citizen@resqlanka.lk');
@@ -40,11 +39,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-
-  useEffect(() => {
-    setMode(location.pathname === '/register' ? 'register' : 'login');
-    setErrorMessage(null);
-  }, [location.pathname]);
 
   // Quick fill demo credentials for evaluation
   const handleQuickFill = (roleKey) => {
@@ -241,8 +235,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setMode('login');
                   setErrorMessage(null);
+                  navigate('/login');
                 }}
                 className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
                   mode === 'login'
@@ -255,8 +249,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setMode('register');
                   setErrorMessage(null);
+                  navigate('/register');
                 }}
                 className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
                   mode === 'register'
@@ -520,7 +514,10 @@ export default function LoginPage() {
                 Don't have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setMode('register')}
+                  onClick={() => {
+                    setErrorMessage(null);
+                    navigate('/register');
+                  }}
                   className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
                 >
                   Register Now
@@ -531,7 +528,10 @@ export default function LoginPage() {
                 Already have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setMode('login')}
+                  onClick={() => {
+                    setErrorMessage(null);
+                    navigate('/login');
+                  }}
                   className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
                 >
                   Sign In

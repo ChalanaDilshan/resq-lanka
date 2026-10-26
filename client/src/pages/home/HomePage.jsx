@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Phone,
   ShieldCheck,
-  Building2,
   Activity,
   HeartHandshake,
   PackageCheck,

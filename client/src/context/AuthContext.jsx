@@ -1,15 +1,15 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import {
   loginUser,
   registerUser,
   fetchCurrentUser,
   logoutUser,
-  setAuthToken,
 } from '../services/authService';
 
 const AuthContext = createContext(null);
 
-export const ROLE_CONFIGS = {
+const ROLE_CONFIGS = {
   citizen: {
     key: 'citizen',
     label: 'Citizen',

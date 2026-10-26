@@ -5,14 +5,12 @@ import {
   Building2,
   Waves,
   TreePine,
-  Filter,
   PlusCircle,
   Sliders,
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
   RefreshCw,
-  Users,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -28,7 +26,7 @@ import AddShelterModal from '../../components/mod2-shelter/AddShelterModal';
 import ShelterDetailModal from '../../components/mod2-shelter/ShelterDetailModal';
 
 export default function ShelterListPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { user, activeRole, switchRole } = useAuth();
   const isAuthorizedManager = Boolean(
     user && ['administrator', 'coordinator'].includes(activeRole || user.role)
@@ -50,6 +48,11 @@ export default function ShelterListPage() {
   const [selectedShelter, setSelectedShelter] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
+
+  const refreshData = () => {
+    setReloadTrigger((prev) => prev + 1);
+  };
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -58,33 +61,45 @@ export default function ShelterListPage() {
     }, 4000);
   };
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const [shelterList, shelterStats] = await Promise.all([
-        fetchShelters({
-          hazardType: hazardFilter !== 'all' ? hazardFilter : undefined,
-          district: districtFilter !== 'all' ? districtFilter : undefined,
-          status: statusFilter !== 'all' ? statusFilter : undefined,
-          search: searchQuery.trim() || undefined,
-        }),
-        fetchShelterStats(),
-      ]);
-      setShelters(shelterList);
-      setStats(shelterStats);
-    } catch (err) {
-      console.error('Failed to load shelter directory:', err);
-      setError('Unable to fetch live shelter records from server. Showing cached directory.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Trigger data load on filter change
+  // Trigger data load on filter change with cancellation guard
   useEffect(() => {
+    let isCancelled = false;
+
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [shelterList, shelterStats] = await Promise.all([
+          fetchShelters({
+            hazardType: hazardFilter !== 'all' ? hazardFilter : undefined,
+            district: districtFilter !== 'all' ? districtFilter : undefined,
+            status: statusFilter !== 'all' ? statusFilter : undefined,
+            search: searchQuery.trim() || undefined,
+          }),
+          fetchShelterStats(),
+        ]);
+        if (!isCancelled) {
+          setShelters(shelterList);
+          setStats(shelterStats);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.error('Failed to load shelter directory:', err);
+          setError('Unable to fetch live shelter records from server. Showing cached directory.');
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadData();
-  }, [hazardFilter, districtFilter, statusFilter, searchQuery]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [hazardFilter, districtFilter, statusFilter, searchQuery, reloadTrigger]);
 
   // Handle coordinator occupancy update
   const handleSaveOccupancy = async (id, payload) => {
@@ -210,7 +225,7 @@ export default function ShelterListPage() {
             </div>
             <button
               type="button"
-              onClick={loadData}
+              onClick={refreshData}
               className="px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-xl font-bold text-[11px] transition"
             >
               Retry Sync
@@ -297,7 +312,7 @@ export default function ShelterListPage() {
           {/* Quick refresh button */}
           <button
             type="button"
-            onClick={loadData}
+            onClick={refreshData}
             title="Refresh directory"
             className="self-end md:self-auto p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl text-xs font-bold transition flex items-center gap-1.5"
           >
