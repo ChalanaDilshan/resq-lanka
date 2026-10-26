@@ -20,6 +20,12 @@ import NoticeBoardPage from './pages/noticeboard/NoticeBoardPage';
 import AlertDetailPage from './pages/noticeboard/AlertDetailPage';
 import PostAlertPage from './pages/noticeboard/PostAlertPage';
 
+import DashboardLayout from './layouts/DashboardLayout';
+import DashboardRedirect from './pages/dashboards/DashboardRedirect';
+import CitizenDashboard from './pages/dashboards/CitizenDashboard';
+import VolunteerDashboard from './pages/dashboards/VolunteerDashboard';
+import AdministratorDashboard from './pages/dashboards/AdministratorDashboard';
+
 function App() {
   return (
     <Router>
@@ -76,6 +82,28 @@ function App() {
               {/* Module 1: SOS Reporting */}
               <Route path="/sos" element={<SOSRequestForm />} />
               <Route path="/sos-dashboard" element={<SOSDashboard />} />
+
+              {/* Module 6: Shared Dashboards & Role-Aware Operations */}
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route index element={<DashboardRedirect />} />
+                <Route path="citizen" element={<CitizenDashboard />} />
+                <Route
+                  path="volunteer"
+                  element={
+                    <ProtectedRoute allowedRoles={['volunteer', 'administrator', 'coordinator']}>
+                      <VolunteerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="administrator"
+                  element={
+                    <ProtectedRoute allowedRoles={['administrator', 'coordinator']}>
+                      <AdministratorDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
               {/* Fallback */}
               <Route path="*" element={<HomePage />} />
