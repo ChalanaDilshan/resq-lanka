@@ -13,6 +13,7 @@ import {
   Users,
   PlusCircle,
   Bell,
+  LayoutDashboard,
 } from 'lucide-react';
 import ResQLogo from './ResQLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -21,6 +22,10 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, activeRole, switchRole } = useAuth();
+
+  if (location.pathname.startsWith('/dashboard')) {
+    return null;
+  }
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -179,6 +184,14 @@ export default function Navbar() {
                     </div>
 
                     <div className="py-1">
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-blue-700 bg-blue-50/60 hover:bg-blue-100/70 border-b border-blue-100/50"
+                      >
+                        <LayoutDashboard size={15} className="text-blue-600" />
+                        <span>Operations Dashboard</span>
+                      </Link>
                       <Link
                         to="/shelters"
                         onClick={() => setUserDropdownOpen(false)}
