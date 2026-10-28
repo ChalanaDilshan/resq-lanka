@@ -52,7 +52,7 @@ export default function DashboardHeader({ onOpenMobileMenu }) {
               Dashboard
             </Link>
             <ChevronRight size={11} className="text-slate-300" />
-            <span className="text-slate-600 font-bold capitalize">{activeRole}</span>
+            <span className="text-slate-600 font-bold capitalize">{user?.role || activeRole}</span>
           </nav>
           <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
             {viewInfo.title}
@@ -79,14 +79,14 @@ export default function DashboardHeader({ onOpenMobileMenu }) {
                 : 'bg-blue-600 text-white'
             }`}
           >
-            {(user?.name || activeRole || 'U').charAt(0).toUpperCase()}
+            {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
           </div>
           <div className="hidden sm:block text-left text-xs">
             <div className="font-bold text-slate-800 leading-tight">
-              {user?.name || roleConfig.defaultName}
+              {user ? user.name : 'Authorized User'}
             </div>
             <div className="text-[10px] text-slate-400 font-medium truncate max-w-[140px]">
-              {user?.district || 'Ampara District'}
+              {user ? (user.district || user.email) : 'ResQ-Lanka Network'}
             </div>
           </div>
         </div>

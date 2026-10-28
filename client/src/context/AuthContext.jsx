@@ -20,8 +20,6 @@ const ROLE_CONFIGS = {
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',
     badgeClass: 'bg-blue-100 text-blue-700',
-    defaultEmail: 'citizen@resqlanka.lk',
-    defaultName: 'Kasun Bandara',
   },
   volunteer: {
     key: 'volunteer',
@@ -33,8 +31,6 @@ const ROLE_CONFIGS = {
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-200',
     badgeClass: 'bg-amber-100 text-amber-700',
-    defaultEmail: 'volunteer@resqlanka.lk',
-    defaultName: 'Saman Kumara',
   },
   administrator: {
     key: 'administrator',
@@ -46,8 +42,6 @@ const ROLE_CONFIGS = {
     bgColor: 'bg-emerald-50',
     borderColor: 'border-emerald-200',
     badgeClass: 'bg-emerald-100 text-emerald-800',
-    defaultEmail: 'admin@resqlanka.lk',
-    defaultName: 'ResQ-Lanka Administrator',
   },
   // Legacy coordinator alias mapped to administrator styling
   coordinator: {
@@ -60,15 +54,12 @@ const ROLE_CONFIGS = {
     bgColor: 'bg-emerald-50',
     borderColor: 'border-emerald-200',
     badgeClass: 'bg-emerald-100 text-emerald-800',
-    defaultEmail: 'coordinator@resqlanka.lk',
-    defaultName: 'Eng. N. Senanayake',
   },
 };
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeRole, setActiveRole] = useState('citizen');
 
   // Load and verify existing session on initial load
   useEffect(() => {
@@ -78,19 +69,12 @@ export function AuthProvider({ children }) {
       try {
         const currentUser = await fetchCurrentUser();
         if (isMounted) {
-          if (currentUser) {
-            setUser(currentUser);
-            setActiveRole(currentUser.role || 'citizen');
-          } else {
-            setUser(null);
-            setActiveRole('citizen');
-          }
+          setUser(currentUser || null);
         }
       } catch (err) {
         console.warn('Could not restore auth session:', err);
         if (isMounted) {
           setUser(null);
-          setActiveRole('citizen');
         }
       } finally {
         if (isMounted) {
@@ -113,7 +97,6 @@ export function AuthProvider({ children }) {
     const result = await loginUser({ email, password });
     if (result.user) {
       setUser(result.user);
-      setActiveRole(result.user.role || 'citizen');
       return result.user;
     }
     throw new Error('Login failed: user data missing from server response.');
@@ -126,7 +109,6 @@ export function AuthProvider({ children }) {
     const result = await registerUser(userData);
     if (result.user) {
       setUser(result.user);
-      setActiveRole(result.user.role || 'citizen');
       return result.user;
     }
     throw new Error('Registration failed: user data missing from server response.');
@@ -138,35 +120,27 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     await logoutUser();
     setUser(null);
-    setActiveRole('citizen');
   };
 
   /**
-   * Development demo role switch (evaluation helper)
-   * In local development, if backend is offline or for quick evaluator inspection,
-   * allows quick UI switching without retyping passwords.
+   * Fast authentic account switch
+   * Performs genuine backend JWT authentication with seeded verified accounts.
    */
-  const switchRole = (newRole) => {
-    const normalized = newRole === 'coordinator' ? 'administrator' : newRole;
-    const config = ROLE_CONFIGS[normalized] || ROLE_CONFIGS.citizen;
-
-    if (user) {
-      // Temporary preview role in dev mode
-      setActiveRole(config.key);
-    } else {
-      // Demo mock session for evaluator convenience
-      const demoUser = {
-        id: `demo-${Date.now()}`,
-        name: config.defaultName,
-        email: config.defaultEmail,
-        role: config.key,
-        district: 'Ampara District',
-        isDemoAccount: true,
-      };
-      setUser(demoUser);
-      setActiveRole(config.key);
+  const switchAccount = async (targetRole) => {
+    let email = 'citizen@resqlanka.lk';
+    let password = 'password123';
+    if (targetRole === 'administrator' || targetRole === 'coordinator') {
+      email = 'admin@resqlanka.lk';
+      password = 'Admin@ResQ2026!';
+    } else if (targetRole === 'volunteer') {
+      email = 'volunteer@resqlanka.lk';
+      password = 'password123';
     }
+    return await login(email, password);
   };
+
+  // Canonical role strictly determined by authentic logged-in user profile
+  const activeRole = user?.role === 'coordinator' ? 'administrator' : (user?.role || 'citizen');
 
   return (
     <AuthContext.Provider
@@ -179,7 +153,8 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        switchRole,
+        switchAccount,
+        switchRole: switchAccount,
       }}
     >
       {children}

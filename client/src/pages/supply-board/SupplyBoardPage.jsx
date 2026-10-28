@@ -233,24 +233,32 @@ export default function SupplyBoardPage() {
               <span>Module 3: Relief Supplies & Verified Donor Pledges</span>
             </div>
 
-            {/* Role Switcher Pill */}
+            {/* Authenticated Account Status */}
             <div className="flex items-center gap-2 bg-slate-800/90 border border-slate-700 px-3.5 py-1.5 rounded-2xl text-xs">
-              <span className="text-slate-400 font-medium">Viewing as:</span>
+              <span className="text-slate-400 font-medium">Logged in:</span>
               <span className="font-bold text-white capitalize bg-blue-600 px-2 py-0.5 rounded-lg">
-                {activeRole}
+                {user ? `${user.name} (${activeRole})` : 'Public Visitor'}
               </span>
               <div className="flex gap-1 ml-2">
-                {['citizen', 'volunteer', 'coordinator'].map((r) => (
+                {[
+                  { key: 'citizen', label: 'Citizen' },
+                  { key: 'volunteer', label: 'Volunteer' },
+                  { key: 'coordinator', label: 'Coordinator' },
+                ].map((item) => (
                   <button
-                    key={r}
-                    onClick={() => switchRole(r)}
+                    key={item.key}
+                    type="button"
+                    title={`Authenticate as ${item.label}`}
+                    onClick={async () => {
+                      await switchRole(item.key);
+                    }}
                     className={`px-2 py-0.5 rounded text-[11px] font-semibold transition ${
-                      activeRole === r
+                      activeRole === item.key && user
                         ? 'bg-white text-slate-900 font-bold'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                    {item.label}
                   </button>
                 ))}
               </div>

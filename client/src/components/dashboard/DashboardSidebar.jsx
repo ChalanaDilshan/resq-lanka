@@ -11,10 +11,9 @@ import { getNavItemsForRole } from './dashboardNavConfig';
 
 export default function DashboardSidebar({ isOpen, onClose }) {
   const location = useLocation();
-  const { user, activeRole, switchRole, logout, roleConfig } = useAuth();
+  const { user, activeRole, logout, roleConfig } = useAuth();
 
   const navItems = getNavItemsForRole(activeRole);
-  const roleOptions = ['citizen', 'volunteer', 'administrator'];
 
   const isActive = (path) => {
     if (path === '/dashboard/citizen' || path === '/dashboard/volunteer' || path === '/dashboard/administrator') {
@@ -63,7 +62,7 @@ export default function DashboardSidebar({ isOpen, onClose }) {
               }`}
             />
             <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              {roleConfig.label} Mode
+              {roleConfig.label} Workspace
             </span>
           </div>
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${roleConfig.badgeClass}`}>
@@ -123,30 +122,32 @@ export default function DashboardSidebar({ isOpen, onClose }) {
 
       {/* Bottom Footer & Session Controls */}
       <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-3">
-        {/* Role Switcher (Evaluation / Demo helper) */}
-        <div className="bg-white rounded-xl p-2.5 border border-slate-200 shadow-xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 px-1">
-            Switch Workspace Role
-          </p>
-          <div className="grid grid-cols-3 gap-1">
-            {roleOptions.map((role) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => {
-                  switchRole(role);
-                }}
-                className={`py-1 px-1.5 rounded-lg text-[11px] font-bold capitalize transition text-center ${
-                  activeRole === role
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
+        {/* Authenticated User Profile */}
+        {user ? (
+          <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <div
+                className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white shrink-0 ${
+                  activeRole === 'administrator'
+                    ? 'bg-emerald-600'
+                    : activeRole === 'volunteer'
+                    ? 'bg-amber-500'
+                    : 'bg-blue-600'
                 }`}
               >
-                {role === 'administrator' ? 'Admin' : role}
-              </button>
-            ))}
+                {(user.name || user.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div className="truncate min-w-0 flex-1">
+                <div className="text-xs font-bold text-slate-800 truncate">
+                  {user.name}
+                </div>
+                <div className="text-[10px] text-slate-400 capitalize truncate">
+                  {user.role} &bull; {user.district || 'National'}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         {/* Public Portal Link */}
         <Link

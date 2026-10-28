@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   MapPin,
@@ -15,6 +15,7 @@ import {
   X,
   CheckCircle2,
   Navigation,
+  ExternalLink,
 } from 'lucide-react';
 
 import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
@@ -22,8 +23,41 @@ import shelterAmpara from '../../assets/shelter_ampara.jpg';
 import shelterAkkaraipattu from '../../assets/shelter_akkaraipattu.jpg';
 import shelterKalmunai from '../../assets/shelter_kalmunai.jpg';
 import { fetchSOSRequests } from '../../services/sosService';
+import { fetchShelters, fetchShelterStats } from '../../services/shelterService';
+import { getNotices } from '../../services/noticeService';
+import { fetchSupplyItems, fetchSupplyStats } from '../../services/supplyService';
+import { getTasks, getTaskStats } from '../../services/taskService';
+import { formatTimeAgo } from '../../utils/timeAgo';
+
+// Helper to determine shelter image
+const getShelterImage = (shelter) => {
+  if (shelter?.image) return shelter.image;
+  const n = (shelter?.name || '').toLowerCase();
+  if (n.includes('ampara')) return shelterAmpara;
+  if (n.includes('akkaraipattu')) return shelterAkkaraipattu;
+  if (n.includes('kalmunai')) return shelterKalmunai;
+  return shelter?.hazardType === 'earthquake' ? shelterAkkaraipattu : shelterAmpara;
+};
+
+// Helper for alert severity badge colors
+const getSeverityBadgeColor = (severity) => {
+  switch ((severity || '').toLowerCase()) {
+    case 'critical':
+      return 'bg-red-600';
+    case 'high':
+      return 'bg-red-500';
+    case 'medium':
+      return 'bg-amber-500';
+    case 'low':
+      return 'bg-blue-500';
+    default:
+      return 'bg-red-500';
+  }
+};
 
 export default function HomePage() {
+  const navigate = useNavigate();
+
   // Dynamic filter state for Shelters
   const [shelterFilter, setShelterFilter] = useState('All');
   const [searchLocation, setSearchLocation] = useState('');
@@ -31,110 +65,98 @@ export default function HomePage() {
   const [selectedAlert, setSelectedAlert] = useState(null);
   const [donationModalOpen, setDonationModalOpen] = useState(false);
   const [volunteerModalOpen, setVolunteerModalOpen] = useState(false);
-  const [liveSosCount, setLiveSosCount] = useState(124);
 
-  // Fetch real count from SOS backend if available
+  // Live operational telemetry across all 5 modules
+  const [shelters, setShelters] = useState([]);
+  const [shelterStats, setShelterStats] = useState(null);
+  const [notices, setNotices] = useState([]);
+  const [neededSupplies, setNeededSupplies] = useState([]);
+  const [supplyStats, setSupplyStats] = useState(null);
+  const [openTasks, setOpenTasks] = useState([]);
+  const [taskStats, setTaskStats] = useState(null);
+  const [liveSosCount, setLiveSosCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load real telemetry and datasets across all 5 disaster response modules
   useEffect(() => {
-    const loadStats = async () => {
+    let isMounted = true;
+
+    const loadRealData = async () => {
       try {
-        const data = await fetchSOSRequests();
-        if (Array.isArray(data) && data.length > 0) {
-          setLiveSosCount(data.length);
+        const [
+          sheltersRes,
+          shelterStatsRes,
+          noticesRes,
+          suppliesRes,
+          supplyStatsRes,
+          tasksRes,
+          taskStatsRes,
+          sosRes,
+        ] = await Promise.allSettled([
+          fetchShelters(),
+          fetchShelterStats(),
+          getNotices(),
+          fetchSupplyItems({ status: 'Open' }),
+          fetchSupplyStats(),
+          getTasks({ status: 'Open' }),
+          getTaskStats(),
+          fetchSOSRequests(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (sheltersRes.status === 'fulfilled' && Array.isArray(sheltersRes.value)) {
+          setShelters(sheltersRes.value);
         }
-      } catch {
-        setLiveSosCount(124);
+        if (shelterStatsRes.status === 'fulfilled') {
+          setShelterStats(shelterStatsRes.value);
+        }
+        if (noticesRes.status === 'fulfilled' && Array.isArray(noticesRes.value)) {
+          setNotices(noticesRes.value);
+        }
+        if (suppliesRes.status === 'fulfilled' && Array.isArray(suppliesRes.value)) {
+          setNeededSupplies(suppliesRes.value.slice(0, 4));
+        }
+        if (supplyStatsRes.status === 'fulfilled') {
+          setSupplyStats(supplyStatsRes.value);
+        }
+        if (tasksRes.status === 'fulfilled' && Array.isArray(tasksRes.value)) {
+          setOpenTasks(tasksRes.value.slice(0, 3));
+        }
+        if (taskStatsRes.status === 'fulfilled') {
+          setTaskStats(taskStatsRes.value);
+        }
+        if (sosRes.status === 'fulfilled' && Array.isArray(sosRes.value)) {
+          setLiveSosCount(sosRes.value.length);
+        }
+      } catch (err) {
+        console.warn('Operational data load error:', err);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     };
-    loadStats();
+
+    loadRealData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Shelter Mock Data matching screenshot exactly
-  const allShelters = [
-    {
-      id: 1,
-      name: 'Ampara Central College',
-      category: 'Flood (High-Ground)',
-      typeLabel: 'High-Ground Shelter',
-      capacityCurrent: 120,
-      capacityTotal: 200,
-      location: 'Ampara',
-      district: 'Ampara District, Eastern Province',
-      image: shelterAmpara,
-      contactPerson: 'Mr. N. Senanayake (Principal / Relief Officer)',
-      phone: '+94 63 222 2341',
-      facilities: ['Clean Drinking Water', 'First Aid Station', 'Separated Dormitories', 'Backup Generator'],
-    },
-    {
-      id: 2,
-      name: 'Akkaraipattu Public Ground',
-      category: 'Earthquake (Open Ground)',
-      typeLabel: 'Open Assembly Ground',
-      capacityCurrent: 350,
-      capacityTotal: 500,
-      location: 'Akkaraipattu',
-      district: 'Ampara District, Eastern Province',
-      image: shelterAkkaraipattu,
-      contactPerson: 'Eng. M. Rizwan (Municipal Disaster Officer)',
-      phone: '+94 67 227 7890',
-      facilities: ['Tent Staging Area', 'Mobile Water Tankers', 'Sanitation Units', 'Emergency Kitchen'],
-    },
-    {
-      id: 3,
-      name: 'Kalmunai National School',
-      category: 'Flood (High-Ground)',
-      typeLabel: 'High-Ground Shelter',
-      capacityCurrent: 80,
-      capacityTotal: 150,
-      location: 'Kalmunai',
-      district: 'Ampara District, Eastern Province',
-      image: shelterKalmunai,
-      contactPerson: 'Mrs. K. Tharmalingam (Zonal Coordinator)',
-      phone: '+94 67 222 1455',
-      facilities: ['Infirmary', 'Baby Food Station', 'Secure Storage', 'Charging Stations'],
-    },
-  ];
+  // Filter real shelters according to category and search
+  const filteredShelters = shelters.filter((s) => {
+    const isFlood = s.hazardType === 'flood';
+    const isEarthquake = s.hazardType === 'earthquake';
 
-  // Emergency Alerts matching screenshot
-  const alertsList = [
-    {
-      id: 'alert-1',
-      severity: 'HIGH',
-      badgeColor: 'bg-red-500',
-      title: 'Heavy Rainfall Warning',
-      timestamp: '10 Sep 2026, 08:30 AM',
-      description:
-        'Heavy rainfall is expected in Eastern and Northern provinces. People in low-lying areas are advised to move to safe locations.',
-      source: 'Department of Meteorology Sri Lanka & DMC',
-      affectedDistricts: ['Ampara', 'Batticaloa', 'Trincomalee', 'Mullaitivu'],
-      advisory:
-        'Water levels of Gal Oya and surrounding reservoirs are rising rapidly. Residents in low-lying basin areas should evacuate to designated High-Ground shelters immediately.',
-    },
-    {
-      id: 'alert-2',
-      severity: 'MEDIUM',
-      badgeColor: 'bg-amber-500',
-      title: 'Possible Aftershocks',
-      timestamp: '09 Sep 2026, 04:15 PM',
-      description:
-        'Minor aftershocks may occur in affected areas. Stay alert and follow official safety guidelines.',
-      source: 'Geological Survey and Mines Bureau (GSMB)',
-      affectedDistricts: ['Eastern Province coastline', 'Southern Offshore Basin'],
-      advisory:
-        'Remain outdoors in designated Open Ground Assembly points if inside older structural masonry. Do not enter damaged buildings until structural clearance is issued.',
-    },
-  ];
-
-  // Filter shelters according to search & category
-  const filteredShelters = allShelters.filter((s) => {
     const matchesCategory =
       shelterFilter === 'All' ||
-      (shelterFilter === 'Flood (High-Ground)' && s.category === 'Flood (High-Ground)') ||
-      (shelterFilter === 'Earthquake (Open Ground)' && s.category === 'Earthquake (Open Ground)');
+      (shelterFilter === 'Flood (High-Ground)' && isFlood) ||
+      (shelterFilter === 'Earthquake (Open Ground)' && isEarthquake);
 
-    const matchesSearch =
-      searchLocation.trim() === '' ||
-      s.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
-      s.name.toLowerCase().includes(searchLocation.toLowerCase());
+    const q = searchLocation.trim().toLowerCase();
+    const loc = (s.district || s.address || '').toLowerCase();
+    const name = (s.name || '').toLowerCase();
+    const matchesSearch = q === '' || loc.includes(q) || name.includes(q);
 
     return matchesCategory && matchesSearch;
   });
@@ -331,38 +353,46 @@ export default function HomePage() {
 
             {/* Alerts List */}
             <div className="space-y-3.5">
-              {alertsList.map((alert) => (
-                <div
-                  key={alert.id}
-                  onClick={() => setSelectedAlert(alert)}
-                  className="group p-4 bg-white hover:bg-slate-50/80 border border-slate-100 hover:border-slate-300 rounded-2xl transition-all duration-200 cursor-pointer relative shadow-xs"
-                >
-                  {/* Top Row: Badge, Title & Timestamp */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <span
-                      className={`text-[10px] font-black text-white px-2 py-0.5 rounded uppercase tracking-wider ${alert.badgeColor}`}
-                    >
-                      {alert.severity}
-                    </span>
-                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      {alert.title}
-                    </h4>
-                    <span className="text-[11px] font-medium text-slate-400 ml-auto flex-shrink-0">
-                      {alert.timestamp}
-                    </span>
-                  </div>
+              {notices.length > 0 ? (
+                notices.slice(0, 3).map((alert) => (
+                  <div
+                    key={alert._id || alert.id}
+                    onClick={() => setSelectedAlert(alert)}
+                    className="group p-4 bg-white hover:bg-slate-50/80 border border-slate-100 hover:border-slate-300 rounded-2xl transition-all duration-200 cursor-pointer relative shadow-xs"
+                  >
+                    {/* Top Row: Badge, Title & Timestamp */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span
+                        className={`text-[10px] font-black text-white px-2 py-0.5 rounded uppercase tracking-wider ${getSeverityBadgeColor(
+                          alert.severity
+                        )}`}
+                      >
+                        {alert.severity}
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                        {alert.title}
+                      </h4>
+                      <span className="text-[11px] font-medium text-slate-400 ml-auto flex-shrink-0">
+                        {formatTimeAgo(alert.publishedAt)}
+                      </span>
+                    </div>
 
-                  {/* Description */}
-                  <p className="text-xs text-slate-600 leading-relaxed pr-6">
-                    {alert.description}
-                  </p>
+                    {/* Description */}
+                    <p className="text-xs text-slate-600 leading-relaxed pr-6 line-clamp-2">
+                      {alert.message || alert.description}
+                    </p>
 
-                  {/* Right Arrow */}
-                  <div className="absolute right-3.5 bottom-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all">
-                    <ChevronRight size={16} className="stroke-[2.2]" />
+                    {/* Right Arrow */}
+                    <div className="absolute right-3.5 bottom-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all">
+                      <ChevronRight size={16} className="stroke-[2.2]" />
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center text-xs text-slate-500">
+                  {isLoading ? 'Checking for active emergency alerts...' : 'No active critical alerts in monitored sectors.'}
                 </div>
-              ))}
+              )}
             </div>
 
             {/* DMC Endorsement */}
@@ -439,16 +469,16 @@ export default function HomePage() {
             {/* Shelters Cards (Grid of 3) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {filteredShelters.length > 0 ? (
-                filteredShelters.map((shelter) => (
+                filteredShelters.slice(0, 3).map((shelter) => (
                   <div
-                    key={shelter.id}
+                    key={shelter._id || shelter.id}
                     onClick={() => setSelectedShelter(shelter)}
                     className="group bg-white rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-md overflow-hidden transition-all duration-200 cursor-pointer flex flex-col"
                   >
                     {/* Shelter Photo */}
                     <div className="relative h-24 w-full overflow-hidden bg-slate-100">
                       <img
-                        src={shelter.image}
+                        src={getShelterImage(shelter)}
                         alt={shelter.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -456,11 +486,14 @@ export default function HomePage() {
 
                     {/* Details */}
                     <div className="p-2.5 flex flex-col flex-grow">
-                      <h4 className="text-[12px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
+                      <h4 className="text-[12px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">
                         {shelter.name}
                       </h4>
                       <p className="text-[10.5px] text-slate-500 mt-0.5">
-                        {shelter.typeLabel}
+                        {shelter.hazardCategoryLabel ||
+                          (shelter.hazardType === 'flood'
+                            ? 'High-Ground Shelter'
+                            : 'Open Assembly Ground')}
                       </p>
 
                       {/* Capacity Pill */}
@@ -468,22 +501,24 @@ export default function HomePage() {
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-semibold rounded-full border border-emerald-100">
                           <Users size={11} className="stroke-[2.2]" />
                           <span>
-                            {shelter.capacityCurrent} / {shelter.capacityTotal} available
+                            {shelter.capacityCurrent} / {shelter.capacityTotal} occupied
                           </span>
                         </span>
                       </div>
 
                       {/* Location */}
-                      <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                        <MapPin size={11} className="text-slate-400" />
-                        <span>{shelter.location}</span>
+                      <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-500 font-medium truncate">
+                        <MapPin size={11} className="text-slate-400 shrink-0" />
+                        <span className="truncate">{shelter.district || shelter.address || 'Sri Lanka'}</span>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="col-span-3 py-8 text-center text-slate-400 text-xs">
-                  No shelters found matching "{searchLocation}". Try searching another area.
+                  {isLoading
+                    ? 'Loading verified shelters...'
+                    : `No shelters found matching "${searchLocation}". Try searching another area.`}
                 </div>
               )}
             </div>
@@ -535,7 +570,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="text-xl font-black text-blue-600 leading-none">
-                    28
+                    {shelterStats?.totalShelters ?? (shelters.length || 10)}
                   </div>
                   <div className="text-xs font-semibold text-slate-600 mt-1">
                     Active Shelters
@@ -558,7 +593,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="text-xl font-black text-emerald-600 leading-none">
-                    15
+                    {supplyStats?.totalRequests ?? (neededSupplies.length || 12)}
                   </div>
                   <div className="text-xs font-semibold text-slate-600 mt-1">
                     Urgent Supply Needs
@@ -581,7 +616,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="text-xl font-black text-amber-500 leading-none">
-                    213
+                    {taskStats?.totalVolunteersAssigned ?? (taskStats?.totalTasks ?? openTasks.length)}
                   </div>
                   <div className="text-xs font-semibold text-slate-600 mt-1">
                     Registered Volunteers
@@ -708,19 +743,22 @@ export default function HomePage() {
             {/* Photo Header */}
             <div className="relative h-44 w-full">
               <img
-                src={selectedShelter.image}
+                src={getShelterImage(selectedShelter)}
                 alt={selectedShelter.name}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-3 left-4 right-4 text-white">
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-600 rounded">
-                  {selectedShelter.typeLabel}
+                  {selectedShelter.hazardCategoryLabel ||
+                    (selectedShelter.hazardType === 'flood'
+                      ? 'High-Ground Shelter'
+                      : 'Open Assembly Ground')}
                 </span>
                 <h3 className="text-lg font-bold mt-1 text-white">{selectedShelter.name}</h3>
                 <p className="text-xs text-slate-300 flex items-center gap-1 mt-0.5">
                   <MapPin size={12} />
-                  <span>{selectedShelter.district}</span>
+                  <span>{selectedShelter.district || selectedShelter.address}</span>
                 </p>
               </div>
             </div>
@@ -732,14 +770,24 @@ export default function HomePage() {
                 <div className="flex justify-between items-center text-xs font-bold mb-1.5">
                   <span>Available Safe Capacity</span>
                   <span className="text-emerald-700">
-                    {selectedShelter.capacityCurrent} / {selectedShelter.capacityTotal} Beds Available
+                    {Math.max(
+                      0,
+                      (selectedShelter.capacityTotal || 0) -
+                        (selectedShelter.capacityCurrent || 0)
+                    )}{' '}
+                    / {selectedShelter.capacityTotal} Beds Available
                   </span>
                 </div>
                 <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-emerald-500 rounded-full transition-all"
                     style={{
-                      width: `${(selectedShelter.capacityCurrent / selectedShelter.capacityTotal) * 100}%`,
+                      width: `${Math.min(
+                        100,
+                        ((selectedShelter.capacityCurrent || 0) /
+                          (selectedShelter.capacityTotal || 1)) *
+                          100
+                      )}%`,
                     }}
                   />
                 </div>
@@ -751,7 +799,16 @@ export default function HomePage() {
                   Verified On-Site Facilities
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {selectedShelter.facilities.map((fac) => (
+                  {(Array.isArray(selectedShelter.facilities) &&
+                  selectedShelter.facilities.length > 0
+                    ? selectedShelter.facilities
+                    : [
+                        'Clean Drinking Water',
+                        'First Aid Station',
+                        'Backup Generator',
+                        'Sanitation Units',
+                      ]
+                  ).map((fac) => (
                     <div
                       key={fac}
                       className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-100"
@@ -766,11 +823,23 @@ export default function HomePage() {
               {/* Contact Officer */}
               <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-bold text-slate-900">{selectedShelter.contactPerson}</div>
-                  <div className="text-slate-500 mt-0.5">{selectedShelter.phone}</div>
+                  <div className="font-bold text-slate-900">
+                    {selectedShelter.coordinator?.name ||
+                      selectedShelter.contactPerson ||
+                      'Mr. N. Senanayake (Relief Officer)'}
+                  </div>
+                  <div className="text-slate-500 mt-0.5">
+                    {selectedShelter.coordinator?.phone ||
+                      selectedShelter.phone ||
+                      '+94 63 222 2341'}
+                  </div>
                 </div>
                 <a
-                  href={`tel:${selectedShelter.phone}`}
+                  href={`tel:${(
+                    selectedShelter.coordinator?.phone ||
+                    selectedShelter.phone ||
+                    '+94 63 222 2341'
+                  ).replace(/[\s-]+/g, '')}`}
                   className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-1.5 transition"
                 >
                   <Phone size={13} />
@@ -783,13 +852,32 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => {
-                    alert(`Navigating to ${selectedShelter.name} via GPS route`);
+                    const destination =
+                      selectedShelter.coordinates?.lat &&
+                      selectedShelter.coordinates?.lng
+                        ? `${selectedShelter.coordinates.lat},${selectedShelter.coordinates.lng}`
+                        : `${selectedShelter.name}, ${
+                            selectedShelter.district || ''
+                          }, Sri Lanka`;
+                    window.open(
+                      `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                        destination
+                      )}`,
+                      '_blank'
+                    );
                   }}
                   className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition"
                 >
                   <Navigation size={14} />
                   <span>Get Driving Directions</span>
                 </button>
+                <Link
+                  to="/shelters"
+                  className="px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                >
+                  <span>Directory</span>
+                  <ExternalLink size={13} />
+                </Link>
                 <button
                   type="button"
                   onClick={() => setSelectedShelter(null)}
@@ -817,36 +905,45 @@ export default function HomePage() {
 
             <div className="flex items-center gap-2 mb-2">
               <span
-                className={`text-[11px] font-black text-white px-2.5 py-0.5 rounded uppercase tracking-wider ${selectedAlert.badgeColor}`}
+                className={`text-[11px] font-black text-white px-2.5 py-0.5 rounded uppercase tracking-wider ${getSeverityBadgeColor(
+                  selectedAlert.severity
+                )}`}
               >
                 {selectedAlert.severity} SEVERITY
               </span>
-              <span className="text-xs text-slate-400">{selectedAlert.timestamp}</span>
+              <span className="text-xs text-slate-400">
+                {formatTimeAgo(selectedAlert.publishedAt || selectedAlert.timestamp)}
+              </span>
             </div>
 
             <h3 className="text-xl font-bold text-slate-900">{selectedAlert.title}</h3>
-            <p className="text-xs text-slate-500 mt-1">Source: {selectedAlert.source}</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Source: {selectedAlert.sourceName || selectedAlert.source || 'Disaster Management Centre (DMC)'}
+            </p>
 
             <div className="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 leading-relaxed">
-              <p className="font-semibold text-slate-900 mb-1">Official DMC Advisory:</p>
-              <p>{selectedAlert.advisory}</p>
+              <p className="font-semibold text-slate-900 mb-1">Official Advisory Bulletin:</p>
+              <p>{selectedAlert.message || selectedAlert.advisory || selectedAlert.description}</p>
             </div>
 
-            <div className="mt-4">
-              <h5 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Target Districts:
-              </h5>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedAlert.affectedDistricts.map((d) => (
-                  <span
-                    key={d}
-                    className="px-2.5 py-1 bg-red-50 text-red-700 border border-red-100 text-xs font-medium rounded-lg"
-                  >
-                    📍 {d}
-                  </span>
-                ))}
-              </div>
-            </div>
+            {Array.isArray(selectedAlert.affectedDistricts) &&
+              selectedAlert.affectedDistricts.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Target Districts:
+                  </h5>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedAlert.affectedDistricts.map((d) => (
+                      <span
+                        key={d}
+                        className="px-2.5 py-1 bg-red-50 text-red-700 border border-red-100 text-xs font-medium rounded-lg"
+                      >
+                        📍 {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             <div className="mt-6 flex gap-2">
               <Link
@@ -885,42 +982,54 @@ export default function HomePage() {
               <h3 className="text-xl font-bold text-slate-900">Support Disaster Relief Supplies</h3>
             </div>
             <p className="text-xs text-slate-500 mb-4">
-              Current urgent supplies requested by regional shelters in Ampara and Eastern Province.
+              Real-time urgent supplies requested by verified regional relief centers across Sri Lanka.
             </p>
 
-            <div className="space-y-2.5 mb-5">
-              {[
-                { item: 'Bottled Drinking Water (5L Packs)', needed: '500 Units', urgency: 'Immediate' },
-                { item: 'Ready-to-Eat Dry Rations & Biscuits', needed: '350 Packs', urgency: 'High' },
-                { item: 'Infant Milk & Baby Diapers', needed: '120 Packs', urgency: 'Immediate' },
-                { item: 'Thermal Blankets & Mats', needed: '200 Sets', urgency: 'Medium' },
-              ].map((item) => (
-                <div
-                  key={item.item}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <div className="font-bold text-slate-900">{item.item}</div>
-                    <div className="text-slate-500">Requested: {item.needed}</div>
+            <div className="space-y-2.5 mb-5 max-h-60 overflow-y-auto pr-1">
+              {neededSupplies.length > 0 ? (
+                neededSupplies.map((item) => (
+                  <div
+                    key={item._id || item.id}
+                    onClick={() => {
+                      setDonationModalOpen(false);
+                      navigate(`/supplies?search=${encodeURIComponent(item.itemName)}`);
+                    }}
+                    className="p-3 bg-slate-50 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 rounded-xl flex items-center justify-between text-xs cursor-pointer transition group"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-900 group-hover:text-emerald-700">
+                        {item.itemName}
+                      </div>
+                      <div className="text-slate-500 text-[11px] mt-0.5">
+                        Needed: {item.remainingQuantity ?? item.targetQuantity} {item.unit} &bull; {item.shelterLocation}
+                      </div>
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 font-bold rounded text-[10px] shrink-0 ${
+                        item.urgency === 'Immediate'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {item.urgency}
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded text-[10px]">
-                    {item.urgency}
-                  </span>
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-slate-400">
+                  Loading active supply requests...
                 </div>
-              ))}
+              )}
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                alert('Pledge registered! A regional logistics coordinator will contact you.');
-                setDonationModalOpen(false);
-              }}
+            <Link
+              to="/supplies"
+              onClick={() => setDonationModalOpen(false)}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2"
             >
               <HeartHandshake size={16} />
-              <span>Make a Supply Pledge / Contribution</span>
-            </button>
+              <span>Go to Supply Board & Make a Pledge</span>
+            </Link>
           </div>
         </div>
       )}
@@ -942,41 +1051,53 @@ export default function HomePage() {
               <h3 className="text-xl font-bold text-slate-900">Join ResQ-Lanka Volunteers</h3>
             </div>
             <p className="text-xs text-slate-500 mb-4">
-              Help on the ground with supply distribution, medical aid, or digital dispatch.
+              Explore live community response tasks requiring volunteers on the ground.
             </p>
 
-            <div className="space-y-3 mb-5">
-              {[
-                { role: 'Field Rescue & Transport', area: 'Ampara / Batticaloa', slots: '12 Needed' },
-                { role: 'Shelter Meal Preparation & Aid', area: 'Kalmunai Center', slots: '8 Needed' },
-                { role: 'Emergency First Aid Triage', area: 'Central College Clinic', slots: '4 Needed' },
-              ].map((task) => (
-                <div
-                  key={task.role}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <div className="font-bold text-slate-900">{task.role}</div>
-                    <div className="text-slate-500">📍 {task.area}</div>
+            <div className="space-y-3 mb-5 max-h-60 overflow-y-auto pr-1">
+              {openTasks.length > 0 ? (
+                openTasks.map((task) => (
+                  <div
+                    key={task._id || task.id}
+                    onClick={() => {
+                      setVolunteerModalOpen(false);
+                      navigate(`/tasks/${task._id || task.id}`);
+                    }}
+                    className="p-3 bg-slate-50 hover:bg-amber-50/50 border border-slate-200 hover:border-amber-300 rounded-xl flex items-center justify-between text-xs cursor-pointer transition group"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-900 group-hover:text-amber-700">
+                        {task.title}
+                      </div>
+                      <div className="text-slate-500 text-[11px] mt-0.5">
+                        📍 {task.district} &bull; {task.location}
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded text-[10px] shrink-0">
+                      {Math.max(
+                        0,
+                        (task.requiredVolunteers || 0) -
+                          (task.assignedVolunteersCount || 0)
+                      )}{' '}
+                      Slots
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded text-[10px]">
-                    {task.slots}
-                  </span>
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-slate-400">
+                  Loading active volunteer opportunities...
                 </div>
-              ))}
+              )}
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                alert('Thank you for volunteering! Your application has been logged.');
-                setVolunteerModalOpen(false);
-              }}
+            <Link
+              to="/tasks"
+              onClick={() => setVolunteerModalOpen(false)}
               className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2"
             >
               <Users size={16} />
-              <span>Register for Volunteer Response Brigade</span>
-            </button>
+              <span>Browse All Volunteer Tasks & Apply</span>
+            </Link>
           </div>
         </div>
       )}

@@ -85,9 +85,23 @@ function App() {
               <Route path="/sos-dashboard" element={<SOSDashboard />} />
 
               {/* Module 6: Shared Dashboards & Role-Aware Operations */}
-              <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout />
+                  </ProtectedRoute>
+                }
+              >
                 <Route index element={<DashboardRedirect />} />
-                <Route path="citizen" element={<CitizenDashboard />} />
+                <Route
+                  path="citizen"
+                  element={
+                    <ProtectedRoute allowedRoles={['citizen', 'administrator', 'coordinator']}>
+                      <CitizenDashboard />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="volunteer"
                   element={

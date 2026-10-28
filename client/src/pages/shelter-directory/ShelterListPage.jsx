@@ -202,10 +202,12 @@ export default function ShelterListPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => switchRole('administrator')}
+                    onClick={async () => {
+                      await switchRole('administrator');
+                    }}
                     className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition shadow-xs"
                   >
-                    Switch to Administrator
+                    Switch to Administrator (Live)
                   </button>
                 </div>
               )}
@@ -444,7 +446,9 @@ export default function ShelterListPage() {
                 isCoordinator={isAuthorizedManager}
                 onOpenOccupancyModal={(sh) => setEditingShelter(sh)}
                 onSelectShelter={(sh) => setSelectedShelter(sh)}
-                onSwitchToCoordinator={() => switchRole('administrator')}
+                onSwitchToCoordinator={async () => {
+                  await switchRole('administrator');
+                }}
               />
             ))}
           </div>
@@ -468,7 +472,9 @@ export default function ShelterListPage() {
           onClose={() => setSelectedShelter(null)}
           onOpenOccupancyModal={(sh) => setEditingShelter(sh)}
           isCoordinator={isAuthorizedManager}
-          onSwitchToCoordinator={() => switchRole('administrator')}
+          onSwitchToCoordinator={async () => {
+            await switchRole('administrator');
+          }}
         />
       )}
 

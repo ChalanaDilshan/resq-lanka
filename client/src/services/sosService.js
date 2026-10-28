@@ -10,12 +10,24 @@ const getSOSBaseUrl = () => {
 
 const API_BASE_URL = getSOSBaseUrl();
 
+const TOKEN_KEY = 'resq_jwt_token';
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 /**
  * Submit emergency SOS request
  */
 export const createSOSRequest = async (formData) => {
   try {
-    const response = await axios.post(API_BASE_URL, formData);
+    const response = await axios.post(API_BASE_URL, formData, {
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data?.data || response.data;
   } catch (error) {
     const message =
@@ -72,10 +84,19 @@ export const fetchSOSById = async (id) => {
  */
 export const updateSOSStatus = async (id, status, note = '') => {
   try {
-    const response = await axios.patch(`${API_BASE_URL}/${id}/status`, {
-      status,
-      note,
-    });
+    const response = await axios.patch(
+      `${API_BASE_URL}/${id}/status`,
+      {
+        status,
+        note,
+      },
+      {
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json',
+        },
+      }
+    );
     return response.data?.data || response.data;
   } catch (error) {
     const message =

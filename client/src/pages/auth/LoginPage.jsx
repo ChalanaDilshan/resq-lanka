@@ -100,28 +100,11 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error('Auth operation failed:', err);
-      // If backend API is unreachable in evaluation environment, fallback gracefully to mock demo login
-      if (
-        err.message?.includes('Network Error') ||
-        err.message?.includes('ECONNREFUSED') ||
-        err.message?.includes('Failed to fetch')
-      ) {
-        setErrorMessage(
-          'Backend API offline. Switched to offline demo mode for evaluation.'
-        );
-        const demoRole =
-          email.includes('admin') || email.includes('coordinator')
-            ? 'administrator'
-            : email.includes('volunteer')
-            ? 'volunteer'
-            : 'citizen';
-        switchRole(demoRole);
-        setTimeout(() => {
-          navigate(demoRole === 'administrator' ? '/coordinator' : '/');
-        }, 700);
-      } else {
-        setErrorMessage(err.message || 'Authentication failed. Please try again.');
-      }
+      setErrorMessage(
+        err.response?.data?.message ||
+          err.message ||
+          'Authentication failed. Please check your credentials and try again.'
+      );
     } finally {
       setIsLoading(false);
     }
