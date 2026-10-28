@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ShieldAlert, ArrowLeft } from 'lucide-react';
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
-  const { user, isAuthenticated, isLoading, activeRole } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     // Redirect unauthenticated user to login, preserving intended destination
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
@@ -25,10 +25,10 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   // Check role authorization
   if (allowedRoles.length > 0) {
     // Treat legacy 'coordinator' as matching 'administrator'
-    const normalizedUserRole = user?.role === 'coordinator' ? 'administrator' : user?.role;
+    const normalizedUserRole = user.role === 'coordinator' ? 'administrator' : user.role;
     const isAuthorized = allowedRoles.some((role) => {
       const normalizedAllowed = role === 'coordinator' ? 'administrator' : role;
-      return normalizedAllowed === normalizedUserRole || normalizedAllowed === activeRole;
+      return normalizedAllowed === normalizedUserRole;
     });
 
     if (!isAuthorized) {
@@ -43,16 +43,17 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed mb-6">
               This operational area requires one of the following roles: [
-              <strong>{allowedRoles.join(', ')}</strong>]. Your current active
-              role is <strong>{user?.role || activeRole}</strong>.
+              <strong className="capitalize">{allowedRoles.join(', ')}</strong>]. Your current assigned
+              account role is <strong className="capitalize">{user.role}</strong>. Please sign in with an authorized
+              account to access this section.
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">
               <Link
-                to="/"
+                to="/dashboard"
                 className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5"
               >
                 <ArrowLeft size={14} />
-                <span>Return to Home</span>
+                <span>My Dashboard</span>
               </Link>
               <Link
                 to="/login"

@@ -257,6 +257,7 @@ export const createSupplyRequest = async (itemData) => {
 export const submitDonorPledge = async (itemId, pledgeData) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/${itemId}/pledge`, pledgeData, {
+      headers: getAuthHeaders(),
       timeout: 5000,
     });
     return response.data;
