@@ -64,6 +64,46 @@ export const loginUser = async ({ email, password }) => {
 };
 
 /**
+ * Verify 6-digit OTP code using temporary session token
+ */
+export const verifyOtp = async ({ tempToken, otp }) => {
+  try {
+    const response = await axios.post(`${AUTH_API_URL}/verify-otp`, {
+      tempToken,
+      otp,
+    });
+    if (response.data?.token) {
+      setAuthToken(response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      'Invalid or expired verification code.';
+    throw new Error(message, { cause: error });
+  }
+};
+
+/**
+ * Resend a new OTP code to user's email
+ */
+export const resendOtp = async ({ tempToken }) => {
+  try {
+    const response = await axios.post(`${AUTH_API_URL}/resend-otp`, {
+      tempToken,
+    });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      'Failed to resend verification code.';
+    throw new Error(message, { cause: error });
+  }
+};
+
+/**
  * Fetch authenticated user profile using stored JWT
  */
 export const fetchCurrentUser = async () => {

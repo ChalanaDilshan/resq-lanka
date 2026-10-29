@@ -5,6 +5,8 @@ import {
   registerUser,
   fetchCurrentUser,
   logoutUser,
+  verifyOtp,
+  resendOtp,
 } from '../services/authService';
 
 const AuthContext = createContext(null);
@@ -91,15 +93,37 @@ export function AuthProvider({ children }) {
   }, []);
 
   /**
-   * Real backend login
+   * Real backend login - handles OTP flow and direct login
    */
   const login = async (email, password) => {
     const result = await loginUser({ email, password });
+    if (result.requiresOtp) {
+      return result;
+    }
+    if (result.user) {
+      setUser(result.user);
+      return result;
+    }
+    throw new Error('Login failed: user data missing from server response.');
+  };
+
+  /**
+   * Verify OTP code and activate authenticated session
+   */
+  const verifyOtpCode = async (tempToken, otp) => {
+    const result = await verifyOtp({ tempToken, otp });
     if (result.user) {
       setUser(result.user);
       return result.user;
     }
-    throw new Error('Login failed: user data missing from server response.');
+    throw new Error('Verification failed: user data missing from server response.');
+  };
+
+  /**
+   * Request resending a fresh OTP code
+   */
+  const resendOtpCode = async (tempToken) => {
+    return await resendOtp({ tempToken });
   };
 
   /**
@@ -151,6 +175,8 @@ export function AuthProvider({ children }) {
         activeRole,
         roleConfig: ROLE_CONFIGS[activeRole] || ROLE_CONFIGS.citizen,
         login,
+        verifyOtp: verifyOtpCode,
+        resendOtp: resendOtpCode,
         register,
         logout,
         switchAccount,
