@@ -5,7 +5,6 @@ import {
   Waves,
   TreePine,
   ShieldCheck,
-  CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -133,68 +132,69 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 animate-fadeIn">
+      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 flex items-start justify-between bg-gradient-to-r from-blue-50/50 via-white to-emerald-50/50">
+        <div className="p-4 sm:p-5 border-b border-slate-200 flex items-start justify-between bg-slate-50">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-blue-100 text-blue-800 mb-1">
-              <ShieldCheck size={13} />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-slate-900 text-white mb-1">
+              <ShieldCheck size={12} />
               DMC Registration Protocol
             </span>
-            <h3 className="text-xl font-black text-slate-900 leading-tight">
+            <h3 className="text-lg font-bold text-slate-900 leading-snug">
               Register Verified Disaster Shelter
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Categorize safe facility by hazard vulnerability profile
+              Classify safe haven by hazard vulnerability and evacuation profile
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-md transition"
+            aria-label="Close dialog"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
           {errorMsg && (
-            <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2 font-medium">
-              <AlertTriangle size={16} className="text-red-500 shrink-0" />
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-md text-xs flex items-center gap-2 font-medium">
+              <AlertTriangle size={15} className="text-rose-600 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Hazard Type Radio Cards */}
           <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-800 mb-1.5">
               Hazard Categorization *
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {/* Flood Option */}
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, hazardType: 'flood' })}
-                className={`p-4 rounded-2xl border text-left transition-all relative ${
+                className={`p-3.5 rounded-lg border text-left transition-all relative ${
                   formData.hazardType === 'flood'
-                    ? 'border-cyan-500 bg-cyan-50/70 ring-2 ring-cyan-500/20'
+                    ? 'border-sky-600 bg-sky-50/70 ring-1 ring-sky-600'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-9 h-9 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
-                    <Waves size={18} />
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="w-8 h-8 rounded-md bg-sky-100 text-sky-800 flex items-center justify-center font-bold">
+                    <Waves size={16} />
                   </div>
                   {formData.hazardType === 'flood' && (
-                    <CheckCircle2 size={18} className="text-cyan-600 fill-cyan-100" />
+                    <span className="w-2 h-2 rounded-full bg-sky-600" />
                   )}
                 </div>
-                <div className="font-extrabold text-sm text-cyan-950">
+                <div className="font-bold text-sm text-slate-900">
                   High-Ground Facility
                 </div>
-                <div className="text-[11px] text-cyan-800 mt-1 leading-relaxed">
+                <div className="text-xs text-slate-600 mt-0.5 leading-relaxed">
                   For Floods & Inundations. Elevated structures, school halls, hill campuses.
                 </div>
               </button>
@@ -203,32 +203,32 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, hazardType: 'earthquake' })}
-                className={`p-4 rounded-2xl border text-left transition-all relative ${
+                className={`p-3.5 rounded-lg border text-left transition-all relative ${
                   formData.hazardType === 'earthquake'
-                    ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20'
+                    ? 'border-stone-600 bg-stone-100/70 ring-1 ring-stone-600'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                    <TreePine size={18} />
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="w-8 h-8 rounded-md bg-stone-200 text-stone-800 flex items-center justify-center font-bold">
+                    <TreePine size={16} />
                   </div>
                   {formData.hazardType === 'earthquake' && (
-                    <CheckCircle2 size={18} className="text-emerald-600 fill-emerald-100" />
+                    <span className="w-2 h-2 rounded-full bg-stone-700" />
                   )}
                 </div>
-                <div className="font-extrabold text-sm text-emerald-950">
+                <div className="font-bold text-sm text-slate-900">
                   Open Assembly Ground
                 </div>
-                <div className="text-[11px] text-emerald-800 mt-1 leading-relaxed">
-                  For Earthquakes & Tremors. Open fields, stadiums, wide clearance areas.
+                <div className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  For Earthquakes & Tremors. Open fields, stadiums, wide clearance zones.
                 </div>
               </button>
             </div>
           </div>
 
           {/* Shelter Name & District */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
                 Shelter / Facility Name *
@@ -239,7 +239,7 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g. Sammanthurai Central College"
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-semibold"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
               />
             </div>
 
@@ -250,7 +250,7 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
               <select
                 value={formData.district}
                 onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-semibold"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
               >
                 {[
                   'Ampara',
@@ -285,7 +285,7 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="e.g. Main High Street, Sammanthurai (near Divisional Secretariat)"
-              className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
+              className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
             />
           </div>
 
@@ -306,7 +306,7 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                     capacityTotal: Math.max(1, parseInt(e.target.value, 10) || 1),
                   })
                 }
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-bold"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-bold text-slate-900"
               />
             </div>
 
@@ -324,13 +324,13 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                     capacityCurrent: Math.max(0, parseInt(e.target.value, 10) || 0),
                   })
                 }
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-bold"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-bold text-slate-900"
               />
             </div>
 
             {formData.hazardType === 'flood' ? (
               <div>
-                <label className="block text-xs font-bold text-cyan-800 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Elevation (Meters ASL)
                 </label>
                 <input
@@ -341,12 +341,12 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                     setFormData({ ...formData, elevationMeters: e.target.value })
                   }
                   placeholder="e.g. 40"
-                  className="w-full px-3.5 py-2.5 text-xs bg-cyan-50/50 border border-cyan-200 rounded-xl focus:bg-white focus:outline-none focus:border-cyan-500 font-bold text-cyan-900"
+                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-bold text-slate-900"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-bold text-emerald-800 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Debris Clearance (Meters)
                 </label>
                 <input
@@ -357,18 +357,18 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                     setFormData({ ...formData, clearanceRadiusMeters: e.target.value })
                   }
                   placeholder="e.g. 120"
-                  className="w-full px-3.5 py-2.5 text-xs bg-emerald-50/50 border border-emerald-200 rounded-xl focus:bg-white focus:outline-none focus:border-emerald-500 font-bold text-emerald-900"
+                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-bold text-slate-900"
                 />
               </div>
             )}
           </div>
 
           {/* Coordinator Details */}
-          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2.5">
+            <span className="text-xs font-bold text-slate-800 block">
               Assigned Coordinator Contact
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <input
                 type="text"
                 value={formData.coordinatorName}
@@ -376,7 +376,7 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                   setFormData({ ...formData, coordinatorName: e.target.value })
                 }
                 placeholder="Coordinator Name"
-                className="px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl font-medium"
+                className="px-3 py-2 text-xs bg-white border border-slate-300 rounded-md font-medium text-slate-800"
               />
               <input
                 type="text"
@@ -385,17 +385,17 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                   setFormData({ ...formData, coordinatorPhone: e.target.value })
                 }
                 placeholder="Coordinator Phone (+94...)"
-                className="px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl font-medium"
+                className="px-3 py-2 text-xs bg-white border border-slate-300 rounded-md font-medium text-slate-800"
               />
             </div>
           </div>
 
           {/* Facilities Checklist */}
           <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-800 mb-1.5">
               Available Facilities & Sanitation
             </label>
-            <div className="flex flex-wrap gap-2 mb-2">
+            <div className="flex flex-wrap gap-1.5 mb-2">
               {standardFacilities.map((f) => {
                 const isSelected = formData.facilities.includes(f);
                 return (
@@ -403,10 +403,10 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                     key={f}
                     type="button"
                     onClick={() => handleFacilityToggle(f)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition ${
                       isSelected
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                     }`}
                   >
                     {f}
@@ -420,12 +420,12 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
                 value={customFacility}
                 onChange={(e) => setCustomFacility(e.target.value)}
                 placeholder="Add other facility (e.g. Wi-Fi Access, Wheelchair Ramps)..."
-                className="flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl"
+                className="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800"
               />
               <button
                 type="button"
                 onClick={handleAddCustomFacility}
-                className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold"
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-md border border-slate-300 text-xs font-semibold"
               >
                 Add
               </button>
@@ -442,33 +442,33 @@ export default function AddShelterModal({ onClose, onAdd, coordinatorUser }) {
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="e.g. Direct road access via A4 highway. Elevated ground safely above recorded reservoir overflow mark."
-              className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
+              className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
             />
           </div>
 
           {/* Modal Actions */}
-          <div className="border-t border-slate-100 pt-4 flex items-center justify-end gap-3">
+          <div className="border-t border-slate-200 pt-3 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition"
+              className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-300 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition shadow-md shadow-blue-600/20 flex items-center gap-2"
+              className="px-4 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-md transition shadow-xs flex items-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-slate-900"
             >
               {submitting ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Registering...</span>
                 </>
               ) : (
                 <>
-                  <PlusCircle size={15} />
+                  <PlusCircle size={14} />
                   <span>Register Shelter</span>
                 </>
               )}

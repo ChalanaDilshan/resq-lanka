@@ -29,17 +29,18 @@ export default function NoticeWithdrawModal({ notice, isOpen, onClose, onConfirm
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2 text-rose-600">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 animate-fadeIn">
+      <div className="bg-white rounded-xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div className="flex items-center gap-2 text-rose-700">
             <AlertTriangle className="w-5 h-5" />
             <h3 className="text-base font-bold text-slate-900">Withdraw Emergency Alert</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"
+            className="p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition"
+            aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
           </button>
@@ -47,23 +48,23 @@ export default function NoticeWithdrawModal({ notice, isOpen, onClose, onConfirm
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-700 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
-          <div className="p-3.5 bg-rose-50/60 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-1">
-            <p className="font-bold">Notice to be withdrawn from active public feed:</p>
-            <p className="font-semibold text-slate-900">{notice.title}</p>
-            <p className="text-[11px] text-slate-500">
-              Withdrawing will immediately move this alert out of the active emergency feed into the archive with your reason visible.
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-900 space-y-1">
+            <p className="font-semibold">Notice to be withdrawn from active public broadcast:</p>
+            <p className="font-bold text-slate-900">{notice.title}</p>
+            <p className="text-[11px] text-slate-600">
+              Withdrawing will remove this alert from the active emergency feed into the archive with your reason officially logged.
             </p>
           </div>
 
           <div>
-            <label htmlFor="reason" className="block text-xs font-bold text-slate-700 mb-1">
-              Reason for Official Withdrawal <span className="text-red-500">*</span>
+            <label htmlFor="reason" className="block text-xs font-semibold text-slate-700 mb-1">
+              Official Reason for Withdrawal <span className="text-rose-600">*</span>
             </label>
             <textarea
               id="reason"
@@ -71,24 +72,24 @@ export default function NoticeWithdrawModal({ notice, isOpen, onClose, onConfirm
               required
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Danger level receded. DMC and Irrigation engineers confirmed normal reservoir discharge. All clear issued."
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition"
+              placeholder="e.g. Flood waters receded below warning threshold. DMC & Irrigation Dept issued all-clear for Kalmunai basin."
+              className="w-full p-2.5 bg-white border border-slate-300 rounded-md text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition"
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition"
+              className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md border border-slate-300 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition shadow-sm"
+              className="px-4 py-2 text-xs font-semibold text-white bg-rose-700 hover:bg-rose-800 rounded-md transition shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-700"
             >
               {isSubmitting ? 'Withdrawing...' : 'Confirm Withdrawal'}
             </button>

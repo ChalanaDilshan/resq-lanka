@@ -26,7 +26,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, verifyOtp, resendOtp, register, switchRole } = useAuth();
+  const { login, verifyOtp, resendOtp, register } = useAuth();
 
   // Mode: derived directly from current route URL
   const mode = location.pathname === '/register' ? 'register' : 'login';
