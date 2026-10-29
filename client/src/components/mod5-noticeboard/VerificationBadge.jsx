@@ -1,10 +1,14 @@
-import { ShieldCheck, CheckCircle2, HelpCircle, XCircle } from 'lucide-react';
+import { ShieldCheck, HelpCircle, XCircle } from 'lucide-react';
 
-export default function VerificationBadge({ isOfficial = false, verificationStatus = 'Unverified', size = 'md' }) {
+export default function VerificationBadge({
+  isOfficial = false,
+  verificationStatus = 'Unverified',
+  size = 'md',
+}) {
   const sizeClasses = {
-    sm: 'text-[11px] px-2 py-0.5 gap-1 font-semibold rounded-md',
-    md: 'text-xs px-2.5 py-1 gap-1.5 font-bold rounded-lg',
-    lg: 'text-sm px-3 py-1.5 gap-2 font-bold rounded-xl',
+    sm: 'text-[11px] px-2 py-0.5 gap-1 font-semibold rounded',
+    md: 'text-xs px-2.5 py-1 gap-1.5 font-semibold rounded-md',
+    lg: 'text-sm px-3 py-1.5 gap-2 font-semibold rounded-md',
   };
 
   const iconSizes = {
@@ -16,11 +20,13 @@ export default function VerificationBadge({ isOfficial = false, verificationStat
   if (isOfficial && verificationStatus === 'Verified') {
     return (
       <span
-        className={`inline-flex items-center bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-sm ${sizeClasses[size] || sizeClasses.md}`}
-        title="Verified Official Agency Alert (e.g. DMC, Meteorology Dept)"
+        className={`inline-flex items-center bg-green-50 text-green-900 border border-green-300 shadow-xs ${
+          sizeClasses[size] || sizeClasses.md
+        }`}
+        title="Verified Official Agency Alert (e.g. DMC, Meteorology Dept, NBRO)"
       >
-        <ShieldCheck className={`${iconSizes[size] || iconSizes.md} text-emerald-600 stroke-[2.5]`} />
-        <span>Official Verified</span>
+        <ShieldCheck className={`${iconSizes[size] || iconSizes.md} text-green-700 shrink-0`} />
+        <span>Official Bulletin</span>
       </span>
     );
   }
@@ -28,10 +34,12 @@ export default function VerificationBadge({ isOfficial = false, verificationStat
   if (verificationStatus === 'Verified') {
     return (
       <span
-        className={`inline-flex items-center bg-blue-50 text-blue-800 border border-blue-300 shadow-sm ${sizeClasses[size] || sizeClasses.md}`}
+        className={`inline-flex items-center bg-sky-50 text-sky-900 border border-sky-300 shadow-xs ${
+          sizeClasses[size] || sizeClasses.md
+        }`}
         title="Community submission verified by ResQ coordinators"
       >
-        <CheckCircle2 className={`${iconSizes[size] || iconSizes.md} text-blue-600 stroke-[2.5]`} />
+        <ShieldCheck className={`${iconSizes[size] || iconSizes.md} text-sky-700 shrink-0`} />
         <span>Field Verified</span>
       </span>
     );
@@ -40,10 +48,12 @@ export default function VerificationBadge({ isOfficial = false, verificationStat
   if (verificationStatus === 'Rejected') {
     return (
       <span
-        className={`inline-flex items-center bg-rose-50 text-rose-800 border border-rose-300 shadow-sm ${sizeClasses[size] || sizeClasses.md}`}
+        className={`inline-flex items-center bg-rose-50 text-rose-900 border border-rose-300 shadow-xs ${
+          sizeClasses[size] || sizeClasses.md
+        }`}
         title="Source investigated and rejected or discredited"
       >
-        <XCircle className={`${iconSizes[size] || iconSizes.md} text-rose-600 stroke-[2.5]`} />
+        <XCircle className={`${iconSizes[size] || iconSizes.md} text-rose-700 shrink-0`} />
         <span>Source Discredited</span>
       </span>
     );
@@ -51,11 +61,13 @@ export default function VerificationBadge({ isOfficial = false, verificationStat
 
   return (
     <span
-      className={`inline-flex items-center bg-amber-50 text-amber-800 border border-amber-300 shadow-sm ${sizeClasses[size] || sizeClasses.md}`}
+      className={`inline-flex items-center bg-slate-100 text-slate-800 border border-slate-300 shadow-xs ${
+        sizeClasses[size] || sizeClasses.md
+      }`}
       title="Community submission pending administrative verification"
     >
-      <HelpCircle className={`${iconSizes[size] || iconSizes.md} text-amber-600 stroke-[2.5]`} />
-      <span>Community (Unverified)</span>
+      <HelpCircle className={`${iconSizes[size] || iconSizes.md} text-slate-600 shrink-0`} />
+      <span>Community Advisory</span>
     </span>
   );
 }

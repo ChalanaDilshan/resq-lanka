@@ -7,9 +7,7 @@ import {
   TreePine,
   PlusCircle,
   Sliders,
-  CheckCircle2,
   AlertCircle,
-  ShieldCheck,
   RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -109,7 +107,10 @@ export default function ShelterListPage() {
       setShelters((prev) =>
         prev.map((s) => (String(s._id) === String(id) || String(s.id) === String(id) ? updated : s))
       );
-      if (selectedShelter && (String(selectedShelter._id) === String(id) || String(selectedShelter.id) === String(id))) {
+      if (
+        selectedShelter &&
+        (String(selectedShelter._id) === String(id) || String(selectedShelter.id) === String(id))
+      ) {
         setSelectedShelter(updated);
       }
       // Refresh stats
@@ -137,61 +138,59 @@ export default function ShelterListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-20">
+    <div className="min-h-screen bg-slate-50 text-slate-800 pb-20">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 bg-slate-900 text-white text-xs font-bold rounded-2xl shadow-2xl flex items-center gap-2 border border-slate-700 animate-fadeIn">
-          <CheckCircle2 size={16} className="text-emerald-400" />
+        <div className="fixed bottom-6 right-6 z-50 p-3.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl flex items-center gap-2.5 border border-slate-700 animate-fadeIn">
+          <svg
+            className="w-4 h-4 text-sky-400 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Hero Header */}
-      <section className="bg-gradient-to-b from-blue-900 via-slate-900 to-slate-900 text-white pt-12 pb-16 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
-        {/* Background Subtle Grid */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
+      {/* Hero Header: Dignified Civil Protection Identity */}
+      <section className="bg-slate-900 text-white pt-10 pb-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-300 text-xs font-bold uppercase tracking-wider mb-3">
-                <ShieldCheck size={14} className="text-blue-400" />
-                <span>Verified Public Emergency Infrastructure</span>
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-slate-300 text-xs font-medium mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                <span>Disaster Management Centre (DMC) Sri Lanka • Civil Protection</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                Safe Shelter Directory
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                Safe Shelter & Evacuation Directory
               </h1>
-              <p className="mt-3 text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
-                Real-time directory of verified safe havens categorized by hazard vulnerability:{' '}
-                <strong className="text-cyan-300 font-bold">
-                  High-Ground Facilities for floods
-                </strong>{' '}
-                vs.{' '}
-                <strong className="text-emerald-300 font-bold">
-                  Open Assembly Grounds for earthquakes
-                </strong>
-                .
+              <p className="mt-2 text-slate-300 text-sm leading-relaxed max-w-2xl">
+                Real-time registry of certified disaster relief safe havens categorized by hazard vulnerability profile:
+                elevated vertical refuge for flood inundations and open perimeter assembly grounds for seismic tremors.
               </p>
             </div>
 
             {/* Coordinator Actions Banner */}
             <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               {isAuthorizedManager && (
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="px-3.5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-bold flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <div className="px-3 py-1.5 rounded-md bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-400" />
                     <span>
                       {activeRole === 'administrator' || user?.role === 'administrator'
-                        ? 'Administrator Mode Active'
-                        : 'Coordinator Mode Active'}
+                        ? 'Administrator Active'
+                        : 'Coordinator Active'}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setAddModalOpen(true)}
-                    className="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 cursor-pointer"
+                    className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-900 rounded-md text-xs font-semibold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer focus-visible:ring-2 focus-visible:ring-white"
                   >
-                    <PlusCircle size={16} />
+                    <PlusCircle size={15} />
                     <span>Register New Shelter</span>
                   </button>
                 </div>
@@ -202,18 +201,18 @@ export default function ShelterListPage() {
       </section>
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 relative z-20">
         {/* Error Notification Banner */}
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3 shadow-xs">
+          <div className="mb-4 p-3.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-800 text-xs flex items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center gap-2">
-              <AlertCircle size={16} className="text-amber-600 shrink-0" />
+              <AlertCircle size={16} className="text-slate-600 shrink-0" />
               <span>{error}</span>
             </div>
             <button
               type="button"
               onClick={refreshData}
-              className="px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-xl font-bold text-[11px] transition"
+              className="px-3 py-1 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-md font-semibold text-xs transition"
             >
               Retry Sync
             </button>
@@ -224,22 +223,28 @@ export default function ShelterListPage() {
         <ShelterStatsBanner stats={stats} />
 
         {/* Hazard Category Filter Tabs */}
-        <div className="bg-white p-3 sm:p-4 rounded-3xl border border-slate-200/90 shadow-sm mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="bg-white p-2.5 sm:p-3 rounded-lg border border-slate-200 shadow-xs mb-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Categorized hazard buttons */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
               onClick={() => setHazardFilter('all')}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-md text-xs font-semibold transition flex items-center gap-1.5 ${
                 hazardFilter === 'all'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-white hover:bg-slate-100 text-slate-700 border border-transparent'
               }`}
             >
-              <Building2 size={15} />
-              <span>All Shelters</span>
+              <Building2 size={14} />
+              <span>All Safe Havens</span>
               {stats && (
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-200">
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                    hazardFilter === 'all'
+                      ? 'bg-slate-800 text-slate-200'
+                      : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
                   {stats.totalShelters}
                 </span>
               )}
@@ -249,20 +254,20 @@ export default function ShelterListPage() {
             <button
               type="button"
               onClick={() => setHazardFilter('flood')}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-md text-xs font-semibold transition flex items-center gap-1.5 ${
                 hazardFilter === 'flood'
-                  ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
-                  : 'bg-cyan-50 hover:bg-cyan-100 text-cyan-900 border border-cyan-200/60'
+                  ? 'bg-sky-900 text-white shadow-xs'
+                  : 'bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200'
               }`}
             >
-              <Waves size={15} />
-              <span>High-Ground Facilities (Floods)</span>
+              <Waves size={14} className="text-sky-600" />
+              <span>High-Ground (Floods)</span>
               {stats && (
                 <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                  className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
                     hazardFilter === 'flood'
-                      ? 'bg-cyan-800 text-white'
-                      : 'bg-cyan-200 text-cyan-900'
+                      ? 'bg-sky-800 text-white'
+                      : 'bg-sky-100 text-sky-900'
                   }`}
                 >
                   {stats.floodShelters}
@@ -274,20 +279,20 @@ export default function ShelterListPage() {
             <button
               type="button"
               onClick={() => setHazardFilter('earthquake')}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-md text-xs font-semibold transition flex items-center gap-1.5 ${
                 hazardFilter === 'earthquake'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/60'
+                  ? 'bg-stone-900 text-white shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 text-stone-900 border border-stone-300'
               }`}
             >
-              <TreePine size={15} />
-              <span>Open Assembly Grounds (Earthquakes)</span>
+              <TreePine size={14} className="text-stone-600" />
+              <span>Open Assembly (Earthquakes)</span>
               {stats && (
                 <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                  className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
                     hazardFilter === 'earthquake'
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-emerald-200 text-emerald-900'
+                      ? 'bg-stone-800 text-white'
+                      : 'bg-stone-200 text-stone-900'
                   }`}
                 >
                   {stats.earthquakeShelters}
@@ -301,28 +306,28 @@ export default function ShelterListPage() {
             type="button"
             onClick={refreshData}
             title="Refresh directory"
-            className="self-end md:self-auto p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl text-xs font-bold transition flex items-center gap-1.5"
+            className="self-end md:self-auto p-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-md text-xs font-semibold transition flex items-center gap-1.5"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            <span className="hidden sm:inline">Refresh</span>
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+            <span className="hidden sm:inline">Refresh Data</span>
           </button>
         </div>
 
         {/* Secondary Filter & Search Toolbar */}
-        <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+        <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-xs mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
             {/* Search Input */}
             <div className="sm:col-span-6 relative">
               <Search
-                size={16}
-                className="absolute left-3.5 top-3.5 text-slate-400 pointer-events-none"
+                size={15}
+                className="absolute left-3 top-2.5 text-slate-400 pointer-events-none"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search shelter by name, street address, coordinator, facilities..."
-                className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:outline-none focus:border-blue-500 font-medium text-slate-800"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
               />
             </div>
 
@@ -331,7 +336,7 @@ export default function ShelterListPage() {
               <select
                 value={districtFilter}
                 onChange={(e) => setDistrictFilter(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-700"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
               >
                 <option value="all">All Districts</option>
                 <option value="Ampara">Ampara District</option>
@@ -348,7 +353,7 @@ export default function ShelterListPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-700"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-slate-900 font-medium text-slate-800"
               >
                 <option value="all">All Capacities & Statuses</option>
                 <option value="Available">Available Spaces Only</option>
@@ -361,9 +366,9 @@ export default function ShelterListPage() {
         </div>
 
         {/* Shelters Listing Header */}
-        <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 px-0.5 gap-2">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
               {hazardFilter === 'flood'
                 ? 'High-Ground Facilities for Floods'
                 : hazardFilter === 'earthquake'
@@ -376,35 +381,35 @@ export default function ShelterListPage() {
           </div>
 
           {isAuthorizedManager && (
-            <div className="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200 flex items-center gap-1.5">
-              <Sliders size={13} />
-              <span>You have permissions to update capacities & occupancies</span>
+            <div className="text-xs text-slate-700 font-medium bg-slate-100 px-3 py-1 rounded-md border border-slate-200 flex items-center gap-1.5 self-start sm:self-auto">
+              <Sliders size={12} className="text-slate-600" />
+              <span>Coordinator intake permissions enabled</span>
             </div>
           )}
         </div>
 
         {/* Shelters Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3].map((n) => (
               <div
                 key={n}
-                className="bg-white rounded-3xl border border-slate-200 h-96 animate-pulse p-4 flex flex-col justify-between"
+                className="bg-white rounded-xl border border-slate-200 h-96 animate-pulse p-4 flex flex-col justify-between"
               >
-                <div className="w-full h-44 bg-slate-100 rounded-2xl" />
+                <div className="w-full h-44 bg-slate-100 rounded-lg" />
                 <div className="space-y-2 mt-4">
                   <div className="w-3/4 h-5 bg-slate-100 rounded" />
                   <div className="w-1/2 h-4 bg-slate-100 rounded" />
                 </div>
-                <div className="w-full h-10 bg-slate-100 rounded-xl mt-4" />
+                <div className="w-full h-10 bg-slate-100 rounded-md mt-4" />
               </div>
             ))}
           </div>
         ) : shelters.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto">
-            <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+          <div className="bg-white rounded-xl border border-slate-200 p-10 text-center max-w-md mx-auto">
+            <Building2 className="w-10 h-10 text-slate-400 mx-auto mb-2" />
             <h3 className="text-base font-bold text-slate-800">
-              No shelters found matching filters
+              No shelters found matching criteria
             </h3>
             <p className="text-xs text-slate-500 mt-1 mb-4">
               Try adjusting the hazard category, district, or search keywords.
@@ -417,13 +422,13 @@ export default function ShelterListPage() {
                 setStatusFilter('all');
                 setSearchQuery('');
               }}
-              className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold"
+              className="px-3.5 py-2 bg-slate-900 text-white rounded-md text-xs font-semibold cursor-pointer"
             >
               Reset Filters
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {shelters.map((shelter) => (
               <ShelterCard
                 key={shelter._id || shelter.id}

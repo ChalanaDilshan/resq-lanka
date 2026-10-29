@@ -21,56 +21,56 @@ export default function NoticeFilterBar({
   } = filters;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-3.5 sm:p-4 space-y-3.5">
       {/* Top Feed Selection Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-md">
           <button
             type="button"
             onClick={() => onFilterChange({ tab: 'active', isOfficial: false })}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-1.5 ${
               tab === 'active' && !isOfficial
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-900'
             }`}
           >
-            <Flame className="w-3.5 h-3.5 text-amber-500" />
+            <Flame className="w-3.5 h-3.5 text-rose-400" />
             <span>Active Emergency Alerts</span>
           </button>
 
           <button
             type="button"
             onClick={() => onFilterChange({ tab: 'official', isOfficial: true })}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-1.5 ${
               isOfficial
-                ? 'bg-white text-emerald-700 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-900'
             }`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
             <span>Official DMC &amp; Met Only</span>
           </button>
 
           <button
             type="button"
             onClick={() => onFilterChange({ tab: 'archive', isOfficial: false })}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
+            className={`px-3 py-1.5 rounded text-xs font-semibold transition ${
               tab === 'archive'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-900'
             }`}
           >
-            Historical Archive
+            Archive History
           </button>
         </div>
 
-        <div className="text-xs font-semibold text-slate-500">
-          Showing <span className="font-bold text-slate-800">{totalResults}</span> notices
+        <div className="text-xs font-medium text-slate-500">
+          Showing <span className="font-bold text-slate-900">{totalResults}</span> active advisories
         </div>
       </div>
 
       {/* Filter Controls Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
         {/* Search */}
         <div className="relative">
           <input
@@ -78,9 +78,9 @@ export default function NoticeFilterBar({
             value={search}
             onChange={(e) => onFilterChange({ search: e.target.value })}
             placeholder="Search alerts, keywords, agencies..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+            className="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-md text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
         </div>
 
         {/* Hazard Type */}
@@ -88,7 +88,7 @@ export default function NoticeFilterBar({
           <select
             value={hazardType}
             onChange={(e) => onFilterChange({ hazardType: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition"
           >
             <option value="All">All Hazard Types</option>
             {HAZARD_TYPES.map((type) => (
@@ -104,7 +104,7 @@ export default function NoticeFilterBar({
           <select
             value={severity}
             onChange={(e) => onFilterChange({ severity: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition"
           >
             <option value="All">All Severity Levels</option>
             {SEVERITY_LEVELS.map((sev) => (
@@ -120,7 +120,7 @@ export default function NoticeFilterBar({
           <select
             value={district}
             onChange={(e) => onFilterChange({ district: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition"
           >
             <option value="All">All 25 Districts</option>
             {SRI_LANKA_DISTRICTS.map((d) => (
@@ -135,17 +135,17 @@ export default function NoticeFilterBar({
       {/* Reset & Quick Filter Summary */}
       {(search || hazardType !== 'All' || severity !== 'All' || district !== 'All' || isOfficial) && (
         <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-100">
-          <div className="flex items-center gap-1.5 text-slate-500">
-            <Filter className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+            <Filter className="w-3.5 h-3.5 text-slate-400" />
             <span>Active filters applied</span>
           </div>
 
           <button
             type="button"
             onClick={onResetFilters}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 transition"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 hover:text-slate-900 transition"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
             <span>Reset Filters</span>
           </button>
         </div>

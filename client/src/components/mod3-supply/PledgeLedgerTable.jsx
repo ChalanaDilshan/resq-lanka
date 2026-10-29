@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Truck, CheckCircle2, Clock, XCircle, MapPin } from 'lucide-react';
+import { Truck, Clock, XCircle, MapPin, ShieldCheck } from 'lucide-react';
 
 export default function PledgeLedgerTable({
   pledges,
@@ -38,25 +38,25 @@ export default function PledgeLedgerTable({
   return (
     <div className="space-y-6">
       {/* Header and Filter */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-semibold mb-1">
-            <Truck size={14} />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-md text-xs font-semibold mb-1">
+            <Truck size={14} className="text-slate-700" />
             <span>Pledge Dispatch & Verification Ledger</span>
           </div>
-          <h2 className="text-2xl font-black text-slate-900">Donor Pledge Tracking Board</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-xl">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Donor Pledge Tracking Board</h2>
+          <p className="text-xs text-slate-600 mt-1 max-w-xl">
             Track community relief commitments from initial pledge submission to verified arrival at shelter storage facilities.
           </p>
         </div>
 
         {/* Filter Controls */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-bold text-slate-400">Filter Status:</span>
+          <span className="text-xs font-semibold text-slate-600">Filter Status:</span>
           <select
             value={filterStatus}
             onChange={(e) => onFilterChange(e.target.value)}
-            className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-amber-500"
+            className="px-3 py-1.5 bg-white border border-slate-300 rounded-md text-xs font-medium text-slate-800 focus:outline-none focus:border-slate-800"
           >
             <option value="All">All Pledges ({pledges.length})</option>
             <option value="Pledged">Pledged (Awaiting Dispatch)</option>
@@ -68,18 +68,18 @@ export default function PledgeLedgerTable({
       </div>
 
       {/* Table Container */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
+            <thead className="bg-slate-50 text-xs font-semibold text-slate-700 border-b border-slate-200">
               <tr>
-                <th className="py-3.5 px-4 font-bold">Pledge / Donor</th>
-                <th className="py-3.5 px-4 font-bold">Relief Item</th>
-                <th className="py-3.5 px-4 font-bold">Destination Shelter</th>
-                <th className="py-3.5 px-4 font-bold">Pledged Amount</th>
-                <th className="py-3.5 px-4 font-bold">Delivery Method</th>
-                <th className="py-3.5 px-4 font-bold">Tracking Status</th>
-                <th className="py-3.5 px-4 font-bold text-right">
+                <th className="py-3 px-4">Pledge / Donor</th>
+                <th className="py-3 px-4">Relief Item</th>
+                <th className="py-3 px-4">Destination Shelter</th>
+                <th className="py-3 px-4">Pledged Amount</th>
+                <th className="py-3 px-4">Delivery Method</th>
+                <th className="py-3 px-4">Tracking Status</th>
+                <th className="py-3 px-4 text-right">
                   {isCoordinatorOrAdmin ? 'Verification Actions' : 'Ledger Status'}
                 </th>
               </tr>
@@ -92,79 +92,83 @@ export default function PledgeLedgerTable({
                 const isPledged = p.status === 'Pledged';
 
                 return (
-                  <tr key={p._id} className="hover:bg-slate-50/80 transition">
+                  <tr key={p._id} className="hover:bg-slate-50/70 transition-colors">
                     {/* Donor Info (Masked if non-admin) */}
-                    <td className="py-4 px-4">
-                      <div className="font-bold text-slate-900">{p.donorName}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-slate-900">{p.donorName}</div>
+                      <div className="text-[11px] text-slate-600">
                         {p.donorPhone || 'No phone'}
                       </div>
-                      <div className="text-[10px] text-slate-400 font-mono truncate max-w-[150px]">
+                      <div className="text-[11px] text-slate-500 truncate max-w-[150px]">
                         {p.donorEmail || 'No email'}
                       </div>
                     </td>
 
                     {/* Item */}
-                    <td className="py-4 px-4 font-semibold text-slate-800">
+                    <td className="py-3.5 px-4 font-semibold text-slate-900">
                       {p.itemName}
                     </td>
 
                     {/* Shelter */}
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-1 text-slate-700">
-                        <MapPin size={13} className="text-red-500 flex-shrink-0" />
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5 text-slate-700">
+                        <MapPin size={13} className="text-rose-600 flex-shrink-0" />
                         <span className="truncate max-w-[160px]">{p.shelterLocation}</span>
                       </div>
                     </td>
 
                     {/* Quantity */}
-                    <td className="py-4 px-4">
-                      <span className="text-sm font-black text-blue-600">
+                    <td className="py-3.5 px-4">
+                      <span className="text-sm font-bold text-slate-900">
                         {p.pledgedQuantity}
                       </span>{' '}
-                      <span className="text-slate-500 font-medium">{p.unit}</span>
+                      <span className="text-slate-500 font-normal">{p.unit}</span>
                     </td>
 
                     {/* Delivery Method */}
-                    <td className="py-4 px-4 text-slate-600">
-                      <span className="font-medium">{p.deliveryMethod}</span>
+                    <td className="py-3.5 px-4 text-slate-600">
+                      <span className="font-medium text-slate-800">{p.deliveryMethod}</span>
                       {p.donorNotes && (
-                        <div className="text-[10px] text-slate-400 italic mt-0.5 truncate max-w-[130px]">
+                        <div className="text-[11px] text-slate-500 italic mt-0.5 truncate max-w-[130px]">
                           "{p.donorNotes}"
                         </div>
                       )}
                     </td>
 
                     {/* Status Badge */}
-                    <td className="py-4 px-4">
+                    <td className="py-3.5 px-4">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-[10.5px] font-bold inline-flex items-center gap-1 ${
+                        className={`px-2 py-0.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 border ${
                           isReceived
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-green-100 text-green-950 border-green-300'
                             : isInTransit
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-sky-100 text-sky-950 border-sky-300'
                             : isCancelled
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-amber-100 text-amber-800'
+                            ? 'bg-rose-100 text-rose-950 border-rose-300'
+                            : 'bg-amber-100 text-amber-950 border-amber-300'
                         }`}
                       >
-                        {isReceived && <CheckCircle2 size={12} />}
-                        {isInTransit && <Truck size={12} />}
-                        {isPledged && <Clock size={12} />}
-                        {isCancelled && <XCircle size={12} />}
+                        {isReceived && (
+                          <svg className="w-3 h-3 text-green-700 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                        {isInTransit && <Truck size={12} className="text-sky-700" />}
+                        {isPledged && <Clock size={12} className="text-amber-700" />}
+                        {isCancelled && <XCircle size={12} className="text-rose-700" />}
                         <span>{p.status}</span>
                       </span>
 
                       {/* Verification Audit Stamp */}
                       {isReceived && p.verifiedBy && (
-                        <div className="text-[9.5px] text-emerald-600 font-medium mt-1">
-                          By: {p.verifiedBy}
+                        <div className="text-[10px] text-green-800 font-medium mt-1">
+                          Verified by: {p.verifiedBy}
                         </div>
                       )}
                     </td>
 
                     {/* Actions */}
-                    <td className="py-4 px-4 text-right">
+                    <td className="py-3.5 px-4 text-right">
                       {isCoordinatorOrAdmin ? (
                         <div className="flex items-center justify-end gap-1.5 flex-wrap">
                           {isPledged && (
@@ -172,7 +176,7 @@ export default function PledgeLedgerTable({
                               type="button"
                               disabled={updatingId === p._id}
                               onClick={() => handleAction(p._id, 'In Transit')}
-                              className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-[10.5px] rounded-lg transition disabled:opacity-50"
+                              className="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-semibold text-xs rounded-md transition disabled:opacity-50"
                             >
                               Dispatch
                             </button>
@@ -183,7 +187,7 @@ export default function PledgeLedgerTable({
                               type="button"
                               disabled={updatingId === p._id}
                               onClick={() => handleAction(p._id, 'Received & Verified')}
-                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10.5px] rounded-lg transition shadow-xs disabled:opacity-50"
+                              className="px-2.5 py-1 bg-green-700 hover:bg-green-800 text-white font-semibold text-xs rounded-md transition shadow-xs disabled:opacity-50"
                             >
                               Verify & Receive
                             </button>
@@ -194,28 +198,28 @@ export default function PledgeLedgerTable({
                               type="button"
                               disabled={updatingId === p._id}
                               onClick={() => handleAction(p._id, 'Cancelled')}
-                              className="px-2 py-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg text-[10.5px] font-semibold transition disabled:opacity-50"
+                              className="px-2 py-1 text-rose-700 hover:text-rose-900 hover:bg-rose-50 rounded-md text-xs font-medium transition disabled:opacity-50"
                             >
                               Cancel
                             </button>
                           )}
 
                           {isReceived && (
-                            <span className="text-[11px] font-bold text-emerald-600 inline-flex items-center gap-1">
-                              <CheckCircle2 size={13} />
+                            <span className="text-xs font-semibold text-green-800 inline-flex items-center gap-1">
+                              <ShieldCheck size={14} className="text-green-700" />
                               <span>Verified in Stock</span>
                             </span>
                           )}
 
                           {isCancelled && (
-                            <span className="text-[11px] font-semibold text-slate-400">
+                            <span className="text-xs font-medium text-slate-500">
                               Cancelled
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-[11px] text-slate-400 font-medium">
-                          {isReceived ? '✓ In Shelter Inventory' : 'Pending Receipt'}
+                        <span className="text-xs text-slate-500 font-medium">
+                          {isReceived ? 'In Facility Storage' : 'Pending Intake'}
                         </span>
                       )}
                     </td>
@@ -227,10 +231,10 @@ export default function PledgeLedgerTable({
         </div>
 
         {filteredPledges.length === 0 && (
-          <div className="text-center py-16 bg-white">
-            <Truck size={36} className="mx-auto text-slate-300 mb-2" />
-            <h4 className="text-sm font-bold text-slate-700">No pledges match the selected filter.</h4>
-            <p className="text-xs text-slate-400 mt-1">
+          <div className="text-center py-14 bg-white">
+            <Truck size={32} className="mx-auto text-slate-400 mb-2" />
+            <h4 className="text-sm font-semibold text-slate-800">No pledges match the selected filter.</h4>
+            <p className="text-xs text-slate-500 mt-1">
               Select another status filter or submit a pledge from the Supply Board.
             </p>
           </div>

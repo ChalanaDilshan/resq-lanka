@@ -159,125 +159,113 @@ export default function NoticeBoardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
       {/* 24/7 Sri Lanka Emergency Hotlines Bar */}
       <EmergencyHotlineBar />
 
       {/* Hero & Status Banner */}
-      <section className="bg-slate-950 text-white border-b border-slate-800 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-950/40 via-slate-900/60 to-slate-950 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="max-w-3xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/30 rounded-full text-red-400 text-xs font-bold uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                <span>Live Emergency Broadcast</span>
+      <section className="bg-slate-900 text-white border-b border-slate-800 pt-10 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-3xl space-y-2.5">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-slate-300 text-xs font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                <span>DMC Emergency Operations • National Public Warning System</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
                 Emergency Alerts &amp; Noticeboard
               </h1>
 
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                Official disaster warnings from the Disaster Management Centre (DMC), Department of Meteorology, and verified community emergency notices across Sri Lanka.
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl">
+                Official disaster warnings from the Disaster Management Centre (DMC), Department of Meteorology,
+                and verified community emergency notices across Sri Lanka.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
                 onClick={loadNotices}
                 disabled={isLoading}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 shadow-sm"
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-md text-xs font-semibold transition flex items-center gap-1.5 shadow-xs"
               >
-                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                <span>Refresh Live Alerts</span>
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                <span>Refresh Feed</span>
               </button>
 
               <Link
                 to="/alerts/new"
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50"
+                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-900 font-semibold rounded-md text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-white"
               >
-                <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+                <PlusCircle className="w-3.5 h-3.5" />
                 <span>Post Alert / Notice</span>
               </Link>
-            </div>
-          </div>
-
-          {/* Aggregate Stats Ticker */}
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3.5 backdrop-blur-sm">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                <Bell className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-black text-white">
-                  {stats?.totalActive ?? notices.length}
-                </div>
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Active Alerts
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3.5 backdrop-blur-sm">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
-                <Flame className="w-5 h-5 text-red-500" />
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-black text-white">
-                  {stats?.criticalAlerts ?? 0}
-                </div>
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Critical Red Alerts
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3.5 backdrop-blur-sm">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-black text-white">
-                  {stats?.verifiedOfficialCount ?? 0}
-                </div>
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Official Agencies
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3.5 backdrop-blur-sm">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-                <MapPin className="w-5 h-5 text-amber-400" />
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-black text-white">
-                  {stats?.affectedDistrictsCount ?? 0}
-                </div>
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Impacted Districts
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Noticeboard Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6 flex-grow">
-        {/* Success Alert Banner */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5 relative z-10 w-full space-y-5 flex-grow pb-16">
+        {/* Aggregate Stats Strip */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-slate-100 grid grid-cols-2 sm:grid-cols-4">
+          <div className="p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-500 mb-1">
+              <span className="text-xs font-medium">Active Advisories</span>
+              <Bell className="w-4 h-4 text-slate-400" />
+            </div>
+            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+              {stats?.totalActive ?? notices.length}
+            </div>
+            <div className="text-xs text-slate-500 mt-0.5">Live emergency notices</div>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-500 mb-1">
+              <span className="text-xs font-medium">Critical Red Alerts</span>
+              <Flame className="w-4 h-4 text-rose-500" />
+            </div>
+            <div className="text-2xl font-bold text-rose-700 tracking-tight">
+              {stats?.criticalAlerts ?? 0}
+            </div>
+            <div className="text-xs text-slate-500 mt-0.5">Immediate danger warnings</div>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-500 mb-1">
+              <span className="text-xs font-medium">Official Bulletins</span>
+              <ShieldCheck className="w-4 h-4 text-sky-600" />
+            </div>
+            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+              {stats?.verifiedOfficialCount ?? 0}
+            </div>
+            <div className="text-xs text-slate-500 mt-0.5">DMC, Met Dept, NBRO</div>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-500 mb-1">
+              <span className="text-xs font-medium">Impacted Districts</span>
+              <MapPin className="w-4 h-4 text-slate-400" />
+            </div>
+            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+              {stats?.affectedDistrictsCount ?? 0}
+            </div>
+            <div className="text-xs text-slate-500 mt-0.5">Provincial areas affected</div>
+          </div>
+        </div>
+
+        {/* Action Success Toast */}
         {actionSuccess && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs sm:text-sm font-semibold text-emerald-800 flex items-center justify-between animate-fadeIn">
+          <div className="p-3.5 bg-slate-900 text-white border border-slate-800 rounded-lg text-xs font-medium flex items-center justify-between shadow-md animate-fadeIn">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
               <span>{actionSuccess}</span>
             </div>
             <button
               type="button"
               onClick={() => setActionSuccess(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-slate-400 hover:text-white"
             >
               &times;
             </button>
@@ -296,23 +284,23 @@ export default function NoticeBoardPage() {
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-64 bg-slate-200/60 rounded-2xl" />
+              <div key={i} className="h-56 bg-slate-200/70 rounded-xl" />
             ))}
           </div>
         )}
 
         {/* Error State */}
         {!isLoading && error && (
-          <div className="p-8 text-center bg-white rounded-2xl border border-red-200 shadow-sm space-y-4">
-            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
+          <div className="p-8 text-center bg-white rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <AlertTriangle className="w-10 h-10 text-rose-600 mx-auto" />
             <div>
-              <h3 className="text-lg font-bold text-slate-800">Alert Feed Unavailable</h3>
-              <p className="text-sm text-slate-600 mt-1">{error}</p>
+              <h3 className="text-base font-bold text-slate-900">Alert Feed Unavailable</h3>
+              <p className="text-xs text-slate-500 mt-1">{error}</p>
             </div>
             <button
               type="button"
               onClick={loadNotices}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md text-xs transition cursor-pointer"
             >
               Retry Connection
             </button>
@@ -321,18 +309,18 @@ export default function NoticeBoardPage() {
 
         {/* Empty State */}
         {!isLoading && !error && notices.length === 0 && (
-          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <Radio className="w-12 h-12 text-slate-400 mx-auto" />
+          <div className="p-10 text-center bg-white rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <Radio className="w-10 h-10 text-slate-400 mx-auto" />
             <div>
-              <h3 className="text-lg font-bold text-slate-800">No Emergency Alerts Found</h3>
-              <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
+              <h3 className="text-base font-bold text-slate-900">No Emergency Alerts Found</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
                 There are currently no active alerts matching your search criteria. Try selecting different districts or clearing filters.
               </p>
             </div>
             <button
               type="button"
               onClick={handleResetFilters}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition"
+              className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-md text-xs transition cursor-pointer"
             >
               Reset Filters
             </button>
@@ -341,7 +329,7 @@ export default function NoticeBoardPage() {
 
         {/* Notices Cards Grid */}
         {!isLoading && !error && notices.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {notices.map((notice) => (
               <NoticeCard
                 key={notice._id}

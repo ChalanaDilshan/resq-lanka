@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   AlertTriangle,
   Trash2,
-  CheckCircle2,
   Share2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -126,12 +125,12 @@ export default function AlertDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+      <div className="min-h-screen bg-slate-50 flex flex-col">
         <EmergencyHotlineBar />
-        <div className="max-w-4xl mx-auto px-4 py-16 w-full animate-pulse space-y-6">
-          <div className="h-6 w-32 bg-slate-200 rounded-lg" />
-          <div className="h-48 bg-slate-200 rounded-3xl" />
-          <div className="h-64 bg-slate-200 rounded-3xl" />
+        <div className="max-w-4xl mx-auto px-4 py-12 w-full animate-pulse space-y-5">
+          <div className="h-5 w-32 bg-slate-200 rounded" />
+          <div className="h-44 bg-slate-200 rounded-xl" />
+          <div className="h-60 bg-slate-200 rounded-xl" />
         </div>
       </div>
     );
@@ -139,17 +138,17 @@ export default function AlertDetailPage() {
 
   if (error || !notice) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+      <div className="min-h-screen bg-slate-50 flex flex-col">
         <EmergencyHotlineBar />
-        <div className="max-w-lg mx-auto px-4 py-20 text-center space-y-4">
-          <AlertTriangle className="w-16 h-16 text-rose-500 mx-auto" />
-          <h2 className="text-xl font-bold text-slate-900">Alert Not Found</h2>
-          <p className="text-sm text-slate-600">{error || 'The requested emergency notice does not exist.'}</p>
+        <div className="max-w-md mx-auto px-4 py-16 text-center space-y-3">
+          <AlertTriangle className="w-12 h-12 text-rose-600 mx-auto" />
+          <h2 className="text-lg font-bold text-slate-900">Alert Not Found</h2>
+          <p className="text-xs text-slate-500">{error || 'The requested emergency notice does not exist.'}</p>
           <Link
             to="/alerts"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white font-semibold text-xs rounded-md hover:bg-slate-800 transition"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             <span>Return to Noticeboard</span>
           </Link>
         </div>
@@ -185,129 +184,129 @@ export default function AlertDetailPage() {
     switch (hazardType) {
       case 'Flood':
         return [
-          'Move promptly to designated high-ground shelters or school assembly points.',
-          'Never attempt to walk, swim, or drive through flowing water. Just 15cm of rapid water can knock you down.',
-          'Keep emergency medicines, birth certificates, and dry rations sealed in waterproof polythene.',
-          'Turn off main electricity breakers if flood water threatens home ground floors.',
+          'Move promptly to designated high-ground shelters or safe assembly points.',
+          'Never attempt to walk, swim, or drive through fast-moving water. Just 15cm of moving water can cause falls.',
+          'Keep emergency medicines, national identity cards, and essential rations sealed in waterproof bags.',
+          'Turn off main electricity distribution boards if water threatens household ground floors.',
         ];
       case 'Cyclone':
       case 'Heavy Rainfall':
         return [
-          'Secure loose roof sheets, solar panels, and outdoor items with rope or sandbags.',
-          'Clear drainage gutters around houses to prevent local inundation.',
-          'Do not shelter under tall trees, electrical poles, or corroded billboards.',
-          'Avoid sea voyages and coastal lagoon fishing until marine warning is revoked.',
+          'Secure loose roof sheets, solar panels, and outdoor items with ropes or sandbags.',
+          'Clear storm gutters around premises to reduce localized flooding risks.',
+          'Avoid sheltering under unpruned trees, overhead electrical lines, or corroded billboards.',
+          'Suspend marine fishing and coastal operations until official warning cancellation is issued.',
         ];
       case 'Landslide':
         return [
-          'Evacuate immediately if you notice ground fissures, tilting retaining walls, or sudden muddy springs.',
-          'Stay alert during nighttime continuous rainfall exceeding 100mm.',
-          'Report cutting failures to your local Grama Niladhari or NBRO desk.',
+          'Evacuate immediately upon observing ground fissures, tilting boundary walls, or muddy runoff.',
+          'Maintain vigilance during continuous rainfall surpassing 100mm within 24 hours.',
+          'Report early slope instability signs to your local Grama Niladhari or NBRO field station.',
         ];
       case 'Earthquake':
         return [
-          'Drop, Cover, and Hold On beneath heavy tables if inside.',
-          'Evacuate to open ground away from overhead utility wires and unreinforced masonry.',
-          'Expect minor aftershocks and do not re-enter damaged premises without structural clearance.',
+          'Drop, Cover, and Hold On beneath sturdy tables if indoors during tremors.',
+          'Evacuate to open grounds clear of masonry parapets, glass facades, and overhead grids.',
+          'Prepare for secondary aftershocks and avoid re-entering damaged structures without clearance.',
         ];
       default:
         return [
-          'Follow instructions broadcast by DMC district disaster secretariats.',
-          'Keep your mobile phone charged and tuned to SLBC or local radio emergency alerts.',
-          'Assist pregnant mothers, children, and elderly neighbors to safe gathering areas.',
+          'Follow instructions broadcast by DMC district disaster coordination secretariats.',
+          'Keep communication phones charged and monitor verified civil protection bulletins.',
+          'Support children, disabled family members, and elderly neighbors to certified safe havens.',
         ];
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
       <EmergencyHotlineBar />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6 flex-grow">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 w-full space-y-4 flex-grow pb-16">
         {/* Navigation & Share */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3">
           <Link
             to="/alerts"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 transition"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Emergency Noticeboard</span>
           </Link>
 
           <button
             type="button"
             onClick={handleCopyShareLink}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-sm transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 rounded-md text-xs font-semibold shadow-xs transition cursor-pointer"
           >
-            {copiedLink ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
-            <span>{copiedLink ? 'Link Copied!' : 'Share Alert Link'}</span>
+            <Share2 className="w-3.5 h-3.5 text-slate-500" />
+            <span>{copiedLink ? 'Link Copied' : 'Share Alert Link'}</span>
           </button>
         </div>
 
-        {/* Success Banner */}
+        {/* Action Success Toast */}
         {actionSuccess && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs sm:text-sm font-semibold text-emerald-800 flex items-center justify-between animate-fadeIn">
+          <div className="p-3 bg-slate-900 text-white border border-slate-800 rounded-lg text-xs font-medium flex items-center justify-between shadow-md animate-fadeIn">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
               <span>{actionSuccess}</span>
             </div>
             <button
               type="button"
               onClick={() => setActionSuccess(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-slate-400 hover:text-white"
             >
               &times;
             </button>
           </div>
         )}
 
-        {/* Main Alert Card */}
-        <div className={`bg-white rounded-3xl border ${config.borderClass} border-slate-200 shadow-sm overflow-hidden`}>
+        {/* Main Alert File */}
+        <div className={`bg-white rounded-xl border ${config.borderClass} border-slate-200 shadow-xs overflow-hidden`}>
           {/* Status Banners */}
           {isWithdrawn && (
-            <div className="bg-rose-600 text-white px-6 py-2.5 text-sm font-bold flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 shrink-0" />
+            <div className="bg-rose-700 text-white px-5 py-2 text-xs font-semibold flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>
-                WITHDRAWN NOTICE{withdrawnAt ? ` (${new Date(withdrawnAt).toLocaleDateString()})` : ''}: {withdrawnReason || 'Official advisory revoked.'}
+                Withdrawn Notice{withdrawnAt ? ` (${new Date(withdrawnAt).toLocaleDateString()})` : ''}: {withdrawnReason || 'Official advisory revoked.'}
               </span>
             </div>
           )}
           {!isWithdrawn && isPastExpiry && (
-            <div className="bg-slate-700 text-slate-200 px-6 py-2.5 text-sm font-bold flex items-center gap-2">
-              <Clock className="w-5 h-5 shrink-0 text-slate-400" />
-              <span>EXPIRED ALERT: This emergency advisory has passed its validity threshold.</span>
+            <div className="bg-slate-700 text-slate-200 px-5 py-2 text-xs font-semibold flex items-center gap-2">
+              <Clock className="w-4 h-4 shrink-0 text-slate-400" />
+              <span>Expired Alert: This emergency advisory has passed its operational validity window.</span>
             </div>
           )}
 
-          <div className="p-6 sm:p-8 space-y-6">
+          <div className="p-5 sm:p-6 space-y-5">
             {/* Badges Header */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <AlertSeverityBadge severity={severity} size="lg" />
-                <VerificationBadge isOfficial={isOfficial} verificationStatus={verificationStatus} size="lg" />
+            <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-100 pb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <AlertSeverityBadge severity={severity} size="md" />
+                <VerificationBadge isOfficial={isOfficial} verificationStatus={verificationStatus} size="md" />
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
-                <span>Hazard Classification:</span>
-                <span className="text-slate-900 font-extrabold">{hazardType}</span>
+              <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                <span className="font-normal">Hazard:</span>
+                <span className="text-slate-900 font-semibold">{hazardType}</span>
               </div>
             </div>
 
             {/* Title */}
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
                 {title}
               </h1>
 
               {/* Published and Expiry Times */}
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-3">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-slate-400" />
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-2">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" />
                   Published {publishedAt ? new Date(publishedAt).toLocaleString() : 'Recently'} ({publishedAt && timeAgo(publishedAt)})
                 </span>
 
                 {expiresAt && (
-                  <span className={`flex items-center gap-1.5 font-semibold ${isPastExpiry ? 'text-rose-600' : 'text-slate-600'}`}>
+                  <span className={`flex items-center gap-1 font-medium ${isPastExpiry ? 'text-rose-700' : 'text-slate-700'}`}>
                     <span>Valid until:</span>
                     <span>{new Date(expiresAt).toLocaleString()}</span>
                   </span>
@@ -317,16 +316,16 @@ export default function AlertDetailPage() {
 
             {/* Impacted Districts */}
             {affectedDistricts.length > 0 && (
-              <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-blue-600" />
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+                <div className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-slate-500" />
                   <span>Impacted Areas &amp; Administrative Districts:</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {affectedDistricts.map((district) => (
                     <span
                       key={district}
-                      className="px-3 py-1 bg-white border border-slate-200 text-slate-800 text-xs font-bold rounded-xl shadow-xs"
+                      className="px-2.5 py-0.5 bg-white border border-slate-200 text-slate-800 text-xs font-medium rounded"
                     >
                       {district} District
                     </span>
@@ -336,54 +335,54 @@ export default function AlertDetailPage() {
             )}
 
             {/* Full Message Body */}
-            <div className="space-y-3">
-              <h2 className="text-base font-bold text-slate-900 uppercase tracking-wider text-xs">
-                Emergency Situation Advisory
+            <div className="space-y-1.5">
+              <h2 className="text-xs font-bold text-slate-800">
+                Official Incident Advisory Details
               </h2>
-              <div className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+              <div className="text-slate-800 text-xs sm:text-sm leading-relaxed whitespace-pre-line bg-slate-50 p-4 rounded-lg border border-slate-200">
                 {message}
               </div>
             </div>
 
             {/* Emergency Hotline Contact if available */}
             {contactNumber && (
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
-                    <Phone className="w-5 h-5" />
+              <div className="p-3.5 bg-slate-50 border border-slate-300 rounded-lg flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-md bg-slate-900 text-white flex items-center justify-center shrink-0">
+                    <Phone className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs text-amber-800 font-semibold uppercase tracking-wider">
-                      Designated Emergency Hotline for this Incident:
+                    <div className="text-xs text-slate-600 font-medium">
+                      Designated Emergency Desk for this Incident:
                     </div>
-                    <div className="text-base font-black text-amber-950">
+                    <div className="text-sm font-bold text-slate-900">
                       {contactNumber}
                     </div>
                   </div>
                 </div>
                 <a
                   href={`tel:${contactNumber}`}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition shrink-0"
+                  className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md text-xs transition shrink-0"
                 >
-                  Call Now
+                  Call Desk
                 </a>
               </div>
             )}
 
             {/* Source Information & Official Verification Card */}
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-3">
+            <div className="p-4 bg-white border border-slate-200 rounded-lg shadow-xs space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <div className="text-xs font-semibold text-slate-500">
                   Source Provenance &amp; Verification
                 </div>
                 <VerificationBadge isOfficial={isOfficial} verificationStatus={verificationStatus} size="sm" />
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-0.5">
                 <div>
-                  <div className="text-sm font-black text-slate-900">{sourceName}</div>
+                  <div className="text-sm font-bold text-slate-900">{sourceName}</div>
                   {verificationNotes && (
-                    <div className="text-xs text-slate-500 mt-1 italic">
+                    <div className="text-xs text-slate-500 mt-0.5 italic">
                       Verification Reference: {verificationNotes}
                     </div>
                   )}
@@ -394,25 +393,25 @@ export default function AlertDetailPage() {
                     href={sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-xs font-bold border border-blue-200 transition shrink-0 self-start sm:self-auto"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-800 hover:bg-slate-200 rounded-md text-xs font-semibold border border-slate-200 transition shrink-0 self-start sm:self-auto"
                   >
-                    <span>Visit Agency Bulletin</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Official Agency Bulletin</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
                   </a>
                 )}
               </div>
             </div>
 
             {/* Safety Guidelines */}
-            <div className="p-5 bg-blue-50/50 border border-blue-200/80 rounded-2xl space-y-3">
-              <h3 className="text-xs font-extrabold uppercase tracking-wider text-blue-900 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-blue-600" />
-                <span>Recommended Safety Protocols for {hazardType}</span>
+            <div className="p-4 bg-sky-50/60 border border-sky-200 rounded-lg space-y-2">
+              <h3 className="text-xs font-bold text-sky-950 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-sky-700" />
+                <span>Recommended Civil Safety Actions for {hazardType}</span>
               </h3>
-              <ul className="space-y-2 text-xs sm:text-sm text-blue-950">
+              <ul className="space-y-1.5 text-xs text-slate-700">
                 {getSafetyGuidelines().map((tip, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-600 mt-1.5 shrink-0" />
                     <span>{tip}</span>
                   </li>
                 ))}
@@ -421,16 +420,16 @@ export default function AlertDetailPage() {
 
             {/* Admin Action Toolbar */}
             {isAdmin && (
-              <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Administrative Management Controls
+              <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2.5">
+                <div className="text-xs font-semibold text-slate-600">
+                  Administrative Incident Controls
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setIsVerifyModalOpen(true)}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                    className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition shadow-xs cursor-pointer"
                   >
                     Verify Source
                   </button>
@@ -439,7 +438,7 @@ export default function AlertDetailPage() {
                     <button
                       type="button"
                       onClick={() => setIsWithdrawModalOpen(true)}
-                      className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                      className="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-md text-xs font-semibold transition cursor-pointer"
                     >
                       Withdraw Alert
                     </button>
@@ -448,7 +447,7 @@ export default function AlertDetailPage() {
                   <button
                     type="button"
                     onClick={handleDelete}
-                    className="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-white text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-md text-xs font-semibold transition flex items-center gap-1 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Delete</span>

@@ -7,26 +7,26 @@ export default function AlertSeverityBadge({ severity = 'Medium', size = 'md', s
   const getIcon = () => {
     switch (severity) {
       case 'Critical':
-        return <ShieldAlert className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'} />;
+        return <ShieldAlert className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5'} />;
       case 'High':
-        return <AlertTriangle className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'} />;
+        return <AlertTriangle className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5'} />;
       case 'Medium':
-        return <AlertCircle className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'} />;
+        return <AlertCircle className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5'} />;
       case 'Low':
       default:
-        return <Info className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'} />;
+        return <Info className={size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5'} />;
     }
   };
 
   const sizeClasses = {
-    sm: 'text-[11px] px-2 py-0.5 gap-1 font-semibold rounded-md',
-    md: 'text-xs px-2.5 py-1 gap-1.5 font-bold rounded-lg',
-    lg: 'text-sm px-3.5 py-1.5 gap-2 font-black rounded-xl tracking-wide',
+    sm: 'text-[11px] px-2 py-0.5 gap-1 font-semibold rounded',
+    md: 'text-xs px-2.5 py-0.5 gap-1.5 font-semibold rounded-md',
+    lg: 'text-sm px-3 py-1 gap-2 font-bold rounded-md',
   };
 
   return (
     <span
-      className={`inline-flex items-center border uppercase tracking-wider shadow-sm ${config.badgeClass} ${sizeClasses[size] || sizeClasses.md}`}
+      className={`inline-flex items-center border shadow-xs ${config.badgeClass} ${sizeClasses[size] || sizeClasses.md}`}
       role="status"
       aria-label={`Severity level: ${severity}`}
     >
