@@ -1,15 +1,25 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
+import { generateOtp, sendOtpEmail } from '../services/emailService.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'resq_lanka_secure_dev_jwt_secret_key_2026_swt';
 const JWT_EXPIRES_IN = '7d';
 
 /**
- * Generate signed JWT token
+ * Generate signed JWT token for authenticated session
  */
 const generateToken = (userId, role) => {
   return jwt.sign({ id: userId, role }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
+  });
+};
+
+/**
+ * Generate short-lived temporary token for 2FA verification step (10 minutes)
+ */
+const generateTempToken = (userId, email) => {
+  return jwt.sign({ id: userId, email, isOtpPending: true }, JWT_SECRET, {
+    expiresIn: '10m',
   });
 };
 
@@ -89,7 +99,7 @@ export const register = async (req, res) => {
 };
 
 /**
- * Log in with email and password
+ * Log in with email and password -> triggers OTP generation and email dispatch
  * POST /api/auth/login
  */
 export const login = async (req, res) => {
@@ -130,19 +140,175 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id, user.role);
+    // Generate 6-digit verification code & set 10 minute expiry
+    const otp = generateOtp();
+    user.otpCode = otp;
+    user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    // Send OTP to user's email (with terminal console fallback in dev)
+    await sendOtpEmail({
+      to: user.email,
+      name: user.name,
+      otp,
+    });
+
+    // Issue short-lived temporary token for step 2 OTP verification
+    const tempToken = generateTempToken(user._id, user.email);
 
     return res.status(200).json({
       success: true,
-      message: 'Login successful.',
-      token,
-      user: user.toSafeObject(),
+      requiresOtp: true,
+      tempToken,
+      email: user.email,
+      message: `A 6-digit verification code has been sent to ${user.email}.`,
     });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({
       success: false,
       message: error.message || 'Server error during login.',
+    });
+  }
+};
+
+/**
+ * Verify 6-digit OTP code and issue final JWT session token
+ * POST /api/auth/verify-otp
+ */
+export const verifyOtp = async (req, res) => {
+  try {
+    const { tempToken, otp } = req.body;
+
+    if (!tempToken || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Temporary token and OTP code are required.',
+      });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(tempToken, JWT_SECRET);
+    } catch {
+      return res.status(401).json({
+        success: false,
+        message: 'Verification session has expired or is invalid. Please log in again.',
+      });
+    }
+
+    if (!decoded.isOtpPending || !decoded.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification session.',
+      });
+    }
+
+    const user = await User.findById(decoded.id).select('+otpCode +otpExpiresAt');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.',
+      });
+    }
+
+    if (!user.otpCode || !user.otpExpiresAt) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active OTP verification session found. Please log in again.',
+      });
+    }
+
+    if (new Date() > user.otpExpiresAt) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired. Please request a new code.',
+      });
+    }
+
+    if (user.otpCode !== otp.toString().trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification code. Please check and try again.',
+      });
+    }
+
+    // OTP verified successfully! Clear OTP fields
+    user.otpCode = undefined;
+    user.otpExpiresAt = undefined;
+    await user.save();
+
+    // Generate full authenticated JWT token
+    const token = generateToken(user._id, user.role);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification successful. Welcome to ResQ-Lanka!',
+      token,
+      user: user.toSafeObject(),
+    });
+  } catch (error) {
+    console.error('verifyOtp error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Server error during OTP verification.',
+    });
+  }
+};
+
+/**
+ * Resend a new OTP to user's email
+ * POST /api/auth/resend-otp
+ */
+export const resendOtp = async (req, res) => {
+  try {
+    const { tempToken } = req.body;
+
+    if (!tempToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Temporary session token is required.',
+      });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(tempToken, JWT_SECRET);
+    } catch {
+      return res.status(401).json({
+        success: false,
+        message: 'Verification session has expired. Please log in again.',
+      });
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.',
+      });
+    }
+
+    const otp = generateOtp();
+    user.otpCode = otp;
+    user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    await sendOtpEmail({
+      to: user.email,
+      name: user.name,
+      otp,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `A new verification code has been sent to ${user.email}.`,
+    });
+  } catch (error) {
+    console.error('resendOtp error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Server error resending OTP.',
     });
   }
 };

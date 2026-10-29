@@ -80,8 +80,15 @@ function App() {
                 }
               />
 
-              {/* Module 1: SOS Reporting */}
-              <Route path="/sos" element={<SOSRequestForm />} />
+              {/* Module 1: SOS Reporting - Protected: Requires Login & 2FA */}
+              <Route
+                path="/sos"
+                element={
+                  <ProtectedRoute>
+                    <SOSRequestForm />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/sos-dashboard" element={<SOSDashboard />} />
 
               {/* Module 6: Shared Dashboards & Role-Aware Operations */}
