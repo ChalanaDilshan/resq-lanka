@@ -32,7 +32,7 @@ import PledgeLedgerTable from '../../components/mod3-supply/PledgeLedgerTable';
 export default function SupplyBoardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const { user, activeRole, switchRole } = useAuth();
+  const { user, activeRole } = useAuth();
 
   // Active Tab derived directly from URL parameters & route
   const activeTab =
@@ -239,29 +239,6 @@ export default function SupplyBoardPage() {
               <span className="font-bold text-white capitalize bg-blue-600 px-2 py-0.5 rounded-lg">
                 {user ? `${user.name} (${activeRole})` : 'Public Visitor'}
               </span>
-              <div className="flex gap-1 ml-2">
-                {[
-                  { key: 'citizen', label: 'Citizen' },
-                  { key: 'volunteer', label: 'Volunteer' },
-                  { key: 'coordinator', label: 'Coordinator' },
-                ].map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    title={`Authenticate as ${item.label}`}
-                    onClick={async () => {
-                      await switchRole(item.key);
-                    }}
-                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition ${
-                      activeRole === item.key && user
-                        ? 'bg-white text-slate-900 font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
 

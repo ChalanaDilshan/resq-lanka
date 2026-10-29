@@ -19,7 +19,6 @@ export default function ShelterDetailModal({
   onClose,
   onOpenOccupancyModal,
   isCoordinator,
-  onSwitchToCoordinator,
 }) {
   if (!shelter) return null;
 
@@ -316,34 +315,23 @@ export default function ShelterDetailModal({
           </a>
 
           <div className="flex items-center gap-2">
-            {isCoordinator ? (
+            {isCoordinator && (
               <button
                 type="button"
                 onClick={() => {
                   onClose();
                   onOpenOccupancyModal(shelter);
                 }}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5 cursor-pointer"
               >
                 <Sliders size={14} />
                 <span>Edit Capacity & Occupancy</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onSwitchToCoordinator();
-                }}
-                className="px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50 rounded-xl transition"
-              >
-                Switch to Coordinator
               </button>
             )}
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition"
+              className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition cursor-pointer"
             >
               Close
             </button>

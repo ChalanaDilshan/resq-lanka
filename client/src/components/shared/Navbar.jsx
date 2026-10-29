@@ -21,7 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout, activeRole, switchRole } = useAuth();
+  const { user, isAuthenticated, logout, activeRole } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -261,34 +261,6 @@ export default function Navbar() {
                         <ShieldAlert size={15} />
                         <span>Incident Dashboard</span>
                       </Link>
-                    </div>
-
-                    <div className="border-t border-slate-100 pt-1">
-                      <div className="px-4 py-1 text-[10px] uppercase font-bold text-slate-400">
-                        Switch Verified Account (Live)
-                      </div>
-                      {[
-                        { role: 'citizen', name: 'Kasun (Citizen)' },
-                        { role: 'volunteer', name: 'Saman (Volunteer)' },
-                        { role: 'administrator', name: 'Admin (Coordinator)' },
-                      ].map((item) => (
-                        <button
-                          key={item.role}
-                          type="button"
-                          onClick={async () => {
-                            await switchRole(item.role);
-                            setUserDropdownOpen(false);
-                          }}
-                          className={`w-full text-left px-4 py-1.5 text-xs flex items-center justify-between capitalize ${
-                            activeRole === item.role
-                              ? 'text-blue-600 font-bold bg-blue-50'
-                              : 'text-slate-600 hover:bg-slate-50'
-                          }`}
-                        >
-                          <span>{item.name}</span>
-                          {activeRole === item.role && <CheckCircle2 size={13} />}
-                        </button>
-                      ))}
                     </div>
 
                     <div className="border-t border-slate-100 mt-1 pt-1">

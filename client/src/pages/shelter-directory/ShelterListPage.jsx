@@ -27,7 +27,7 @@ import ShelterDetailModal from '../../components/mod2-shelter/ShelterDetailModal
 
 export default function ShelterListPage() {
   const [searchParams] = useSearchParams();
-  const { user, activeRole, switchRole } = useAuth();
+  const { user, activeRole } = useAuth();
   const isAuthorizedManager = Boolean(
     user && ['administrator', 'coordinator'].includes(activeRole || user.role)
   );
@@ -176,8 +176,8 @@ export default function ShelterListPage() {
 
             {/* Coordinator Actions Banner */}
             <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              {isAuthorizedManager ? (
-                <>
+              {isAuthorizedManager && (
+                <div className="flex flex-wrap items-center gap-3">
                   <div className="px-3.5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-bold flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span>
@@ -189,25 +189,10 @@ export default function ShelterListPage() {
                   <button
                     type="button"
                     onClick={() => setAddModalOpen(true)}
-                    className="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
+                    className="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs font-bold transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <PlusCircle size={16} />
                     <span>Register New Shelter</span>
-                  </button>
-                </>
-              ) : (
-                <div className="p-3 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between gap-3 text-xs">
-                  <div className="text-slate-300 text-[11px]">
-                    Are you a shelter coordinator or admin?
-                  </div>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await switchRole('administrator');
-                    }}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition shadow-xs"
-                  >
-                    Switch to Administrator (Live)
                   </button>
                 </div>
               )}
@@ -446,9 +431,6 @@ export default function ShelterListPage() {
                 isCoordinator={isAuthorizedManager}
                 onOpenOccupancyModal={(sh) => setEditingShelter(sh)}
                 onSelectShelter={(sh) => setSelectedShelter(sh)}
-                onSwitchToCoordinator={async () => {
-                  await switchRole('administrator');
-                }}
               />
             ))}
           </div>
@@ -472,9 +454,6 @@ export default function ShelterListPage() {
           onClose={() => setSelectedShelter(null)}
           onOpenOccupancyModal={(sh) => setEditingShelter(sh)}
           isCoordinator={isAuthorizedManager}
-          onSwitchToCoordinator={async () => {
-            await switchRole('administrator');
-          }}
         />
       )}
 

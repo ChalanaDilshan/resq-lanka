@@ -14,7 +14,6 @@ export default function ShelterCard({
   onOpenOccupancyModal,
   onSelectShelter,
   isCoordinator,
-  onSwitchToCoordinator,
 }) {
   const isClosed = shelter.status === 'Closed';
   const current = shelter.capacityCurrent || 0;
@@ -218,31 +217,22 @@ export default function ShelterCard({
           <button
             type="button"
             onClick={() => onSelectShelter(shelter)}
-            className="flex-1 py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+            className="flex-1 py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <span>View Details</span>
             <ExternalLink size={13} />
           </button>
 
           {/* Coordinator Edit Occupancy Button */}
-          {isCoordinator ? (
+          {isCoordinator && (
             <button
               type="button"
               onClick={() => onOpenOccupancyModal(shelter)}
-              className="py-2.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm shadow-emerald-600/20 flex items-center justify-center gap-1.5 shrink-0"
+              className="py-2.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm shadow-emerald-600/20 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
               title="Update shelter capacity and current occupancy numbers"
             >
               <Sliders size={14} />
               <span>Update Occupancy</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onSwitchToCoordinator}
-              className="py-2.5 px-2.5 text-[11px] text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl font-semibold transition"
-              title="Switch role to Coordinator to edit capacity"
-            >
-              Coordinator Mode
             </button>
           )}
         </div>
