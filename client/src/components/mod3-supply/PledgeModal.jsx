@@ -122,16 +122,26 @@ export default function PledgeModal({ item, user, onClose, onPledgeSuccess, onVi
               </div>
 
               <div className="pt-3 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    if (onViewTracker) onViewTracker();
-                  }}
-                  className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-md transition shadow-xs"
-                >
-                  View in Pledge Ledger
-                </button>
+                {onViewTracker ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onViewTracker();
+                    }}
+                    className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-md transition shadow-xs"
+                  >
+                    View in Pledge Ledger
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-md transition shadow-xs"
+                  >
+                    Done
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={onClose}

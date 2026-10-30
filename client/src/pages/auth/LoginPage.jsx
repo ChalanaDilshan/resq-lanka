@@ -39,8 +39,8 @@ export default function LoginPage() {
   const [isResending, setIsResending] = useState(false);
 
   // Form Fields
-  const [email, setEmail] = useState('citizen@resqlanka.lk');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [district, setDistrict] = useState('Ampara District');
@@ -61,21 +61,6 @@ export default function LoginPage() {
     }
     return () => clearInterval(timer);
   }, [resendCooldown]);
-
-  // Quick fill demo credentials for testing
-  const handleQuickFill = (roleKey) => {
-    setErrorMessage(null);
-    if (roleKey === 'administrator' || roleKey === 'coordinator') {
-      setEmail('admin@resqlanka.lk');
-      setPassword('Admin@ResQ2026!');
-    } else if (roleKey === 'volunteer') {
-      setEmail('volunteer@resqlanka.lk');
-      setPassword('password123');
-    } else {
-      setEmail('citizen@resqlanka.lk');
-      setPassword('password123');
-    }
-  };
 
   const loggedUserIsAdmin = (u) =>
     u.role === 'administrator' || u.role === 'coordinator';
@@ -630,60 +615,6 @@ export default function LoginPage() {
                       : 'Complete Registration'}
                   </button>
                 </form>
-
-                {/* Quick Role Fill Section */}
-                <div className="relative my-4 text-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-200" />
-                  </div>
-                  <span className="relative px-2.5 bg-white text-xs font-medium text-slate-500">
-                    Evaluation Quick-Fill
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('citizen')}
-                    className="p-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
-                  >
-                    <User size={14} className="text-slate-700" />
-                    <span className="text-xs font-semibold text-slate-900 leading-tight">
-                      Citizen
-                    </span>
-                    <span className="text-[10px] text-slate-500 leading-tight">
-                      Public SOS
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('volunteer')}
-                    className="p-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
-                  >
-                    <Users size={14} className="text-slate-700" />
-                    <span className="text-xs font-semibold text-slate-900 leading-tight">
-                      Volunteer
-                    </span>
-                    <span className="text-[10px] text-slate-500 leading-tight">
-                      Relief Tasks
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('administrator')}
-                    className="p-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
-                  >
-                    <Building2 size={14} className="text-slate-700" />
-                    <span className="text-xs font-semibold text-slate-900 leading-tight">
-                      Coordinator
-                    </span>
-                    <span className="text-[10px] text-slate-500 leading-tight">
-                      Admin Panel
-                    </span>
-                  </button>
-                </div>
               </>
             )}
           </div>

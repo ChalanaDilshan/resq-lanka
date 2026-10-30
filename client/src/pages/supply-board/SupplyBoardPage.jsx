@@ -33,11 +33,22 @@ export default function SupplyBoardPage() {
   const location = useLocation();
   const { user, activeRole } = useAuth();
 
-  // Active Tab derived directly from URL parameters & route
-  const activeTab =
+  const isCoordinatorOrAdmin =
+    activeRole === 'coordinator' ||
+    activeRole === 'administrator' ||
+    user?.role === 'coordinator' ||
+    user?.role === 'administrator';
+
+  // Active Tab derived from URL parameters & route, strictly gated by role permissions
+  const activeTabRaw =
     location.pathname === '/coordinator'
       ? 'coordinator'
       : searchParams.get('tab') || 'board';
+
+  const activeTab =
+    (activeTabRaw === 'coordinator' || activeTabRaw === 'pledges') && !isCoordinatorOrAdmin
+      ? 'board'
+      : activeTabRaw;
 
   // Data states
   const [supplies, setSupplies] = useState([]);
@@ -86,12 +97,6 @@ export default function SupplyBoardPage() {
   // Pledge filter for tracking tab
   const [pledgeStatusFilter, setPledgeStatusFilter] = useState('All');
 
-  const isCoordinatorOrAdmin =
-    activeRole === 'coordinator' ||
-    activeRole === 'administrator' ||
-    user?.role === 'coordinator' ||
-    user?.role === 'administrator';
-
   const [reloadTrigger, setReloadTrigger] = useState(0);
 
   const refreshData = () => {
@@ -135,6 +140,9 @@ export default function SupplyBoardPage() {
   }, [activeRole, reloadTrigger]);
 
   const handleTabChange = (newTab) => {
+    if ((newTab === 'coordinator' || newTab === 'pledges') && !isCoordinatorOrAdmin) {
+      return;
+    }
     setSearchParams({ tab: newTab });
   };
 
@@ -253,17 +261,19 @@ export default function SupplyBoardPage() {
               </p>
             </div>
 
-            {/* Quick Action Button */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => handleTabChange('coordinator')}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 font-medium rounded-md text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
-              >
-                <PlusCircle size={16} />
-                <span>Coordinator: List Needed Items</span>
-              </button>
-            </div>
+            {/* Quick Action Button - Coordinator Only */}
+            {isCoordinatorOrAdmin && (
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('coordinator')}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 font-medium rounded-md text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
+                >
+                  <PlusCircle size={16} />
+                  <span>Coordinator: List Needed Items</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Integrated Telemetry Census Strip */}
@@ -320,60 +330,60 @@ export default function SupplyBoardPage() {
       </section>
 
       {/* =========================================================================
-          NAVIGATION TABS
+          NAVIGATION TABS (Only shown for authorized coordinators / administrators)
          ========================================================================= */}
-      <div className="sticky top-20 z-40 bg-white border-b border-slate-200 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
-          <div className="bg-slate-100 p-1 rounded-lg inline-flex gap-1 border border-slate-200 overflow-x-auto max-w-full">
-            <button
-              onClick={() => handleTabChange('board')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm rounded-md transition ${
-                activeTab === 'board'
-                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 font-medium'
-              }`}
-            >
-              <Boxes size={16} />
-              <span>Public Supply Requests</span>
-              <span className="px-2 py-0.2 bg-slate-200 text-slate-800 rounded-full text-xs font-semibold">
-                {supplies.length}
-              </span>
-            </button>
+      {isCoordinatorOrAdmin && (
+        <div className="sticky top-20 z-40 bg-white border-b border-slate-200 shadow-xs">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+            <div className="bg-slate-100 p-1 rounded-lg inline-flex gap-1 border border-slate-200 overflow-x-auto max-w-full">
+              <button
+                onClick={() => handleTabChange('board')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm rounded-md transition ${
+                  activeTab === 'board'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 font-medium'
+                }`}
+              >
+                <Boxes size={16} />
+                <span>Public Supply Requests</span>
+                <span className="px-2 py-0.2 bg-slate-200 text-slate-800 rounded-full text-xs font-semibold">
+                  {supplies.length}
+                </span>
+              </button>
 
-            <button
-              onClick={() => handleTabChange('coordinator')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm rounded-md transition ${
-                activeTab === 'coordinator'
-                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 font-medium'
-              }`}
-            >
-              <ClipboardList size={16} />
-              <span>Coordinator Logistics Portal</span>
-              {isCoordinatorOrAdmin && (
+              <button
+                onClick={() => handleTabChange('coordinator')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm rounded-md transition ${
+                  activeTab === 'coordinator'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 font-medium'
+                }`}
+              >
+                <ClipboardList size={16} />
+                <span>Coordinator Logistics Portal</span>
                 <span className="px-2 py-0.2 bg-slate-800 text-slate-100 font-semibold rounded-full text-[10px]">
                   Staff
                 </span>
-              )}
-            </button>
+              </button>
 
-            <button
-              onClick={() => handleTabChange('pledges')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm rounded-md transition ${
-                activeTab === 'pledges'
-                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 font-medium'
-              }`}
-            >
-              <Truck size={16} />
-              <span>Pledge Tracking Ledger</span>
-              <span className="px-2 py-0.2 bg-slate-200 text-slate-800 rounded-full text-xs font-semibold">
-                {pledges.length}
-              </span>
-            </button>
+              <button
+                onClick={() => handleTabChange('pledges')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm rounded-md transition ${
+                  activeTab === 'pledges'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 font-medium'
+                }`}
+              >
+                <Truck size={16} />
+                <span>Pledge Tracking Ledger</span>
+                <span className="px-2 py-0.2 bg-slate-200 text-slate-800 rounded-full text-xs font-semibold">
+                  {pledges.length}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* =========================================================================
           MAIN APPLICATION CONTENT CONTAINER
@@ -502,7 +512,7 @@ export default function SupplyBoardPage() {
         )}
 
         {/* TAB 2: COORDINATOR INVENTORY & ITEM REQUEST FORM */}
-        {!loading && activeTab === 'coordinator' && (
+        {!loading && activeTab === 'coordinator' && isCoordinatorOrAdmin && (
           <div className="space-y-8">
             {/* Coordinator Action Notice */}
             <div className="bg-slate-900 text-white rounded-xl p-6 sm:p-7 flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-800 shadow-xs">
@@ -846,7 +856,7 @@ export default function SupplyBoardPage() {
         )}
 
         {/* TAB 3: FUNCTIONAL DONOR PLEDGE TRACKING INTERFACE */}
-        {!loading && activeTab === 'pledges' && (
+        {!loading && activeTab === 'pledges' && isCoordinatorOrAdmin && (
           <div>
             <PledgeLedgerTable
               pledges={pledges}
@@ -871,7 +881,7 @@ export default function SupplyBoardPage() {
           user={user}
           onClose={() => setSelectedPledgeItem(null)}
           onPledgeSuccess={handlePledgeSuccess}
-          onViewTracker={() => handleTabChange('pledges')}
+          onViewTracker={isCoordinatorOrAdmin ? () => handleTabChange('pledges') : null}
         />
       )}
     </div>
