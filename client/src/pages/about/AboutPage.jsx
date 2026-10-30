@@ -9,14 +9,11 @@ import {
   HeartHandshake,
   CheckCircle2,
   ChevronDown,
-  ArrowRight,
   Lock,
   PhoneCall,
-  Sparkles,
   Truck,
-  ClipboardList,
   Compass,
-  UserCheck,
+  ShieldCheck,
 } from 'lucide-react';
 
 import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
@@ -29,19 +26,18 @@ export default function AboutPage() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  // What is available on the platform
+  // Verified capabilities on the platform
   const availableServices = [
     {
       title: 'Emergency SOS & Rescue Reporting',
       badge: 'Immediate Help',
       icon: ShieldAlert,
-      iconBg: 'bg-red-600',
       description:
-        'If you or your family are trapped by floodwaters, landslides, or severe weather, report an emergency SOS instantly. Enter your location landmark or tap your exact spot on the interactive map so authorized rescue teams can locate you rapidly.',
+        'If you or your family are trapped by rising floodwaters, landslides, or severe weather, submit an emergency SOS report immediately. Enter your landmark or select your coordinates on the interactive map so authorized rescue responders can dispatch aid.',
       features: [
-        'Instant GPS pin or address description',
-        'Automatic privacy protection on your contact phone',
-        'Live timeline updates as responders are dispatched',
+        'Precise GPS coordinates or landmark descriptions',
+        'Automatic phone number masking to safeguard family privacy',
+        'Transparent status tracking from Pending to Rescued',
       ],
       link: '/sos',
       linkText: 'Report an Emergency SOS',
@@ -50,13 +46,12 @@ export default function AboutPage() {
       title: 'Verified Safe Shelter Directory',
       badge: 'Safe Evacuation',
       icon: Building2,
-      iconBg: 'bg-blue-600',
       description:
-        'Search verified government schools, temples, and community centers operating as safe disaster shelters. Check live remaining bed capacity, coordinator contact details, and flood elevation safety before you leave your home.',
+        'Locate verified government schools, temples, and community centers operating as temporary disaster shelters. View real-time bed capacity, site coordinator contact details, and elevation ratings before traveling.',
       features: [
-        'Real-time capacity and occupancy tracking',
-        'High-ground elevation ratings for flood safety',
-        'Direct phone contacts for shelter camp managers',
+        'Live bed capacity and occupancy tracking',
+        'High-ground elevation assessment for flood resistance',
+        'Direct phone contacts for verified camp managers',
       ],
       link: '/shelters',
       linkText: 'Find Safe Shelters Nearby',
@@ -65,147 +60,143 @@ export default function AboutPage() {
       title: 'Relief Supply & Donation Board',
       badge: 'Direct Humanitarian Aid',
       icon: PackageCheck,
-      iconBg: 'bg-emerald-600',
       description:
-        'See exact, verified shortages requested by camp coordinators—such as clean drinking water, dry food rations, infant formula, or bedding. Pledge supplies directly and ensure your aid reaches real displaced families.',
+        'View specific, verified supply shortages requested directly by shelter coordinators—including bottled water, dry food rations, infant milk, and hygiene kits. Pledge aid directly where it is urgently required.',
       features: [
-        'Live inventory quotas requested directly by camps',
-        'Pledge items in minutes with no guesswork',
-        'Physical verification when your goods arrive at the camp',
+        'Shortage requests logged directly by on-site managers',
+        'Pledge contributions online with delivery method tracking',
+        'On-site physical inspection before inventory is marked verified',
       ],
       link: '/supplies',
       linkText: 'Browse Relief Supply Board',
     },
     {
-      title: 'Community Volunteer Opportunities',
-      badge: 'Civic Support',
+      title: 'Civic Volunteer Coordination',
+      badge: 'Community Support',
       icon: Users,
-      iconBg: 'bg-purple-600',
       description:
-        'Support relief operations through safe, organized volunteer tasks. Help pack dry rations, assemble first aid kits, or welcome displaced families at camp reception desks without being put in hazardous situations.',
+        'Support community relief operations through safe, organized volunteer assignments. Assist with packing dry rations, sorting relief materials, or greeting displaced families without exposure to hazardous field conditions.',
       features: [
-        '100% non-hazardous, supervised relief roles',
-        'Clear shift times, locations, and safety instructions',
-        'Personal volunteer dashboard to manage your assignments',
+        'Strictly supervised non-hazardous community relief roles',
+        'Clear shift schedules, locations, and safety briefings',
+        'Personal volunteer console to manage active assignments',
       ],
       link: '/tasks',
       linkText: 'Explore Volunteer Tasks',
     },
     {
-      title: 'Official Disaster Alerts & Early Warnings',
-      badge: 'Stay Informed',
+      title: 'Official Disaster Alerts & Bulletins',
+      badge: 'Early Warnings',
       icon: Bell,
-      iconBg: 'bg-amber-600',
       description:
-        'Stay ahead of extreme weather with authoritative bulletins from the Disaster Management Centre (DMC) and Department of Meteorology. Check active flood alerts, spillway warnings, and road hazard notices across all 25 districts.',
+        'Stay informed with verified alerts from the Disaster Management Centre (DMC) and Department of Meteorology. Monitor river basin water levels, reservoir spillway warnings, and road closures across all 25 districts.',
       features: [
-        'Color-coded severity levels (Critical, High, Medium, Low)',
-        'District-specific notifications and evacuation directives',
-        'Verified government announcements with emergency hotlines',
+        'Standardized 4-tier alert severity scale',
+        'District-level warnings and evacuation advisories',
+        'Direct source verification links to official bulletins',
       ],
       link: '/alerts',
-      linkText: 'Check Live Warning Notices',
+      linkText: 'View Disaster Advisories',
     },
     {
-      title: 'Personalized User Dashboards',
-      badge: 'Your Action Center',
+      title: 'Role-Aware Action Consoles',
+      badge: 'Operational Tools',
       icon: Compass,
-      iconBg: 'bg-indigo-600',
       description:
-        'Every registered user has an organized dashboard. Check the status of your emergency SOS request, keep track of all your relief supply pledges, or view your upcoming volunteer shifts in one unified view.',
+        'Registered users access an operational console tailored to their role. Monitor the status of your emergency SOS request, keep track of all relief pledges, or view assigned volunteer shifts in one organized interface.',
       features: [
         'Tailored views for Citizens, Volunteers, and Coordinators',
-        'One-click role switching to explore different ways to help',
-        'Direct shortcuts to common emergency tools',
+        'Unified record of emergency submissions and pledges',
+        'Direct access to official communication hotlines',
       ],
       link: '/dashboard',
-      linkText: 'Go to My Dashboard',
+      linkText: 'Access Your Dashboard',
     },
   ];
 
-  // How user can work - interactive workflows
+  // Workflows by role
   const workflows = {
     citizen: {
       role: 'Citizens in Affected Areas',
-      tagline: 'Need safe shelter, food, or emergency rescue?',
+      tagline: 'Need safe refuge, food supplies, or emergency extraction?',
       steps: [
         {
-          num: '01',
-          title: 'Request Help or Find a Shelter',
-          desc: 'If you are in danger, tap "Emergency SOS" to send your location. If you need safe refuge, browse the "Shelters" directory to find an open camp near you with available space.',
+          num: '1',
+          title: 'Request Rescue or Find Shelter',
+          desc: 'If trapped or in direct danger, submit an Emergency SOS with your location. If you need safe evacuation lodging, browse the Shelters directory to find an open facility with confirmed capacity.',
         },
         {
-          num: '02',
-          title: 'Provide Simple Location Details',
-          desc: 'Type your address, nearby landmarks (e.g. Near clock tower, Hospital road), or tap your location on the map. Your telephone number is kept private and only seen by rescue responders.',
+          num: '2',
+          title: 'Provide Clear Landmarks',
+          desc: 'State your address, village, or nearby recognizable landmarks. Your telephone number is automatically masked from public feeds to prevent unsolicited calls.',
         },
         {
-          num: '03',
-          title: 'Track Live Assistance',
-          desc: 'Check the incident feed or your Citizen Dashboard. You will see when rescue teams or coordinators pick up your report and update its status from "Pending" to "In Progress".',
+          num: '3',
+          title: 'Track Response Progress',
+          desc: 'Monitor your request status in real time. Coordinators and authorized rescue personnel update the incident timeline when dispatched to your location.',
         },
       ],
     },
     donor: {
-      role: 'Donors & Aid Organizations',
-      tagline: 'Want to donate food, water, or medical supplies?',
+      role: 'Relief Donors & Aid Organizations',
+      tagline: 'Want to donate clean water, food rations, or essential supplies?',
       steps: [
         {
-          num: '01',
-          title: 'See Real-Time Camp Needs',
-          desc: 'Open the "Donate" board to see current supply requests published directly by shelter coordinators. Items show exactly how many units are still needed.',
+          num: '1',
+          title: 'Inspect Live Camp Requirements',
+          desc: 'Review the Relief Supply Board to view active inventory shortages published directly by verified shelter camp coordinators across Sri Lanka.',
         },
         {
-          num: '02',
-          title: 'Pledge Your Contribution',
-          desc: 'Click "Pledge Support" on any item. Select how many bottles of water, food packs, or medicine kits you can provide and choose your drop-off or dispatch method.',
+          num: '2',
+          title: 'Pledge Specific Quantities',
+          desc: 'Choose an item and specify the exact quantity of rations, water cartons, or medical supplies you will deliver, alongside your scheduled dispatch timeline.',
         },
         {
-          num: '03',
-          title: 'Track Delivery Verification',
-          desc: 'Once your goods arrive at the shelter, coordinators inspect and physically verify the stock on ResQ-Lanka. You can see your donation marked as verified in the public ledger.',
+          num: '3',
+          title: 'Physical Receipt & Verification',
+          desc: 'When your goods reach the shelter, camp staff inspect and count the stock, updating the public ledger to "Fulfilled" so donors have complete transparency.',
         },
       ],
     },
     volunteer: {
-      role: 'Community Volunteers',
-      tagline: 'Want to help displaced families on the ground?',
+      role: 'Civic Volunteers',
+      tagline: 'Ready to assist displaced families with ground relief logistics?',
       steps: [
         {
-          num: '01',
-          title: 'Browse Available Tasks',
-          desc: 'Visit the "Volunteer" board to see organized relief assignments like packing food parcels, sorting first aid kits, or registering displaced families.',
+          num: '1',
+          title: 'Browse Authorized Tasks',
+          desc: 'Explore available relief opportunities such as dry rations packaging, logistics registration, and care support in your home district.',
         },
         {
-          num: '02',
-          title: 'Sign Up for a Shift',
-          desc: 'Select a task that matches your location and availability. Submit a quick application with your contact details and any relevant skills.',
+          num: '2',
+          title: 'Submit Application & Availability',
+          desc: 'Select a task matching your schedule and skills. Acknowledge the civilian non-hazardous safety directive before submitting.',
         },
         {
-          num: '03',
-          title: 'Report to the Staging Center',
-          desc: 'Once accepted, arrive at the relief center at the scheduled time. Safety guidelines, gloves, masks, and on-site briefing are provided by the coordinator.',
+          num: '3',
+          title: 'Report to Staging Point',
+          desc: 'Upon approval by a relief coordinator, report to the designated staging center on time with appropriate safety footwear and visibility gear.',
         },
       ],
     },
     coordinator: {
-      role: 'Camp Coordinators & Authorities',
-      tagline: 'Managing an evacuation center or official response?',
+      role: 'Camp Coordinators & Officials',
+      tagline: 'Managing an evacuation shelter or district relief staging post?',
       steps: [
         {
-          num: '01',
-          title: 'Keep Shelter Capacities Updated',
-          desc: 'Log in with coordinator credentials to update your shelter headcount in real time so families don’t arrive at an overcrowded facility.',
+          num: '1',
+          title: 'Update Headcount & Bed Availability',
+          desc: 'Log in with coordinator credentials to maintain real-time shelter capacity so evacuees are not directed to overcrowded facilities.',
         },
         {
-          num: '02',
-          title: 'Request Needed Supplies',
-          desc: 'Publish exact inventory shortages to the community board so generous donors know precisely what your shelter is running low on.',
+          num: '2',
+          title: 'Publish Verified Supply Shortages',
+          desc: 'Log exact shortages of drinking water, medicines, and dry foods to the public relief board so donors can supply what is urgently needed.',
         },
         {
-          num: '03',
-          title: 'Broadcast Warnings & Verify Aid',
-          desc: 'Publish official warning advisories, approve incoming volunteer rosters, and verify physically delivered donations upon arrival.',
+          num: '3',
+          title: 'Verify Aid & Manage Responders',
+          desc: 'Approve volunteer applications, supervise non-hazardous operations, and physically verify incoming donations upon arrival.',
         },
       ],
     },
@@ -213,216 +204,236 @@ export default function AboutPage() {
 
   const faqs = [
     {
-      q: 'Do I have to create an account to request emergency rescue or find shelter?',
-      a: 'No. You can submit an emergency SOS request or search for safe evacuation shelters completely free and without registering. Creating an account simply allows you to track all your reports, donations, or volunteer applications in a personal dashboard.',
+      q: 'Do I have to register an account to report an emergency or locate safe shelters?',
+      a: 'No. You can submit an emergency SOS request and search the entire safe shelter directory completely free and without an account. Registering simply allows you to track multiple requests, manage volunteer rosters, or monitor donation pledges over time.',
     },
     {
-      q: 'How do I know if an evacuation shelter actually has room for my family?',
-      a: 'Every shelter in our directory shows a live capacity meter (e.g. 120 / 250 occupants). Coordinators update these numbers as people arrive. Shelters that reach full capacity are labeled "At Capacity" or "Nearly Full", and if a facility closes, it is clearly marked so you can head to an alternate shelter.',
+      q: 'How is shelter capacity kept accurate during rapidly evolving disasters?',
+      a: 'Shelter managers and ground coordinators update occupancy numbers directly through their operational console. Facilities that reach their maximum limits are automatically flagged as "At Capacity" to redirect families toward alternate high-ground shelters.',
     },
     {
-      q: 'Is my phone number visible to the general public when I ask for help?',
-      a: 'No. ResQ-Lanka automatically masks your phone number on public feeds (e.g., 077 123 4567 appears as 077 **** 567) to protect your family from spam or unauthorized calls. Only authorized rescue personnel and shelter coordinators can view your full contact number.',
+      q: 'Is my phone number visible to the public when I report an SOS?',
+      a: 'No. ResQ-Lanka enforces privacy-first data masking on all public incident feeds (e.g., 077 123 4567 is displayed as 077 **** 567). Only authenticated rescue coordinators and emergency personnel have access to full contact numbers.',
     },
     {
-      q: 'How does ResQ-Lanka prevent fake or phantom donations?',
-      a: 'When someone pledges to donate an item, the board shows it as "Pledged". However, the item is only counted as "Fulfilled" after the shelter coordinator physically receives the shipment, counts it, and marks it verified on the system.',
+      q: 'How does the platform prevent phantom or unverified donation pledges?',
+      a: 'A pledged contribution remains in "Pledged" status until the physical shipment reaches the evacuation center. The camp manager inspects the items and records physical verification before it counts toward the fulfilled quota.',
     },
     {
-      q: 'Can volunteers participate in dangerous flood rescues?',
-      a: 'No. Hazardous swift-water, boat extractions, and landslide rescues are handled exclusively by the Tri-Forces, Police, and certified Disaster Management Centre (DMC) units. ResQ-Lanka volunteers assist strictly with safe, non-hazardous support tasks like packing food hampers, sorting medical kits, and registering families.',
+      q: 'Are civilian volunteers deployed for hazardous flood rescues?',
+      a: 'No. Deep-water rescues, boat extractions, and unstable structural operations are strictly conducted by the Sri Lanka Navy, Army, Police Special Task Force, and certified Disaster Management Centre rescue teams. Volunteers participate solely in supervised, non-hazardous support roles.',
     },
     {
-      q: 'Who should I contact immediately if lives are in immediate danger?',
-      a: 'For immediate, life-threatening emergencies, always dial the National Disaster Management Hotline at 117, Suwa Seriya Ambulance at 1990, or Emergency Police at 119. ResQ-Lanka works alongside these national hotlines to coordinate ground assistance.',
+      q: 'Which official hotlines should I call if immediate life safety is at risk?',
+      a: 'For life-threatening emergencies requiring direct rescue or medical dispatch, immediately dial the National Disaster Management Centre (117), the Suwa Seriya Ambulance Service (1990), or the Sri Lanka Police Emergency Service (119).',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-20 selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-800 pb-16">
       {/* =========================================================================
-          HERO BANNER
+          CIVIC HERO SECTION
          ========================================================================= */}
-      <section className="relative bg-slate-900 text-white overflow-hidden py-16 sm:py-24 border-b border-slate-800">
-        <div className="absolute inset-0 z-0 opacity-25">
+      <header className="relative bg-slate-900 text-white overflow-hidden py-14 sm:py-20 border-b border-slate-800">
+        <div className="absolute inset-0 z-0 opacity-20">
           <img
             src={heroDisasterBg}
-            alt="Disaster Response"
-            className="w-full h-full object-cover object-center filter saturate-150"
+            alt="Disaster Relief Operations"
+            className="w-full h-full object-cover object-center grayscale contrast-125"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/95 to-slate-900" />
+          <div className="absolute inset-0 bg-slate-950/80" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30 mb-5">
-            <Sparkles size={14} />
-            <span>Community Disaster Relief & Coordination Platform</span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold mb-4">
+            <ShieldCheck size={14} className="text-emerald-400" />
+            <span>Sri Lanka Community Disaster Relief &amp; Emergency Coordination</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl leading-tight">
-            Connecting Communities, Safe Shelters & Relief Aid Across Sri Lanka
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white max-w-3xl leading-tight">
+            Connecting Communities, Safe Shelters &amp; Relief Operations Across Sri Lanka
           </h1>
 
-          <p className="mt-5 text-base sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
-            ResQ-Lanka is an open, community-first platform built to help citizens, donors, volunteers, and camp coordinators
-            stay connected during monsoonal floods, landslides, and emergencies. Here is everything you can do on the platform.
+          <p className="mt-4 text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+            ResQ-Lanka is an open, community-first emergency response network built to support
+            displaced citizens, relief donors, civic volunteers, and shelter managers during
+            monsoonal floods, landslides, and extreme weather emergencies.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               to="/sos"
-              className="px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl text-sm transition shadow-lg shadow-red-600/30 flex items-center gap-2"
+              className="px-4 py-2.5 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-lg text-xs sm:text-sm transition-colors flex items-center gap-2 shadow-xs"
             >
-              <ShieldAlert size={18} />
-              <span>Ask for Emergency Help</span>
+              <ShieldAlert size={16} />
+              <span>Report an Emergency SOS</span>
             </Link>
             <Link
               to="/shelters"
-              className="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl text-sm border border-slate-700 transition flex items-center gap-2"
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg text-xs sm:text-sm border border-slate-700 transition-colors flex items-center gap-2"
             >
-              <Building2 size={18} />
+              <Building2 size={16} />
               <span>Find Safe Shelters</span>
             </Link>
             <Link
               to="/supplies"
-              className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm transition shadow-md shadow-emerald-600/20 flex items-center gap-2"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-white text-slate-900 font-semibold rounded-lg text-xs sm:text-sm transition-colors flex items-center gap-2"
             >
-              <PackageCheck size={18} />
-              <span>Donate Relief Items</span>
+              <PackageCheck size={16} />
+              <span>Donate Relief Supplies</span>
             </Link>
           </div>
         </div>
-      </section>
+      </header>
 
       {/* =========================================================================
-          QUICK VALUE STATS
+          OPERATIONAL PILLARS
          ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl p-6 sm:p-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-black text-red-600 tracking-tight">SOS</div>
-            <div className="text-xs sm:text-sm font-bold text-slate-900">Direct Rescue Broadcast</div>
-            <p className="text-[11px] text-slate-500">Fast reporting with map location</p>
+      <section
+        aria-label="Core operational pillars"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20"
+      >
+        <div className="bg-white rounded-xl border border-slate-300 shadow-xs p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="space-y-1 sm:border-r border-slate-200 sm:pr-4">
+            <div className="text-xs font-semibold text-red-700 uppercase tracking-wide">
+              Emergency SOS
+            </div>
+            <h2 className="text-sm font-bold text-slate-900">Direct Rescue Broadcast</h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Fast reporting with GPS coordinates and automatic contact phone masking.
+            </p>
           </div>
-          <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-black text-blue-600 tracking-tight">Live</div>
-            <div className="text-xs sm:text-sm font-bold text-slate-900">Shelter Capacity Tracking</div>
-            <p className="text-[11px] text-slate-500">Know where open beds are</p>
+
+          <div className="space-y-1 sm:border-r border-slate-200 sm:pr-4">
+            <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+              Real-Time Tracking
+            </div>
+            <h2 className="text-sm font-bold text-slate-900">Verified Shelter Capacity</h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Live bed counts, high-ground elevation safety ratings, and camp contact details.
+            </p>
           </div>
-          <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">100%</div>
-            <div className="text-xs sm:text-sm font-bold text-slate-900">Physically Verified Aid</div>
-            <p className="text-[11px] text-slate-500">Direct delivery to verified camps</p>
+
+          <div className="space-y-1 sm:border-r border-slate-200 sm:pr-4">
+            <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+              On-Site Audit
+            </div>
+            <h2 className="text-sm font-bold text-slate-900">Physically Verified Aid</h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Donations are confirmed only after shelter coordinators inspect physical deliveries.
+            </p>
           </div>
+
           <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-black text-purple-600 tracking-tight">Safe</div>
-            <div className="text-xs sm:text-sm font-bold text-slate-900">Volunteer Assignments</div>
-            <p className="text-[11px] text-slate-500">Organized, non-hazardous community tasks</p>
+            <div className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+              Civilian Safety
+            </div>
+            <h2 className="text-sm font-bold text-slate-900">Structured Non-Hazard Roles</h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Strictly supervised packing, logistics, and registration without hazard exposure.
+            </p>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          WHAT IS AVAILABLE ON THE PLATFORM (SERVICES & FEATURES)
+          PLATFORM CAPABILITIES
          ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-200 mb-3">
-            <Compass size={14} />
-            <span>Platform Capabilities</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="max-w-3xl mb-8">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            Platform Capabilities
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
             What You Can Do on ResQ-Lanka
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-2">
-            Everything you need during a disaster is organized into clear, accessible tools designed for fast action.
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+            Essential emergency relief tools organized into clear, verified civic services.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {availableServices.map((service) => {
             const Icon = service.icon;
             return (
-              <div
+              <article
                 key={service.title}
-                className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-md transition flex flex-col justify-between group"
+                className="bg-white rounded-xl p-5 border border-slate-300 shadow-xs flex flex-col justify-between hover:border-slate-400 transition-colors"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-2xl ${service.iconBg} text-white flex items-center justify-center shadow-md`}>
-                      <Icon size={22} />
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center">
+                      <Icon size={18} />
                     </div>
-                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200">
                       {service.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition">
+                  <h3 className="text-base font-bold text-slate-900 leading-snug">
                     {service.title}
                   </h3>
 
-                  <p className="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                     {service.description}
                   </p>
 
-                  <ul className="mt-4 space-y-2 border-t border-slate-100 pt-3">
+                  <ul className="mt-4 space-y-1.5 border-t border-slate-100 pt-3">
                     {service.features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2 text-[11.5px] text-slate-600">
-                        <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <li key={feat} className="flex items-start gap-2 text-xs text-slate-600">
+                        <CheckCircle2 size={13} className="text-emerald-700 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+                <div className="pt-4 mt-4 border-t border-slate-100">
                   <Link
                     to={service.link}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5"
+                    className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline inline-block"
                   >
-                    <span>{service.linkText}</span>
-                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    {service.linkText}
                   </Link>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
       </section>
 
       {/* =========================================================================
-          HOW USERS CAN WORK (STEP-BY-STEP WORKFLOWS BY ROLE)
+          HOW USERS WORK (ROLE WORKFLOWS)
          ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-sm">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-200 mb-2">
-              <ClipboardList size={14} />
-              <span>How It Works For You</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Simple Steps to Take Action
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-300 shadow-xs space-y-6">
+          <div className="max-w-2xl">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              Operational Workflows
+            </span>
+            <h2 className="text-2xl font-bold text-slate-900 mt-1">
+              How ResQ-Lanka Works for You
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Select who you are below to see how easy it is to use ResQ-Lanka:
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Select your role to view clear, step-by-step guidance on taking action:
             </p>
 
-            {/* Workflow Role Selector Tabs */}
-            <div className="mt-6 flex flex-wrap justify-center gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-xl mx-auto">
+            {/* Role Selector Tabs */}
+            <div className="mt-4 flex flex-wrap gap-1.5 border border-slate-200 rounded-lg p-1 bg-slate-50">
               {[
                 { id: 'citizen', label: 'Affected Citizen' },
                 { id: 'donor', label: 'Relief Donor' },
-                { id: 'volunteer', label: 'Volunteer' },
+                { id: 'volunteer', label: 'Civic Volunteer' },
                 { id: 'coordinator', label: 'Camp Coordinator' },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                   }`}
                 >
                   {tab.label}
@@ -431,29 +442,27 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Workflow Steps Card */}
-          <div className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200">
-            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900">
-                  {workflows[activeTab].role}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                  {workflows[activeTab].tagline}
-                </p>
-              </div>
-              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 self-start sm:self-auto">
-                3-Step Guide
-              </span>
+          {/* Workflow Steps Display */}
+          <div className="bg-slate-50 rounded-lg p-5 sm:p-6 border border-slate-200 space-y-5">
+            <div className="pb-3 border-b border-slate-200">
+              <h3 className="text-base font-bold text-slate-900">
+                {workflows[activeTab].role}
+              </h3>
+              <p className="text-xs text-slate-600 mt-0.5">
+                {workflows[activeTab].tagline}
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {workflows[activeTab].steps.map((st) => (
-                <div key={st.num} className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                    {st.num}
+                <div
+                  key={st.num}
+                  className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs space-y-2"
+                >
+                  <div className="text-xs font-bold text-slate-500">
+                    Step {st.num}
                   </div>
-                  <h4 className="text-base font-bold text-slate-900">{st.title}</h4>
+                  <h4 className="text-sm font-bold text-slate-900">{st.title}</h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{st.desc}</p>
                 </div>
               ))}
@@ -463,51 +472,50 @@ export default function AboutPage() {
       </section>
 
       {/* =========================================================================
-          KEY SAFETY & PRIVACY PROMISES
+          SAFETY, PRIVACY & VERIFICATION PROMISES
          ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-xl">
-          <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold border border-blue-500/30 mb-3">
-              <UserCheck size={14} />
-              <span>Our Safety Commitment</span>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="bg-slate-900 text-white rounded-xl p-6 sm:p-8 border border-slate-800 space-y-6">
+          <div className="max-w-3xl">
+            <span className="text-xs font-semibold text-emerald-400">
+              Institutional Commitments
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Designed with Protection, Privacy & Ground Truth in Mind
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1">
+              Civilian Protection, Privacy &amp; Data Verification
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2">
-              During an emergency, trust and accuracy matter most. ResQ-Lanka follows strict guidelines to keep you safe:
+            <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
+              In a national crisis, accurate information saves lives. ResQ-Lanka adheres to rigorous protocols to protect all participants:
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/80 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                <Lock size={18} />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-slate-950/60 p-4 rounded-lg border border-slate-800 space-y-2">
+              <div className="flex items-center gap-2 text-slate-200 font-semibold text-xs sm:text-sm">
+                <Lock size={16} className="text-blue-400" />
+                <span>Contact Phone Privacy</span>
               </div>
-              <h4 className="text-sm font-bold text-white">Your Contact Phone is Kept Private</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                When you post an emergency request, your contact number is masked (e.g. 077 **** 567) so only official responders can access it.
+                Emergency contact numbers are automatically masked on all public feeds. Full telephone numbers are accessible solely to authenticated rescue teams and verified shelter managers.
               </p>
             </div>
 
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/80 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <Truck size={18} />
+            <div className="bg-slate-950/60 p-4 rounded-lg border border-slate-800 space-y-2">
+              <div className="flex items-center gap-2 text-slate-200 font-semibold text-xs sm:text-sm">
+                <Truck size={16} className="text-emerald-400" />
+                <span>Physically Audited Supplies</span>
               </div>
-              <h4 className="text-sm font-bold text-white">Verified Aid Delivery</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                We never assume promised donations have arrived. Shelter coordinators must inspect and physically count stock at the camp.
+                Donations are never recorded as fulfilled based on promises alone. Shelter coordinators inspect and physically count relief inventory upon arrival at the facility.
               </p>
             </div>
 
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/80 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
-                <HeartHandshake size={18} />
+            <div className="bg-slate-950/60 p-4 rounded-lg border border-slate-800 space-y-2">
+              <div className="flex items-center gap-2 text-slate-200 font-semibold text-xs sm:text-sm">
+                <HeartHandshake size={16} className="text-amber-400" />
+                <span>Hazard-Free Civilian Roles</span>
               </div>
-              <h4 className="text-sm font-bold text-white">No Untrained Hazard Rescues</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Swift-water boat rescues are handled exclusively by authorized military & DMC teams. Community volunteers help only with safe ground tasks.
+                Swift-water boat rescues and structural extractions are conducted strictly by Tri-Forces and certified DMC units. Volunteers participate exclusively in organized, safe logistical tasks.
               </p>
             </div>
           </div>
@@ -515,77 +523,89 @@ export default function AboutPage() {
       </section>
 
       {/* =========================================================================
-          EMERGENCY HOTLINES STRIP
+          NATIONAL EMERGENCY HOTLINES STRIP
          ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
-        <div className="bg-red-50 border border-red-200 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4 text-center sm:text-left">
-            <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-red-600/30">
-              <PhoneCall size={26} />
-            </div>
+      <section
+        aria-label="National Emergency Hotlines"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16"
+      >
+        <div className="bg-red-50 border border-red-300 rounded-xl p-6 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex items-start gap-3.5 max-w-xl">
+            <PhoneCall size={24} className="text-red-700 shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-bold text-red-950">Immediate Life-Threatening Emergency?</h3>
-              <p className="text-xs sm:text-sm text-red-700 mt-0.5">
-                Always contact Sri Lanka’s 24/7 national emergency hotlines for direct extraction and paramedic dispatch.
+              <h2 className="text-base font-bold text-red-950">
+                Immediate Life-Threatening Emergency?
+              </h2>
+              <p className="text-xs sm:text-sm text-red-900 mt-0.5 leading-relaxed">
+                For swift-water trapped families, direct medical emergencies, or urgent evacuation, dial Sri Lanka&apos;s 24/7 national emergency response lines immediately:
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 flex-shrink-0">
-            <div className="bg-white px-4 py-2 rounded-xl border border-red-200 text-center">
-              <span className="text-[10px] uppercase font-bold text-red-600 block">DMC Hotline</span>
-              <span className="text-lg font-black text-slate-900">117</span>
-            </div>
-            <div className="bg-white px-4 py-2 rounded-xl border border-red-200 text-center">
-              <span className="text-[10px] uppercase font-bold text-red-600 block">Ambulance</span>
-              <span className="text-lg font-black text-slate-900">1990</span>
-            </div>
-            <div className="bg-white px-4 py-2 rounded-xl border border-red-200 text-center">
-              <span className="text-[10px] uppercase font-bold text-red-600 block">Police Emergency</span>
-              <span className="text-lg font-black text-slate-900">119</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            <a
+              href="tel:117"
+              className="bg-white hover:bg-slate-50 px-4 py-2 rounded-lg border border-red-200 text-center transition-colors flex-1 sm:flex-initial"
+            >
+              <span className="text-[11px] font-semibold text-slate-600 block">DMC Hotline</span>
+              <span className="text-lg font-bold text-red-700 tabular-nums">117</span>
+            </a>
+            <a
+              href="tel:1990"
+              className="bg-white hover:bg-slate-50 px-4 py-2 rounded-lg border border-red-200 text-center transition-colors flex-1 sm:flex-initial"
+            >
+              <span className="text-[11px] font-semibold text-slate-600 block">Ambulance</span>
+              <span className="text-lg font-bold text-red-700 tabular-nums">1990</span>
+            </a>
+            <a
+              href="tel:119"
+              className="bg-white hover:bg-slate-50 px-4 py-2 rounded-lg border border-red-200 text-center transition-colors flex-1 sm:flex-initial"
+            >
+              <span className="text-[11px] font-semibold text-slate-600 block">Police Emergency</span>
+              <span className="text-lg font-bold text-red-700 tabular-nums">119</span>
+            </a>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          FREQUENTLY ASKED QUESTIONS (PRACTICAL USER FAQS)
+          FREQUENTLY ASKED QUESTIONS
          ========================================================================= */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-200 mb-2">
-            <CheckCircle2 size={14} />
-            <span>Common Questions</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="mb-6">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            Support &amp; Answers
+          </span>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
             Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Find quick answers to how ResQ-Lanka helps you during a disaster:
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            Common questions regarding ResQ-Lanka disaster coordination and operations:
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {faqs.map((faq, idx) => (
             <div
               key={faq.q}
-              className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden transition"
+              className="bg-white rounded-lg border border-slate-300 shadow-xs overflow-hidden"
             >
               <button
                 type="button"
                 onClick={() => toggleFaq(idx)}
-                className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-slate-900 hover:text-blue-600 transition"
+                aria-expanded={openFaq === idx}
+                className="w-full p-4 text-left flex items-center justify-between gap-4 font-semibold text-sm text-slate-900 hover:text-blue-700 transition-colors"
               >
                 <span>{faq.q}</span>
                 <ChevronDown
-                  size={18}
-                  className={`text-slate-400 flex-shrink-0 transition-transform duration-200 ${
-                    openFaq === idx ? 'rotate-180 text-blue-600' : ''
+                  size={16}
+                  className={`text-slate-500 shrink-0 transition-transform duration-200 ${
+                    openFaq === idx ? 'rotate-180 text-blue-700' : ''
                   }`}
                 />
               </button>
               {openFaq === idx && (
-                <div className="px-4 sm:px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fadeIn">
+                <div className="px-4 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
                   {faq.a}
                 </div>
               )}
@@ -595,35 +615,34 @@ export default function AboutPage() {
       </section>
 
       {/* =========================================================================
-          BOTTOM CALL TO ACTION
+          CIVIC ACTION FOOTER
          ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white rounded-3xl p-8 sm:p-12 text-center shadow-xl space-y-4">
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-            Join the ResQ-Lanka Community Today
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="bg-slate-900 text-white rounded-xl p-8 sm:p-10 text-center border border-slate-800 space-y-4">
+          <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-white">
+            Support Sri Lanka&apos;s Disaster Relief Network
           </h2>
-          <p className="text-xs sm:text-base text-blue-100 max-w-2xl mx-auto leading-relaxed">
-            Every verified shelter bed, pledged water bottle, and volunteer hour makes a tangible difference to families
-            rebuilding after disaster.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Every reported emergency pin, verified shelter occupancy update, pledged water bottle, and volunteer hour supports vulnerable families during critical hours.
           </p>
-          <div className="pt-4 flex flex-wrap justify-center gap-3">
+          <div className="pt-2 flex flex-wrap justify-center gap-3">
             <Link
               to="/register"
-              className="px-6 py-3.5 bg-white text-slate-900 font-bold rounded-2xl text-xs sm:text-sm hover:bg-slate-100 transition shadow-lg"
+              className="px-4 py-2.5 bg-white text-slate-900 font-semibold rounded-lg text-xs sm:text-sm hover:bg-slate-100 transition-colors"
             >
-              Create Free Account
+              Register Responder Profile
             </Link>
             <Link
               to="/shelters"
-              className="px-6 py-3.5 bg-blue-900/80 hover:bg-blue-900 text-white font-bold rounded-2xl text-xs sm:text-sm border border-white/20 transition"
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg text-xs sm:text-sm border border-slate-700 transition-colors"
             >
-              Browse Safe Shelters
+              View Safe Shelters
             </Link>
             <Link
               to="/supplies"
-              className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs sm:text-sm transition shadow-md"
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg text-xs sm:text-sm border border-slate-700 transition-colors"
             >
-              Donate Supplies
+              Donate Relief Supplies
             </Link>
           </div>
         </div>

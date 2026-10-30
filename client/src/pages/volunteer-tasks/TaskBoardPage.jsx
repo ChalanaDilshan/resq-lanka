@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Users,
-  PlusCircle,
+  Plus,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle,
+  AlertTriangle,
   Loader2,
   ClipboardList,
   Compass,
-  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -26,7 +25,8 @@ export default function TaskBoardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Active view tab: 'explore' or 'my-applications'
-  const initialTab = searchParams.get('tab') === 'my-applications' ? 'my-applications' : 'explore';
+  const initialTab =
+    searchParams.get('tab') === 'my-applications' ? 'my-applications' : 'explore';
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Filters state
@@ -100,11 +100,11 @@ export default function TaskBoardPage() {
           }
         }
       } catch (err) {
-        if (isMounted) {
+        if (!isMounted) {
           setError(err.message || 'Failed to load volunteer tasks.');
         }
       } finally {
-        if (isMounted) {
+        if (!isMounted) {
           setIsLoading(false);
         }
       }
@@ -128,126 +128,116 @@ export default function TaskBoardPage() {
   }, {});
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
-      {/* Hero Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-10 shadow-xl border border-white/10">
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold backdrop-blur-md">
-            <ShieldCheck size={14} className="text-emerald-400" />
-            <span>Sri Lanka Community Disaster Relief Coordination</span>
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-            Volunteer Relief Task Board
-          </h1>
-
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Support displaced families across Sri Lanka with emergency dry rations packing,
-            drinking water distribution, high-ground shelter logistics, and care assistance.
-          </p>
-
-          {/* Safety Disclaimer Banner */}
-          <div className="bg-amber-500/10 border border-amber-400/30 rounded-2xl p-3.5 flex items-start gap-3 backdrop-blur-sm">
-            <ShieldCheck size={18} className="text-amber-400 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-200">
-              <strong className="text-white">Civilian Safety Protocol:</strong> Volunteers are deployed
-              exclusively for organized, non-hazardous community relief roles. Swift-water rescues,
-              hazardous structural work, or unauthorized boat missions are strictly prohibited.
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+      {/* Civic Operations Header */}
+      <header className="bg-slate-900 text-white rounded-xl border border-slate-800 p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+          <div className="max-w-3xl space-y-3">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold">
+              <ShieldCheck size={14} className="text-emerald-400" />
+              <span>National Disaster Relief Operations</span>
             </div>
+
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              Volunteer Relief Task Board
+            </h1>
+
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Mobilizing civilian relief volunteers across Sri Lanka for dry rations packaging,
+              drinking water supply logistics, shelter reception, and non-hazardous community assistance.
+            </p>
           </div>
+
+          {isAdminOrCoordinator && (
+            <div className="shrink-0">
+              <Link
+                to="/tasks/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold text-xs sm:text-sm transition-colors focus:ring-2 focus:ring-emerald-400"
+              >
+                <Plus size={16} />
+                <span>Post New Task</span>
+              </Link>
+            </div>
+          )}
         </div>
 
-        {/* Action Button for Admins in Hero */}
-        {isAdminOrCoordinator && (
-          <div className="relative z-10 pt-4 flex flex-wrap gap-3">
-            <Link
-              to="/tasks/new"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition-all"
-            >
-              <PlusCircle size={17} />
-              <span>Post New Relief Task</span>
-            </Link>
+        {/* Civilian Safety Protocol Banner */}
+        <div className="mt-6 pt-5 border-t border-slate-800 flex items-start gap-3 text-xs bg-slate-950/60 p-4 rounded-lg border border-slate-800/80">
+          <ShieldCheck size={18} className="text-amber-400 shrink-0 mt-0.5" />
+          <div className="text-slate-300 space-y-1">
+            <span className="font-semibold text-white">Civilian Safety Directive: </span>
+            <span>
+              Volunteers are assigned strictly to authorized, non-hazardous community relief roles.
+              Swift-water rescues, high-risk structural debris removal, and unauthorized boat missions are strictly reserved for Sri Lanka Armed Forces and specialized Disaster Management Centre (DMC) rescue units.
+            </span>
           </div>
-        )}
+        </div>
+      </header>
 
-        {/* Decorative background glow */}
-        <div className="absolute right-0 top-0 -mt-10 -mr-10 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-      </div>
-
-      {/* Aggregate Metrics Bar */}
+      {/* Operational Metrics Strip */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-              <ClipboardList size={20} />
+        <section
+          aria-label="Operational task statistics"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 bg-white border border-slate-300 rounded-xl p-4 shadow-xs"
+        >
+          <div className="p-3 border-r border-slate-200 last:border-r-0">
+            <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
+              <ClipboardList size={15} />
+              <span>Total Tasks</span>
             </div>
-            <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Total Tasks
-              </p>
-              <p className="text-xl font-extrabold text-slate-900">
-                {stats.totalTasks || 0}
-              </p>
-            </div>
+            <p className="text-2xl font-bold text-slate-900 mt-1 tabular-nums">
+              {stats.totalTasks || 0}
+            </p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <CheckCircle2 size={20} />
+          <div className="p-3 border-r border-slate-200 last:border-r-0">
+            <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
+              <CheckCircle2 size={15} className="text-emerald-700" />
+              <span>Open Opportunities</span>
             </div>
-            <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Open Opportunities
-              </p>
-              <p className="text-xl font-extrabold text-emerald-700">
-                {stats.openTasks || 0}
-              </p>
-            </div>
+            <p className="text-2xl font-bold text-emerald-800 mt-1 tabular-nums">
+              {stats.openTasks || 0}
+            </p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <Users size={20} />
+          <div className="p-3 border-r border-slate-200 last:border-r-0">
+            <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
+              <Users size={15} className="text-amber-700" />
+              <span>Volunteers Required</span>
             </div>
-            <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Volunteers Needed
-              </p>
-              <p className="text-xl font-extrabold text-amber-700">
-                {stats.totalVolunteersRequired || 0}
-              </p>
-            </div>
+            <p className="text-2xl font-bold text-amber-800 mt-1 tabular-nums">
+              {stats.totalVolunteersRequired || 0}
+            </p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-              <ShieldCheck size={20} />
+          <div className="p-3">
+            <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
+              <ShieldCheck size={15} className="text-blue-700" />
+              <span>Volunteers Deployed</span>
             </div>
-            <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Volunteers Assigned
-              </p>
-              <p className="text-xl font-extrabold text-indigo-700">
-                {stats.totalVolunteersAssigned || 0}
-              </p>
-            </div>
+            <p className="text-2xl font-bold text-blue-900 mt-1 tabular-nums">
+              {stats.totalVolunteersAssigned || 0}
+            </p>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Tabs Row for Volunteers */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+      {/* View Switcher Tabs */}
+      <nav
+        aria-label="Task board views"
+        className="flex items-center justify-between border-b border-slate-200 pb-2"
+      >
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => handleTabChange('explore')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
               activeTab === 'explore'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
-            <Compass size={16} />
+            <Compass size={15} />
             <span>Browse Opportunities</span>
           </button>
 
@@ -255,20 +245,20 @@ export default function TaskBoardPage() {
             <button
               type="button"
               onClick={() => handleTabChange('my-applications')}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
                 activeTab === 'my-applications'
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Users size={16} />
-              <span>My Applications &amp; Assignments</span>
+              <Users size={15} />
+              <span>My Applications</span>
               {myApplications.length > 0 && (
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
+                  className={`text-[11px] px-2 py-0.2 rounded font-bold tabular-nums ${
                     activeTab === 'my-applications'
-                      ? 'bg-white text-amber-700'
-                      : 'bg-amber-100 text-amber-800'
+                      ? 'bg-slate-700 text-white'
+                      : 'bg-slate-200 text-slate-800'
                   }`}
                 >
                   {myApplications.length}
@@ -281,18 +271,18 @@ export default function TaskBoardPage() {
         {isAdminOrCoordinator && (
           <Link
             to="/tasks/new"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors"
           >
-            <PlusCircle size={15} />
+            <Plus size={14} />
             <span>Post Task</span>
           </Link>
         )}
-      </div>
+      </nav>
 
-      {/* Tab 1: Explore Tasks */}
+      {/* Tab 1: Explore Opportunities */}
       {activeTab === 'explore' && (
         <div className="space-y-6">
-          {/* Filters Bar */}
+          {/* Filter Toolbar */}
           <TaskFilterBar
             filters={filters}
             onFilterChange={handleFilterChange}
@@ -300,48 +290,48 @@ export default function TaskBoardPage() {
             totalCount={tasks.length}
           />
 
-          {/* Loading State */}
+          {/* Task Feed */}
           {isLoading ? (
             <div className="py-20 flex flex-col items-center justify-center text-center space-y-3">
-              <Loader2 size={36} className="animate-spin text-blue-600" />
-              <p className="text-sm font-semibold text-slate-600">
-                Fetching open relief tasks from ResQ-Lanka...
+              <Loader2 size={32} className="animate-spin text-slate-600" />
+              <p className="text-sm font-medium text-slate-600">
+                Loading verified relief tasks...
               </p>
             </div>
           ) : error ? (
-            <div className="bg-red-50 border border-red-200 rounded-3xl p-8 text-center space-y-3">
-              <AlertCircle size={36} className="text-red-500 mx-auto" />
-              <h3 className="text-base font-bold text-red-900">
-                Unable to load tasks
-              </h3>
-              <p className="text-xs text-red-700 max-w-md mx-auto">{error}</p>
+            <div className="bg-red-50 border border-red-300 rounded-xl p-8 text-center space-y-3">
+              <AlertTriangle size={32} className="text-red-700 mx-auto" />
+              <h2 className="text-base font-bold text-red-950">
+                Unable to load relief tasks
+              </h2>
+              <p className="text-xs text-red-800 max-w-md mx-auto">{error}</p>
               <button
                 type="button"
                 onClick={handleRetry}
-                className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition"
+                className="px-4 py-2 bg-red-700 text-white rounded-lg text-xs font-semibold hover:bg-red-800 transition-colors"
               >
                 Retry
               </button>
             </div>
           ) : tasks.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3">
-              <Users size={40} className="text-slate-300 mx-auto" />
-              <h3 className="text-base font-bold text-slate-800">
+            <div className="bg-white rounded-xl border border-slate-300 p-12 text-center space-y-3">
+              <Users size={36} className="text-slate-400 mx-auto" />
+              <h2 className="text-base font-bold text-slate-900">
                 No relief tasks found matching your filters
-              </h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Try selecting a different district or category, or clear your search terms.
+              </h2>
+              <p className="text-xs text-slate-600 max-w-md mx-auto">
+                Adjust your district, category, or status selections, or reset the filters to see all available opportunities.
               </p>
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition"
+                className="px-3.5 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition-colors"
               >
-                Reset All Filters
+                Clear all filters
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {tasks.map((task) => (
                 <TaskCard
                   key={task._id}
@@ -357,35 +347,33 @@ export default function TaskBoardPage() {
       {/* Tab 2: My Applications & Assignments */}
       {activeTab === 'my-applications' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-sm">
+          <section className="bg-white rounded-xl border border-slate-300 p-6 shadow-xs">
             <h2 className="text-lg font-bold text-slate-900">
               Your Volunteer Applications &amp; Assignments
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Track the status of your applications. Once approved by a relief coordinator, your
-              assignment is officially confirmed.
+            <p className="text-xs text-slate-600 mt-1">
+              Review your current task sign-ups and approved assignments. Once approved by a relief coordinator, report to the designated assembly point at the scheduled time.
             </p>
 
             {myApplications.length === 0 ? (
               <div className="py-12 text-center space-y-3">
-                <Users size={36} className="text-slate-300 mx-auto" />
-                <h3 className="text-sm font-bold text-slate-700">
-                  You haven&apos;t applied for any tasks yet
+                <Users size={32} className="text-slate-400 mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-800">
+                  You have not applied for any relief tasks yet
                 </h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Browse open relief tasks in your district and submit your volunteer application
-                  to support community relief.
+                  Browse tasks in your district and sign up to support displaced families.
                 </p>
                 <button
                   type="button"
                   onClick={() => handleTabChange('explore')}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition"
+                  className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition-colors"
                 >
-                  Explore Relief Tasks
+                  Browse open tasks
                 </button>
               </div>
             ) : (
-              <div className="mt-6 divide-y divide-slate-100">
+              <div className="mt-6 divide-y divide-slate-200">
                 {myApplications.map((app) => {
                   const task = app.task || {};
                   return (
@@ -397,7 +385,7 @@ export default function TaskBoardPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <Link
                             to={`/tasks/${task._id || ''}`}
-                            className="text-sm font-bold text-slate-900 hover:text-blue-600 transition"
+                            className="text-sm font-bold text-slate-900 hover:text-blue-700 transition-colors"
                           >
                             {task.title || 'Untitled Task'}
                           </Link>
@@ -407,23 +395,24 @@ export default function TaskBoardPage() {
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500">
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
                           <span>
-                            District: <strong>{task.district || 'Ampara'}</strong>
+                            District: <span className="font-semibold text-slate-900">{task.district || 'Ampara'}</span>
                           </span>
                           <span>
-                            Assembly Point: <strong>{task.location || 'On-Site'}</strong>
+                            Assembly Point: <span className="font-semibold text-slate-900">{task.location || 'On-Site'}</span>
                           </span>
                           {app.availability && (
                             <span>
-                              Availability: <strong>{app.availability}</strong>
+                              Availability: <span className="font-semibold text-slate-900">{app.availability}</span>
                             </span>
                           )}
                         </div>
 
                         {app.reviewNotes && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-[11px] text-slate-700">
-                            <strong>Coordinator Note:</strong> {app.reviewNotes}
+                          <div className="bg-slate-50 p-2.5 rounded border border-slate-200 text-xs text-slate-700">
+                            <span className="font-semibold">Coordinator note: </span>
+                            {app.reviewNotes}
                           </div>
                         )}
                       </div>
@@ -431,10 +420,9 @@ export default function TaskBoardPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <Link
                           to={`/tasks/${task._id || ''}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition-colors"
                         >
-                          <span>View Details</span>
-                          <ArrowRight size={13} />
+                          View Details
                         </Link>
                       </div>
                     </div>
@@ -442,7 +430,7 @@ export default function TaskBoardPage() {
                 })}
               </div>
             )}
-          </div>
+          </section>
         </div>
       )}
     </div>

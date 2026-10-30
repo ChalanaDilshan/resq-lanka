@@ -114,67 +114,69 @@ export default function PostTaskPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
-      {/* Back Navigation */}
+      {/* Navigation Breadcrumb */}
       <div>
         <Link
           to="/tasks"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 transition"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft size={14} />
           <span>Back to Volunteer Task Board</span>
         </Link>
       </div>
 
-      {/* Main Container Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-10 space-y-6">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 mb-2">
-            <PlusCircle size={14} />
-            <span>Relief Coordinator Form</span>
-          </div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
+      {/* Main Form Container */}
+      <div className="bg-white rounded-xl border border-slate-300 shadow-xs p-6 sm:p-8 space-y-6">
+        <div className="pb-4 border-b border-slate-200">
+          <span className="text-xs font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            Relief Coordinator Form
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
             Publish New Volunteer Task
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Create an emergency community relief opportunity for registered volunteers.
+          <p className="text-xs text-slate-600 mt-1">
+            Dispatch an authorized non-hazardous relief opportunity for registered civilian responders.
           </p>
         </div>
 
         {errorMessage && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3 text-xs text-red-700">
-            <AlertTriangle size={16} className="text-red-500 shrink-0 mt-0.5" />
+          <div
+            role="alert"
+            className="p-3.5 bg-red-50 border border-red-300 rounded-lg flex items-start gap-2.5 text-xs text-red-900"
+          >
+            <AlertTriangle size={16} className="text-red-600 shrink-0 mt-0.5" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5 text-xs">
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           {/* Title */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1">
-              Task Title <span className="text-red-500">*</span>
+            <label className="block font-bold text-slate-900 mb-1">
+              Task Title <span className="text-red-600">*</span>
             </label>
             <input
               type="text"
               name="title"
-              placeholder="e.g. Dry Ration Packing for Flood Evacuees at Central Hall"
+              placeholder="e.g. Dry Ration Packing for Evacuees at Central College"
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs sm:text-sm font-medium"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium"
             />
           </div>
 
           {/* Category & Priority Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Relief Category <span className="text-red-500">*</span>
+              <label className="block font-bold text-slate-900 mb-1">
+                Relief Category <span className="text-red-600">*</span>
               </label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
               >
                 {TASK_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -185,14 +187,14 @@ export default function PostTaskPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Priority Level <span className="text-red-500">*</span>
+              <label className="block font-bold text-slate-900 mb-1">
+                Priority Level <span className="text-red-600">*</span>
               </label>
               <select
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
               >
                 {TASK_PRIORITIES.map((p) => (
                   <option key={p} value={p}>
@@ -206,14 +208,14 @@ export default function PostTaskPage() {
           {/* District & Location */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Affected District <span className="text-red-500">*</span>
+              <label className="block font-bold text-slate-900 mb-1">
+                Target District <span className="text-red-600">*</span>
               </label>
               <select
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
               >
                 {SRI_LANKA_DISTRICTS.map((dst) => (
                   <option key={dst} value={dst}>
@@ -224,8 +226,8 @@ export default function PostTaskPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Assembly Location Point <span className="text-red-500">*</span>
+              <label className="block font-bold text-slate-900 mb-1">
+                Assembly Location Point <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -234,7 +236,7 @@ export default function PostTaskPage() {
                 value={formData.location}
                 onChange={handleChange}
                 required
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
               />
             </div>
           </div>
@@ -242,8 +244,8 @@ export default function PostTaskPage() {
           {/* Required Volunteers & Schedule */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Volunteers Needed <span className="text-red-500">*</span>
+              <label className="block font-bold text-slate-900 mb-1">
+                Volunteers Needed <span className="text-red-600">*</span>
               </label>
               <input
                 type="number"
@@ -253,12 +255,12 @@ export default function PostTaskPage() {
                 value={formData.requiredVolunteers}
                 onChange={handleChange}
                 required
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-900 mb-1">
                 Scheduled Operation Date
               </label>
               <input
@@ -266,12 +268,12 @@ export default function PostTaskPage() {
                 name="scheduledDate"
                 value={formData.scheduledDate}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-900 mb-1">
                 Sign-Up Deadline
               </label>
               <input
@@ -279,15 +281,15 @@ export default function PostTaskPage() {
                 name="deadline"
                 value={formData.deadline}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1">
-              Detailed Task Description <span className="text-red-500">*</span>
+            <label className="block font-bold text-slate-900 mb-1">
+              Detailed Task Description <span className="text-red-600">*</span>
             </label>
             <textarea
               name="description"
@@ -296,29 +298,29 @@ export default function PostTaskPage() {
               value={formData.description}
               onChange={handleChange}
               required
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 leading-relaxed"
             />
           </div>
 
           {/* Skills Required */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1">
+            <label className="block font-bold text-slate-900 mb-1">
               Skills / Qualifications (comma separated)
             </label>
             <input
               type="text"
               name="skillsRequired"
-              placeholder="e.g. Food Packing, Tamil Fluency, Basic First Aid, Driving"
+              placeholder="e.g. Food Packing, Tamil Fluency, First Aid, Driving"
               value={formData.skillsRequired}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
 
           {/* Coordinator Contact Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-900 mb-1">
                 Site Coordinator Name
               </label>
               <input
@@ -326,27 +328,27 @@ export default function PostTaskPage() {
                 name="contactPerson"
                 value={formData.contactPerson}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Coordinator Phone Hotline
+              <label className="block font-bold text-slate-900 mb-1">
+                Coordinator Contact Phone
               </label>
               <input
                 type="text"
                 name="contactPhone"
                 value={formData.contactPhone}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
             </div>
           </div>
 
           {/* Safety Instructions */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1">
+            <label className="block font-bold text-slate-900 mb-1">
               Safety Instructions &amp; Restrictions
             </label>
             <textarea
@@ -354,31 +356,31 @@ export default function PostTaskPage() {
               rows={3}
               value={formData.safetyInstructions}
               onChange={handleChange}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
 
           {/* Mandatory Safety Compliance Checkbox */}
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+          <div className="bg-amber-50 border border-amber-300 rounded-lg p-4">
             <div className="flex items-start gap-2.5">
-              <ShieldCheck size={18} className="text-amber-700 shrink-0 mt-0.5" />
+              <ShieldCheck size={18} className="text-amber-800 shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-amber-900">
-                  DMC Civilian Volunteer Protocol Compliance
-                </h4>
-                <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
-                  I certify as relief coordinator that this task does not direct civilian volunteers
-                  into deep floodwaters, unstable collapsed structures, or hazardous power line zones.
+                <h2 className="font-bold text-amber-950 text-xs">
+                  Civilian Volunteer Safety Compliance Mandate
+                </h2>
+                <p className="text-amber-900 mt-1 leading-relaxed">
+                  I certify as relief coordinator that this task does not deploy civilian volunteers
+                  into hazardous floodwaters, unstable collapsed structures, or live electrical hazards.
                 </p>
                 <label className="mt-3 flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={safetyCompliance}
                     onChange={(e) => setSafetyCompliance(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 rounded border-amber-300 focus:ring-blue-500"
+                    className="w-4 h-4 text-slate-900 rounded border-amber-400 focus:ring-slate-900"
                   />
-                  <span className="font-bold text-amber-900 text-xs">
-                    I verify and confirm civilian safety protocol compliance.
+                  <span className="font-semibold text-amber-950 text-xs">
+                    I verify civilian safety protocol compliance for this task.
                   </span>
                 </label>
               </div>
@@ -386,30 +388,30 @@ export default function PostTaskPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-200">
             <Link
               to="/tasks"
-              className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+              className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting || !safetyCompliance}
-              className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-sm ${
+              className={`inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-semibold transition-colors ${
                 isSubmitting || !safetyCompliance
-                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                  : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-emerald-500/20'
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-900 hover:bg-slate-800 active:bg-black text-white focus:ring-2 focus:ring-slate-900'
               }`}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" />
+                  <Loader2 size={14} className="animate-spin" />
                   <span>Publishing Task...</span>
                 </>
               ) : (
                 <>
-                  <PlusCircle size={15} />
+                  <PlusCircle size={14} />
                   <span>Publish Relief Task</span>
                 </>
               )}
