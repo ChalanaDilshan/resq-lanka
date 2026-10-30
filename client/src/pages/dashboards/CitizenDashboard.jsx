@@ -6,12 +6,13 @@ import {
   PackageCheck,
   Bell,
   ArrowRight,
-  LifeBuoy,
+  ShieldCheck,
   PhoneCall,
   Clock,
   MapPin,
   AlertTriangle,
   RefreshCw,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { fetchSOSRequests } from '../../services/sosService';
@@ -125,55 +126,55 @@ export default function CitizenDashboard() {
   const getUrgencyBadge = (urgency) => {
     switch (urgency) {
       case 'Critical':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-900 border-red-300';
       case 'High':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-amber-100 text-amber-900 border-amber-300';
       case 'Medium':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-sky-100 text-sky-900 border-sky-300';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-slate-100 text-slate-800 border-slate-200';
     }
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Resolved':
-        return 'bg-emerald-100 text-emerald-800';
+        return 'bg-emerald-100 text-emerald-900 border-emerald-300';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-sky-100 text-sky-900 border-sky-300';
       case 'Cancelled':
-        return 'bg-slate-100 text-slate-600';
+        return 'bg-slate-100 text-slate-700 border-slate-300';
       default:
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-amber-100 text-amber-900 border-amber-300';
     }
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Welcome Banner & Primary Actions */}
-      <div className="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+    <div className="space-y-6">
+      {/* =========================================================================
+          CIVIC WELCOME BANNER & PRIMARY DISPATCH ACTION
+         ========================================================================= */}
+      <div className="bg-slate-900 rounded-xl p-5 sm:p-6 border border-slate-800 text-white shadow-xs">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-blue-100 border border-white/10">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-slate-800 rounded-md text-xs font-medium text-slate-300 border border-slate-700">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>Emergency Citizen Portal &bull; {user?.district || 'Sri Lanka'}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Ayubowan, {user?.name || 'Citizen'}
             </h2>
-            <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               If you or your family are in immediate danger from flooding, landslides, or severe weather, submit an emergency SOS distress call now.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
             <Link
               to="/sos"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-red-900/40 hover:shadow-red-900/60 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition shadow-xs"
             >
-              <ShieldAlert size={18} className="stroke-[2.5]" />
+              <ShieldAlert size={16} />
               <span>Report Emergency SOS</span>
             </Link>
 
@@ -184,86 +185,102 @@ export default function CitizenDashboard() {
                 setReloadTrigger((v) => v + 1);
               }}
               disabled={refreshing || loading}
-              className="px-4 py-3.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-2xl border border-white/20 transition flex items-center gap-1.5"
+              className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition inline-flex items-center gap-1.5"
             >
-              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
               <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Quick Module Navigation Tiles */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 mt-6 border-t border-white/10">
-          <Link
-            to="/shelters"
-            className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/15 rounded-2xl transition border border-white/10"
-          >
-            <div className="p-2 bg-blue-500/30 rounded-xl">
-              <Building2 size={18} className="text-blue-200" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-bold text-white leading-tight">Safe Shelters</p>
-              <p className="text-[11px] text-blue-200">Directory &amp; high grounds</p>
-            </div>
-          </Link>
+      {/* =========================================================================
+          HIGH-CONTRAST CIVIC UTILITY NAVIGATION TILES
+         ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <Link
+          to="/shelters"
+          className="flex items-center gap-3.5 p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-colors shadow-xs group"
+        >
+          <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+            <Building2 size={19} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-900 group-hover:text-slate-900 transition-colors">
+              Safe Shelters Directory
+            </p>
+            <p className="text-[11px] text-slate-500 truncate">
+              Evacuation centers &amp; elevation ratings
+            </p>
+          </div>
+        </Link>
 
-          <Link
-            to="/supplies"
-            className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/15 rounded-2xl transition border border-white/10"
-          >
-            <div className="p-2 bg-emerald-500/30 rounded-xl">
-              <PackageCheck size={18} className="text-emerald-200" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-bold text-white leading-tight">Relief Supplies</p>
-              <p className="text-[11px] text-blue-200">Rations, water &amp; aid</p>
-            </div>
-          </Link>
+        <Link
+          to="/supplies"
+          className="flex items-center gap-3.5 p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-colors shadow-xs group"
+        >
+          <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+            <PackageCheck size={19} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-900 group-hover:text-slate-900 transition-colors">
+              Relief Supply Board
+            </p>
+            <p className="text-[11px] text-slate-500 truncate">
+              Food, drinking water &amp; medical needs
+            </p>
+          </div>
+        </Link>
 
-          <Link
-            to="/alerts"
-            className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/15 rounded-2xl transition border border-white/10"
-          >
-            <div className="p-2 bg-rose-500/30 rounded-xl">
-              <Bell size={18} className="text-rose-200" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-bold text-white leading-tight">Disaster Alerts</p>
-              <p className="text-[11px] text-blue-200">Official DMC bulletins</p>
-            </div>
-          </Link>
-        </div>
+        <Link
+          to="/alerts"
+          className="flex items-center gap-3.5 p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-colors shadow-xs group"
+        >
+          <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+            <Bell size={19} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-900 group-hover:text-slate-900 transition-colors">
+              Disaster Bulletins
+            </p>
+            <p className="text-[11px] text-slate-500 truncate">
+              Official DMC alerts &amp; weather warnings
+            </p>
+          </div>
+        </Link>
       </div>
 
       {error && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs flex items-center justify-between">
+        <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+            <AlertTriangle size={15} className="text-amber-700 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setReloadTrigger((v) => v + 1)}
-            className="font-bold underline hover:text-amber-900"
+            className="font-bold underline hover:text-amber-950"
           >
             Retry
           </button>
         </div>
       )}
 
-      {/* Grid: Left Column (My Reports & Shelters) / Right Column (Alerts & Supplies) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column (2 cols on large screen) */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Section: My SOS Emergency Reports */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-5">
+      {/* =========================================================================
+          MAIN TWO-COLUMN DASHBOARD GRID
+         ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT COLUMN (2/3 width on large screens) */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* SECTION: MY SOS EMERGENCY REPORTS */}
+          <section className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-red-50 text-red-600 rounded-xl border border-red-100">
-                  <ShieldAlert size={20} />
+                <div className="w-8 h-8 rounded-md bg-red-50 text-red-700 border border-red-200 flex items-center justify-center shrink-0">
+                  <ShieldAlert size={17} />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900">
                     My Emergency Reports
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -273,7 +290,7 @@ export default function CitizenDashboard() {
               </div>
               <Link
                 to="/sos-dashboard"
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                className="text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 transition"
               >
                 <span>Live Feed</span>
                 <ArrowRight size={13} />
@@ -282,66 +299,68 @@ export default function CitizenDashboard() {
 
             {loading ? (
               <div className="py-8 flex flex-col items-center justify-center">
-                <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mb-2" />
-                <p className="text-xs text-slate-400">Loading your reports...</p>
+                <div className="w-7 h-7 border-2 border-slate-800 border-t-transparent rounded-full animate-spin mb-2" />
+                <p className="text-xs text-slate-500">Loading your reports...</p>
               </div>
             ) : mySOSReports.length > 0 ? (
               <div className="space-y-3">
                 {mySOSReports.map((report) => (
                   <div
                     key={report._id || report.id}
-                    className="p-4 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-2xl transition"
+                    className="p-3.5 bg-slate-50/70 hover:bg-slate-50 border border-slate-200 rounded-lg transition"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${getUrgencyBadge(
+                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${getUrgencyBadge(
                               report.urgency
                             )}`}
                           >
                             {report.urgency}
                           </span>
-                          <span className="text-xs font-bold text-slate-800">
+                          <span className="text-xs font-bold text-slate-900">
                             {report.hazardType} Hazard
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 flex items-center gap-1">
-                          <MapPin size={13} className="text-slate-400 shrink-0" />
+                        <p className="text-xs text-slate-600 flex items-center gap-1.5">
+                          <MapPin size={13} className="text-rose-600 shrink-0" />
                           <span>{report.locationText}</span>
                         </p>
                       </div>
                       <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusBadge(
+                        className={`text-xs font-semibold px-2.5 py-0.5 rounded border ${getStatusBadge(
                           report.status
                         )}`}
                       >
                         {report.status}
                       </span>
                     </div>
-                    <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="mt-3 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
                       <span className="flex items-center gap-1">
                         <Clock size={12} />
                         {new Date(report.createdAt).toLocaleString()}
                       </span>
-                      <span>Ref: #{report._id ? report._id.slice(-6).toUpperCase() : 'INC'}</span>
+                      <span className="font-mono">Ref: #{report._id ? report._id.slice(-6).toUpperCase() : 'INC'}</span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-center space-y-2">
-                <div className="w-10 h-10 bg-slate-200/60 text-slate-500 rounded-full flex items-center justify-center mx-auto">
-                  <LifeBuoy size={20} />
+              <div className="p-6 bg-slate-50 rounded-lg border border-slate-200 text-center space-y-2">
+                <div className="w-9 h-9 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <ShieldCheck size={18} />
                 </div>
-                <h4 className="text-xs font-bold text-slate-700">No Active Distress Reports</h4>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                  You have not submitted an emergency SOS request under this account. If you are experiencing a disaster hazard, report immediately.
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                  No Active Distress Reports Logged
+                </h4>
+                <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
+                  You have not submitted an emergency SOS request under this account. If you or someone in your vicinity is in danger, submit a verified emergency report.
                 </p>
                 <div className="pt-2">
                   <Link
                     to="/sos"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs font-semibold transition shadow-xs"
                   >
                     <ShieldAlert size={14} />
                     <span>Submit SOS Report</span>
@@ -351,15 +370,15 @@ export default function CitizenDashboard() {
             )}
           </section>
 
-          {/* Section: Safe Shelter Availability */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-5">
+          {/* SECTION: SHELTER CAPACITY & SAFE HAVENS */}
+          <section className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
-                  <Building2 size={20} />
+                <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+                  <Building2 size={17} />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900">
                     Shelter Capacity &amp; Safe Havens
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -369,37 +388,37 @@ export default function CitizenDashboard() {
               </div>
               <Link
                 to="/shelters"
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                className="text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 transition"
               >
                 <span>View All</span>
                 <ArrowRight size={13} />
               </Link>
             </div>
 
-            {/* Shelter Metrics Chips */}
+            {/* Shelter Metrics Grid */}
             {shelterStats && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                <div className="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-slate-400">Total Shelters</p>
-                  <p className="text-lg font-black text-slate-800">{shelterStats.totalShelters}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                  <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Total Shelters</p>
+                  <p className="text-lg font-bold text-slate-900">{shelterStats.totalShelters}</p>
                 </div>
-                <div className="p-3 bg-emerald-50/70 border border-emerald-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-emerald-700">Available Spaces</p>
-                  <p className="text-lg font-black text-emerald-800">{shelterStats.availableSpaces}</p>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                  <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Available Spaces</p>
+                  <p className="text-lg font-bold text-emerald-800">{shelterStats.availableSpaces}</p>
                 </div>
-                <div className="p-3 bg-blue-50/70 border border-blue-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-blue-700">Flood High-Grounds</p>
-                  <p className="text-lg font-black text-blue-800">{shelterStats.floodShelters || 0}</p>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                  <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Flood High-Grounds</p>
+                  <p className="text-lg font-bold text-slate-900">{shelterStats.floodShelters || 0}</p>
                 </div>
-                <div className="p-3 bg-amber-50/70 border border-amber-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-amber-700">Open Grounds</p>
-                  <p className="text-lg font-black text-amber-800">{shelterStats.earthquakeShelters || 0}</p>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                  <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Open Grounds</p>
+                  <p className="text-lg font-bold text-slate-900">{shelterStats.earthquakeShelters || 0}</p>
                 </div>
               </div>
             )}
 
             {/* Top Shelters List */}
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {topShelters.map((shelter) => {
                 const vacancy = Math.max(0, (shelter.capacityTotal || 0) - (shelter.capacityCurrent || 0));
                 const pct =
@@ -410,31 +429,31 @@ export default function CitizenDashboard() {
                 return (
                   <div
                     key={shelter._id}
-                    className="p-4 bg-slate-50 border border-slate-200/70 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="p-3.5 bg-slate-50/70 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-bold text-slate-900">{shelter.name}</h4>
-                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-md">
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900">{shelter.name}</h4>
+                        <span className="text-[10px] font-semibold text-slate-700 bg-slate-200/80 px-2 py-0.5 rounded border border-slate-300">
                           {shelter.district}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                        <MapPin size={12} className="text-slate-400" />
+                      <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                        <MapPin size={12} className="text-rose-600 shrink-0" />
                         <span>{shelter.address}</span>
                       </p>
                     </div>
 
                     <div className="flex items-center gap-3 self-end sm:self-center">
                       <div className="text-right">
-                        <span className="text-xs font-extrabold text-emerald-700">
+                        <span className="text-xs font-bold text-emerald-800">
                           {vacancy} spaces open
                         </span>
-                        <p className="text-[10px] text-slate-400">{pct}% Occupied</p>
+                        <p className="text-[10px] text-slate-500 font-medium">{pct}% Occupied</p>
                       </div>
                       <Link
                         to={`/shelters?id=${shelter._id}`}
-                        className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl transition"
+                        className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-semibold rounded-md transition shadow-xs"
                       >
                         Details
                       </Link>
@@ -446,88 +465,89 @@ export default function CitizenDashboard() {
           </section>
         </div>
 
-        {/* Right Column: Emergency Alerts & Supplies */}
-        <div className="space-y-8">
-          {/* Section: Official Alerts */}
-          <section className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-4">
+        {/* RIGHT COLUMN (1/3 width on large screens) */}
+        <div className="space-y-6">
+          {/* SECTION: ACTIVE DISASTER ALERTS */}
+          <section className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <Bell size={18} className="text-rose-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">Active Disaster Alerts</h3>
+                <Bell size={16} className="text-rose-600" />
+                <h3 className="text-sm font-bold text-slate-900">Active Disaster Alerts</h3>
               </div>
-              <Link to="/alerts" className="text-xs font-bold text-rose-600 hover:underline">
+              <Link to="/alerts" className="text-xs font-semibold text-rose-700 hover:underline">
                 All Alerts
               </Link>
             </div>
 
             {activeAlerts.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {activeAlerts.map((alert) => (
                   <div
                     key={alert._id}
-                    className="p-3.5 bg-rose-50/50 border border-rose-200/80 rounded-2xl space-y-1.5"
+                    className="p-3 bg-rose-50/40 border border-rose-200 rounded-lg space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-rose-100 text-rose-800 rounded-md">
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-rose-100 text-rose-950 border border-rose-200 rounded">
                         {alert.severity}
                       </span>
-                      <span className="text-[10px] font-semibold text-slate-400">
+                      <span className="text-[10px] font-medium text-slate-500">
                         {new Date(alert.publishedAt || alert.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <h4 className="text-xs font-bold text-slate-900 line-clamp-2">
+                    <h4 className="text-xs font-bold text-slate-900 leading-snug line-clamp-2">
                       {alert.title}
                     </h4>
-                    <p className="text-[11px] text-slate-600 line-clamp-2">
+                    <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-2">
                       {alert.message}
                     </p>
-                    <div className="pt-1 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                    <div className="pt-1 flex items-center justify-between text-[10px] text-slate-500">
                       <span>Source: {alert.sourceName}</span>
                       <Link
                         to={`/alerts/${alert._id}`}
-                        className="text-rose-700 font-bold hover:underline"
+                        className="text-rose-700 font-semibold hover:underline inline-flex items-center gap-0.5"
                       >
-                        Read Bulletin &rarr;
+                        <span>Read Bulletin</span>
+                        <ArrowRight size={11} />
                       </Link>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-4 bg-slate-50 rounded-2xl text-center text-xs text-slate-500">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-center text-xs text-slate-500">
                 No active critical alerts published for your sector.
               </div>
             )}
           </section>
 
-          {/* Section: Relief Supply Needs */}
-          <section className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-4">
+          {/* SECTION: COMMUNITY RELIEF NEEDS */}
+          <section className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <PackageCheck size={18} className="text-emerald-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">Community Aid Needs</h3>
+                <PackageCheck size={16} className="text-emerald-700" />
+                <h3 className="text-sm font-bold text-slate-900">Community Aid Needs</h3>
               </div>
-              <Link to="/supplies" className="text-xs font-bold text-blue-600 hover:underline">
+              <Link to="/supplies" className="text-xs font-semibold text-slate-700 hover:text-slate-900 hover:underline">
                 Donate
               </Link>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {neededSupplies.map((item) => (
                 <div
                   key={item._id}
-                  className="p-3.5 bg-slate-50 border border-slate-200/70 rounded-2xl space-y-1.5"
+                  className="p-3 bg-slate-50/70 border border-slate-200 rounded-lg space-y-1"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800 truncate">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-slate-900 truncate">
                       {item.itemName}
                     </span>
-                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-semibold text-amber-900 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded shrink-0">
                       {item.remainingQuantity} {item.unit} needed
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    Location: {item.shelterLocation}
+                  <p className="text-[11px] text-slate-500 truncate">
+                    Facility: {item.shelterLocation}
                   </p>
                 </div>
               ))}
@@ -535,21 +555,21 @@ export default function CitizenDashboard() {
 
             {/* My Pledges Section if user has made donations */}
             {myPledges.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-slate-100">
+              <div className="mt-3.5 pt-3 border-t border-slate-100">
                 <h4 className="text-xs font-bold text-slate-700 mb-2">My Donor Pledges</h4>
                 <div className="space-y-2">
                   {myPledges.map((p) => (
                     <div
                       key={p._id}
-                      className="p-2.5 bg-emerald-50/60 border border-emerald-200 rounded-xl text-xs flex items-center justify-between"
+                      className="p-2.5 bg-emerald-50/50 border border-emerald-200 rounded-md text-xs flex items-center justify-between"
                     >
                       <div>
-                        <p className="font-bold text-slate-800">{p.itemName}</p>
+                        <p className="font-semibold text-slate-900">{p.itemName}</p>
                         <p className="text-[10px] text-slate-500">
                           {p.pledgedQuantity} {p.unit} &bull; {p.status}
                         </p>
                       </div>
-                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                      <span className="text-[10px] font-semibold text-emerald-900 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded">
                         {p.status}
                       </span>
                     </div>
@@ -559,23 +579,23 @@ export default function CitizenDashboard() {
             )}
           </section>
 
-          {/* Section: Preparedness & Emergency Hotlines */}
-          <section className="bg-slate-900 text-white rounded-3xl p-6 shadow-sm space-y-4">
+          {/* SECTION: EMERGENCY DISCLOSURES & HOTLINES */}
+          <section className="bg-slate-900 text-white rounded-xl p-5 border border-slate-800 shadow-xs space-y-3">
             <div className="flex items-center gap-2">
-              <PhoneCall size={18} className="text-red-400" />
-              <h3 className="text-sm font-extrabold text-white">Emergency Disclosures</h3>
+              <PhoneCall size={16} className="text-rose-400" />
+              <h3 className="text-xs sm:text-sm font-bold text-white">Emergency Hotlines &amp; State Rescue</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               ResQ-Lanka connects community volunteers, shelter coordinators, and local relief teams. For official state military/police rescue, dial:
             </p>
-            <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-              <div className="p-2.5 bg-white/10 rounded-xl border border-white/10 text-center">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2.5 bg-slate-800 rounded-lg border border-slate-700 text-center">
                 <p className="text-[10px] text-slate-400 font-semibold uppercase">DMC Hotline</p>
-                <p className="text-base text-red-400">117</p>
+                <p className="text-base font-bold text-red-400">117</p>
               </div>
-              <div className="p-2.5 bg-white/10 rounded-xl border border-white/10 text-center">
-                <p className="text-[10px] text-slate-400 font-semibold uppercase">Suwa Seriya Ambulance</p>
-                <p className="text-base text-emerald-400">1990</p>
+              <div className="p-2.5 bg-slate-800 rounded-lg border border-slate-700 text-center">
+                <p className="text-[10px] text-slate-400 font-semibold uppercase">Suwa Seriya</p>
+                <p className="text-base font-bold text-emerald-400">1990</p>
               </div>
             </div>
           </section>
