@@ -8,6 +8,12 @@ const donorPledgeSchema = new mongoose.Schema(
       required: [true, 'Supply item reference is required'],
       index: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+      index: true,
+    },
     itemName: {
       type: String,
       required: true,

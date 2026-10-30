@@ -447,6 +447,7 @@ export const makeDonorPledge = async (req, res) => {
       supplyItemId: item._id,
       itemName: item.itemName,
       shelterLocation: item.shelterLocation,
+      userId: req.user?._id || null,
       donorName: donorName.trim(),
       donorEmail: normalizedEmail,
       donorPhone: donorPhone.trim(),
