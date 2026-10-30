@@ -6,7 +6,6 @@ import {
   Calendar,
   ShieldCheck,
   Bell,
-  ArrowRight,
   RefreshCw,
   AlertTriangle,
   FileText,
@@ -103,7 +102,6 @@ export default function VolunteerDashboard() {
     }
     try {
       await withdrawApplication(applicationId);
-      // Reload applications
       const updatedApps = await getMyApplications();
       setMyApplications(updatedApps);
     } catch (err) {
@@ -128,57 +126,55 @@ export default function VolunteerDashboard() {
   const getPriorityBadge = (priority) => {
     switch (priority) {
       case 'Urgent':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-50 text-red-800 border-red-300 font-semibold';
       case 'High':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-amber-50 text-amber-900 border-amber-300 font-semibold';
       case 'Medium':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-sky-50 text-sky-900 border-sky-300 font-medium';
       default:
-        return 'bg-slate-100 text-slate-800 border-slate-200';
+        return 'bg-slate-100 text-slate-700 border-slate-300 font-medium';
     }
   };
 
   const getAppStatusBadge = (status) => {
     switch (status) {
       case 'Approved':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        return 'bg-emerald-50 text-emerald-900 border-emerald-300 font-semibold';
       case 'Pending':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-amber-50 text-amber-900 border-amber-300 font-semibold';
       case 'Rejected':
-        return 'bg-rose-100 text-rose-800 border-rose-200';
+        return 'bg-rose-50 text-rose-900 border-rose-300 font-medium';
       case 'Withdrawn':
-        return 'bg-slate-100 text-slate-600 border-slate-200';
+        return 'bg-slate-100 text-slate-700 border-slate-300 font-medium';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-50 text-blue-900 border-blue-300 font-medium';
     }
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Welcome Header */}
-      <div className="bg-gradient-to-r from-amber-600 via-amber-700 to-orange-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+    <div className="space-y-6">
+      {/* Civic Operations Welcome Header */}
+      <header className="bg-slate-900 text-white rounded-xl border border-slate-800 p-6 sm:p-8">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/15 backdrop-blur-md rounded-full text-xs font-semibold text-amber-100 border border-white/10">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Volunteer Task Board &bull; Field Operations</span>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-slate-800 rounded border border-slate-700 text-xs text-slate-300">
+              <ShieldCheck size={14} className="text-emerald-400" />
+              <span>Civilian Relief Volunteer Console</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
               Ayubowan, {user?.name || 'Volunteer Responder'}
-            </h2>
-            <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed">
-              Support relief distribution, food packing, and shelter coordination across Sri Lanka. Thank you for your humanitarian service.
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Assisting community dry rations distribution, emergency supply handling, and temporary shelter operations across Sri Lanka.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
             <Link
               to="/tasks"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-amber-900 font-extrabold text-sm rounded-2xl shadow-lg hover:bg-amber-50 transition-all transform hover:-translate-y-0.5"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-slate-900 font-semibold text-xs sm:text-sm rounded-lg hover:bg-slate-100 transition-colors"
             >
-              <Users size={18} className="stroke-[2.5] text-amber-700" />
+              <Users size={16} className="text-slate-700" />
               <span>Browse All Open Tasks</span>
             </Link>
 
@@ -189,56 +185,59 @@ export default function VolunteerDashboard() {
                 setReloadTrigger((v) => v + 1);
               }}
               disabled={refreshing || loading}
-              className="px-4 py-3.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold rounded-2xl border border-white/20 transition flex items-center gap-1.5"
+              className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg border border-slate-700 transition-colors flex items-center gap-1.5"
             >
-              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
               <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
             </button>
           </div>
         </div>
 
-        {/* KPI Counter Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 mt-6 border-t border-white/15">
-          <div className="p-3.5 bg-white/10 backdrop-blur-xs rounded-2xl border border-white/10 text-center">
-            <p className="text-[10px] font-bold uppercase text-amber-200">Open Tasks</p>
-            <p className="text-xl sm:text-2xl font-black text-white">
+        {/* Operational Metrics Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 mt-6 border-t border-slate-800">
+          <div className="p-3 bg-slate-950/60 rounded-lg border border-slate-800">
+            <p className="text-xs text-slate-400">Open Tasks</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-1 tabular-nums">
               {taskStats?.openTasks ?? availableTasks.length}
             </p>
           </div>
 
-          <div className="p-3.5 bg-white/10 backdrop-blur-xs rounded-2xl border border-white/10 text-center">
-            <p className="text-[10px] font-bold uppercase text-amber-200">Pending Applications</p>
-            <p className="text-xl sm:text-2xl font-black text-white">
+          <div className="p-3 bg-slate-950/60 rounded-lg border border-slate-800">
+            <p className="text-xs text-amber-300">Pending Applications</p>
+            <p className="text-xl sm:text-2xl font-bold text-amber-400 mt-1 tabular-nums">
               {pendingApps.length}
             </p>
           </div>
 
-          <div className="p-3.5 bg-white/10 backdrop-blur-xs rounded-2xl border border-white/10 text-center">
-            <p className="text-[10px] font-bold uppercase text-emerald-300">Active Assignments</p>
-            <p className="text-xl sm:text-2xl font-black text-emerald-200">
+          <div className="p-3 bg-slate-950/60 rounded-lg border border-slate-800">
+            <p className="text-xs text-emerald-300">Active Assignments</p>
+            <p className="text-xl sm:text-2xl font-bold text-emerald-400 mt-1 tabular-nums">
               {activeAssignments.length}
             </p>
           </div>
 
-          <div className="p-3.5 bg-white/10 backdrop-blur-xs rounded-2xl border border-white/10 text-center">
-            <p className="text-[10px] font-bold uppercase text-amber-200">Completed Relief Tasks</p>
-            <p className="text-xl sm:text-2xl font-black text-white">
+          <div className="p-3 bg-slate-950/60 rounded-lg border border-slate-800">
+            <p className="text-xs text-slate-300">Completed Tasks</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-1 tabular-nums">
               {completedAssignments.length}
             </p>
           </div>
         </div>
-      </div>
+      </header>
 
       {error && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs flex items-center justify-between">
+        <div
+          role="alert"
+          className="p-4 bg-amber-50 border border-amber-300 rounded-lg text-amber-900 text-xs flex items-center justify-between"
+        >
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+            <AlertTriangle size={16} className="text-amber-700 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setReloadTrigger((v) => v + 1)}
-            className="font-bold underline hover:text-amber-900"
+            className="font-bold underline hover:text-amber-950"
           >
             Retry
           </button>
@@ -246,23 +245,18 @@ export default function VolunteerDashboard() {
       )}
 
       {/* Main Grid: Available Tasks & Personal Applications */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2 cols): Available Tasks Board */}
-        <div className="lg:col-span-2 space-y-8">
-          <section className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-100">
-                  <Users size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    Available Relief Tasks
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Open community tasks awaiting volunteer sign-up
-                  </p>
-                </div>
+        <div className="lg:col-span-2 space-y-6">
+          <section className="bg-white rounded-xl p-5 sm:p-6 border border-slate-300 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-200">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Available Relief Tasks
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Open community tasks awaiting volunteer sign-up
+                </p>
               </div>
 
               {/* Filters */}
@@ -270,7 +264,7 @@ export default function VolunteerDashboard() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 >
                   <option value="All">All Categories</option>
                   <option value="Dry Rations & Food Packing">Food Packing</option>
@@ -284,7 +278,7 @@ export default function VolunteerDashboard() {
                 <select
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
-                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 >
                   <option value="All">All Districts</option>
                   <option value="Ampara">Ampara</option>
@@ -298,42 +292,42 @@ export default function VolunteerDashboard() {
             {/* Task Cards List */}
             {loading ? (
               <div className="py-12 flex flex-col items-center justify-center">
-                <div className="w-8 h-8 border-3 border-amber-600 border-t-transparent rounded-full animate-spin mb-2" />
-                <p className="text-xs text-slate-400">Loading open tasks...</p>
+                <div className="w-6 h-6 border-2 border-slate-700 border-t-transparent rounded-full animate-spin mb-2" />
+                <p className="text-xs text-slate-500">Loading open tasks...</p>
               </div>
             ) : filteredTasks.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filteredTasks.map((task) => {
                   const slots = Math.max(0, (task.requiredVolunteers || 0) - (task.assignedVolunteersCount || 0));
 
                   return (
                     <div
                       key={task._id}
-                      className="p-5 bg-slate-50/80 hover:bg-slate-100/90 border border-slate-200/80 rounded-2xl transition space-y-3"
+                      className="p-4 bg-slate-50/70 hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors space-y-2.5"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span
-                              className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${getPriorityBadge(
+                              className={`text-xs px-2 py-0.5 rounded border ${getPriorityBadge(
                                 task.priority
                               )}`}
                             >
                               {task.priority} Priority
                             </span>
-                            <span className="text-[10px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+                            <span className="text-xs text-slate-700 bg-white border border-slate-200 px-2 py-0.5 rounded font-medium">
                               {task.category}
                             </span>
-                            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
+                            <span className="text-xs font-semibold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                               {task.district}
                             </span>
                           </div>
-                          <h4 className="text-sm font-extrabold text-slate-900 leading-snug">
+                          <h3 className="text-sm font-bold text-slate-900 leading-snug">
                             {task.title}
-                          </h4>
+                          </h3>
                         </div>
 
-                        <span className="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full shrink-0">
+                        <span className="text-xs font-semibold text-amber-900 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded shrink-0 tabular-nums">
                           {slots} slots left
                         </span>
                       </div>
@@ -342,15 +336,15 @@ export default function VolunteerDashboard() {
                         {task.description}
                       </p>
 
-                      <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 font-medium">
+                      <div className="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1">
-                            <MapPin size={13} className="text-slate-400" />
+                            <MapPin size={13} className="text-slate-500" />
                             <span>{task.location}</span>
                           </span>
                           {task.scheduledDate && (
                             <span className="flex items-center gap-1">
-                              <Calendar size={13} className="text-slate-400" />
+                              <Calendar size={13} className="text-slate-500" />
                               <span>{new Date(task.scheduledDate).toLocaleDateString()}</span>
                             </span>
                           )}
@@ -358,10 +352,9 @@ export default function VolunteerDashboard() {
 
                         <Link
                           to={`/tasks/${task._id}`}
-                          className="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition shadow-xs flex items-center gap-1"
+                          className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded text-xs transition-colors"
                         >
-                          <span>Apply / Details</span>
-                          <ArrowRight size={13} />
+                          View Task
                         </Link>
                       </div>
                     </div>
@@ -369,32 +362,25 @@ export default function VolunteerDashboard() {
                 })}
               </div>
             ) : (
-              <div className="p-8 bg-slate-50 rounded-2xl text-center text-xs text-slate-500">
+              <div className="p-8 bg-slate-50 border border-slate-200 rounded-lg text-center text-xs text-slate-500">
                 No matching open tasks found for the selected category/district.
               </div>
             )}
           </section>
 
           {/* Section: My Applications & Active Assignments */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    My Volunteer Applications &amp; Assignments
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Status of your submissions and assigned field duties
-                  </p>
-                </div>
+          <section className="bg-white rounded-xl p-5 sm:p-6 border border-slate-300 shadow-xs">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <FileText size={18} className="text-slate-700" />
+                <h2 className="text-base font-bold text-slate-900">
+                  My Volunteer Applications &amp; Assignments
+                </h2>
               </div>
             </div>
 
             {myApplications.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {myApplications.map((app) => {
                   const taskTitle = app.task?.title || 'Volunteer Relief Task';
                   const taskDistrict = app.task?.district || 'Sector';
@@ -402,21 +388,21 @@ export default function VolunteerDashboard() {
                   return (
                     <div
                       key={app._id}
-                      className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-xs font-bold text-slate-900">{taskTitle}</h4>
+                          <h3 className="text-xs font-bold text-slate-900">{taskTitle}</h3>
                           <span
-                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${getAppStatusBadge(
+                            className={`text-xs px-2 py-0.5 rounded border ${getAppStatusBadge(
                               app.status
                             )}`}
                           >
                             {app.status}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">
-                          {taskDistrict} &bull; Applied on{' '}
+                        <p className="text-xs text-slate-500">
+                          {taskDistrict} District • Applied on{' '}
                           {new Date(app.createdAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -425,7 +411,7 @@ export default function VolunteerDashboard() {
                         {app.task?._id && (
                           <Link
                             to={`/tasks/${app.task._id}`}
-                            className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl transition"
+                            className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-semibold rounded transition-colors"
                           >
                             Task Details
                           </Link>
@@ -435,7 +421,7 @@ export default function VolunteerDashboard() {
                           <button
                             type="button"
                             onClick={() => handleWithdraw(app._id)}
-                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                            className="px-2.5 py-1 text-red-700 hover:text-red-900 border border-red-200 hover:bg-red-50 text-xs font-semibold rounded transition-colors flex items-center gap-1"
                           >
                             <XCircle size={13} />
                             <span>Withdraw</span>
@@ -447,7 +433,7 @@ export default function VolunteerDashboard() {
                 })}
               </div>
             ) : (
-              <div className="p-6 bg-slate-50 rounded-2xl text-center text-xs text-slate-500">
+              <div className="p-6 bg-slate-50 border border-slate-200 rounded-lg text-center text-xs text-slate-500">
                 You have not applied for any relief tasks yet. Browse the tasks above to join community operations.
               </div>
             )}
@@ -455,62 +441,68 @@ export default function VolunteerDashboard() {
         </div>
 
         {/* Right Column: Safety Guidelines & Alerts */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Section: Operational Safety Guidelines */}
-          <section className="bg-slate-900 text-white rounded-3xl p-6 shadow-sm space-y-4">
+          <section
+            aria-label="Volunteer Safety Directives"
+            className="bg-slate-900 text-white rounded-xl p-5 border border-slate-800 space-y-3"
+          >
             <div className="flex items-center gap-2">
-              <ShieldCheck size={20} className="text-emerald-400" />
-              <h3 className="text-sm font-extrabold text-white">Volunteer Safety Code</h3>
+              <ShieldCheck size={18} className="text-emerald-400" />
+              <h2 className="text-sm font-bold text-white">Volunteer Safety Code</h2>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              ResQ-Lanka prioritizes responder safety. Civilian volunteers must observe strictly:
+              Civilian responder directives strictly established under national disaster guidelines:
             </p>
             <ul className="text-xs text-slate-300 space-y-2 list-disc list-inside">
-              <li>Wear high-visibility vests and protective closed footwear.</li>
-              <li>Untrained volunteers must not engage in swift-water or structural rescues.</li>
-              <li>Report injuries or hazards immediately to the site relief coordinator.</li>
-              <li>Do not operate heavy equipment or electrical units without certification.</li>
+              <li>Wear high-visibility vests and protective closed footwear at all times.</li>
+              <li>Civilian volunteers must strictly not engage in swift-water or structural rescues.</li>
+              <li>Report injuries or hazards immediately to the on-site relief coordinator.</li>
+              <li>Do not operate heavy equipment or electrical units without certified training.</li>
             </ul>
           </section>
 
           {/* Section: Field Weather & Disaster Bulletins */}
-          <section className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-4">
+          <section
+            aria-label="Field Emergency Bulletins"
+            className="bg-white rounded-xl p-5 border border-slate-300 shadow-xs space-y-3"
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <Bell size={18} className="text-rose-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">Field Weather Bulletins</h3>
+                <Bell size={16} className="text-red-600" />
+                <h2 className="text-sm font-bold text-slate-900">Emergency Bulletins</h2>
               </div>
-              <Link to="/alerts" className="text-xs font-bold text-rose-600 hover:underline">
+              <Link to="/alerts" className="text-xs font-semibold text-blue-700 hover:underline">
                 All Bulletins
               </Link>
             </div>
 
             {volunteerNotices.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {volunteerNotices.map((alert) => (
                   <div
                     key={alert._id}
-                    className="p-3.5 bg-rose-50/50 border border-rose-200/80 rounded-2xl space-y-1"
+                    className="p-3 bg-red-50/60 border border-red-200 rounded-lg space-y-1"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-rose-100 text-rose-800 rounded-md">
+                      <span className="text-xs font-semibold text-red-900 bg-red-100 border border-red-200 px-1.5 py-0.2 rounded">
                         {alert.severity}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[11px] text-slate-500">
                         {alert.affectedDistricts?.slice(0, 2).join(', ')}
                       </span>
                     </div>
-                    <h4 className="text-xs font-bold text-slate-900 line-clamp-2">
+                    <h3 className="text-xs font-bold text-slate-900 line-clamp-2">
                       {alert.title}
-                    </h4>
-                    <p className="text-[11px] text-slate-600 line-clamp-2">
+                    </h3>
+                    <p className="text-xs text-slate-600 line-clamp-2">
                       {alert.message}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-4 bg-slate-50 rounded-2xl text-center text-xs text-slate-500">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded text-center text-xs text-slate-500">
                 No active severe bulletins.
               </div>
             )}

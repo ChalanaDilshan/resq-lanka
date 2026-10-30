@@ -1,31 +1,33 @@
 /**
- * Modern status and priority badges with clear color contrast and text indicator
+ * ResQ-Lanka Field Status & Priority Indicators
+ * High contrast, accessible, devoid of pulsing decorative gimmicks.
  */
 export default function TaskStatusBadge({ status, type = 'status' }) {
   if (type === 'priority') {
     const priorityConfigs = {
-      Urgent: 'bg-red-50 text-red-700 border-red-200 ring-1 ring-red-300/40',
-      High: 'bg-amber-50 text-amber-700 border-amber-200 ring-1 ring-amber-300/40',
-      Medium: 'bg-blue-50 text-blue-700 border-blue-200 ring-1 ring-blue-300/40',
-      Low: 'bg-slate-50 text-slate-600 border-slate-200 ring-1 ring-slate-300/40',
+      Urgent: 'bg-red-50 text-red-800 border-red-300 font-semibold',
+      High: 'bg-amber-50 text-amber-900 border-amber-300 font-semibold',
+      Medium: 'bg-sky-50 text-sky-900 border-sky-300 font-medium',
+      Low: 'bg-slate-100 text-slate-700 border-slate-300 font-medium',
     };
     const style =
       priorityConfigs[status] ||
-      'bg-slate-50 text-slate-700 border-slate-200';
+      'bg-slate-100 text-slate-700 border-slate-300 font-medium';
+
+    const dotColors = {
+      Urgent: 'bg-red-600',
+      High: 'bg-amber-600',
+      Medium: 'bg-sky-600',
+      Low: 'bg-slate-400',
+    };
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style}`}
+        className={`inline-flex items-center px-2 py-0.5 rounded text-xs border ${style}`}
       >
         <span
-          className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-            status === 'Urgent'
-              ? 'bg-red-500 animate-pulse'
-              : status === 'High'
-              ? 'bg-amber-500'
-              : status === 'Medium'
-              ? 'bg-blue-500'
-              : 'bg-slate-400'
+          className={`w-1.5 h-1.5 rounded-full mr-1.5 shrink-0 ${
+            dotColors[status] || 'bg-slate-400'
           }`}
         />
         {status} Priority
@@ -35,27 +37,28 @@ export default function TaskStatusBadge({ status, type = 'status' }) {
 
   if (type === 'application') {
     const appConfigs = {
-      Pending: 'bg-amber-50 text-amber-800 border-amber-200',
-      Approved: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-      Rejected: 'bg-red-50 text-red-800 border-red-200',
-      Withdrawn: 'bg-slate-100 text-slate-600 border-slate-300',
+      Pending: 'bg-amber-50 text-amber-900 border-amber-300',
+      Approved: 'bg-emerald-50 text-emerald-900 border-emerald-300',
+      Rejected: 'bg-rose-50 text-rose-900 border-rose-300',
+      Withdrawn: 'bg-slate-100 text-slate-700 border-slate-300',
     };
     const style =
-      appConfigs[status] || 'bg-slate-50 text-slate-700 border-slate-200';
+      appConfigs[status] || 'bg-slate-100 text-slate-700 border-slate-300';
+
+    const dotColors = {
+      Approved: 'bg-emerald-600',
+      Pending: 'bg-amber-600',
+      Rejected: 'bg-rose-600',
+      Withdrawn: 'bg-slate-400',
+    };
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${style}`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold border ${style}`}
       >
         <span
-          className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-            status === 'Approved'
-              ? 'bg-emerald-600'
-              : status === 'Pending'
-              ? 'bg-amber-500 animate-pulse'
-              : status === 'Rejected'
-              ? 'bg-red-500'
-              : 'bg-slate-400'
+          className={`w-1.5 h-1.5 rounded-full mr-1.5 shrink-0 ${
+            dotColors[status] || 'bg-slate-400'
           }`}
         />
         Application: {status}
@@ -63,36 +66,33 @@ export default function TaskStatusBadge({ status, type = 'status' }) {
     );
   }
 
-  // Default: Task Status
+  // Default: Task Lifecycle Status
   const statusConfigs = {
-    Open: 'bg-emerald-50 text-emerald-800 border-emerald-200 ring-1 ring-emerald-300/30',
-    Assigned: 'bg-blue-50 text-blue-800 border-blue-200 ring-1 ring-blue-300/30',
-    'In Progress':
-      'bg-amber-50 text-amber-800 border-amber-200 ring-1 ring-amber-300/30',
-    Completed:
-      'bg-slate-100 text-slate-700 border-slate-200 ring-1 ring-slate-300/30',
-    Cancelled:
-      'bg-red-50 text-red-800 border-red-200 ring-1 ring-red-300/30',
+    Open: 'bg-emerald-50 text-emerald-900 border-emerald-300 font-semibold',
+    Assigned: 'bg-blue-50 text-blue-900 border-blue-300 font-semibold',
+    'In Progress': 'bg-amber-50 text-amber-900 border-amber-300 font-semibold',
+    Completed: 'bg-slate-100 text-slate-700 border-slate-300 font-medium',
+    Cancelled: 'bg-rose-50 text-rose-900 border-rose-300 font-medium',
+  };
+
+  const dotColors = {
+    Open: 'bg-emerald-600',
+    Assigned: 'bg-blue-600',
+    'In Progress': 'bg-amber-600',
+    Completed: 'bg-slate-500',
+    Cancelled: 'bg-rose-600',
   };
 
   const style =
-    statusConfigs[status] || 'bg-slate-50 text-slate-700 border-slate-200';
+    statusConfigs[status] || 'bg-slate-100 text-slate-700 border-slate-300';
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border tracking-wide ${style}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs border ${style}`}
     >
       <span
-        className={`w-2 h-2 rounded-full mr-1.5 ${
-          status === 'Open'
-            ? 'bg-emerald-500'
-            : status === 'Assigned'
-            ? 'bg-blue-600'
-            : status === 'In Progress'
-            ? 'bg-amber-500 animate-pulse'
-            : status === 'Completed'
-            ? 'bg-slate-500'
-            : 'bg-red-500'
+        className={`w-1.5 h-1.5 rounded-full mr-1.5 shrink-0 ${
+          dotColors[status] || 'bg-slate-400'
         }`}
       />
       {status}

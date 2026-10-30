@@ -21,10 +21,10 @@ export default function TaskFilterBar({
     filters.status !== 'All';
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm space-y-4">
-      {/* Search Input & Status Tabs Row */}
+    <div className="bg-white border border-slate-300 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
+      {/* Top Search & Lifecycle Filter */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-        {/* Search Bar */}
+        {/* Search Input */}
         <div className="relative flex-grow max-w-md">
           <Search
             size={16}
@@ -32,25 +32,25 @@ export default function TaskFilterBar({
           />
           <input
             type="text"
-            placeholder="Search by title, location, or required skills..."
+            placeholder="Search tasks by title, location, or skills..."
             value={filters.search}
             onChange={(e) => onFilterChange('search', e.target.value)}
-            className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+            className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition"
           />
           {filters.search && (
             <button
               type="button"
               onClick={() => onFilterChange('search', '')}
               aria-label="Clear search"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
             >
-              <X size={14} />
+              <X size={15} />
             </button>
           )}
         </div>
 
-        {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+        {/* Status Segmented Buttons */}
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0 scrollbar-none border border-slate-200 rounded-lg p-1 bg-slate-50">
           {statusTabs.map((tab) => {
             const active = filters.status === tab;
             return (
@@ -58,10 +58,10 @@ export default function TaskFilterBar({
                 key={tab}
                 type="button"
                 onClick={() => onFilterChange('status', tab)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors ${
                   active
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
               >
                 {tab}
@@ -71,18 +71,18 @@ export default function TaskFilterBar({
         </div>
       </div>
 
-      {/* Dropdown Filters Row */}
-      <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-100 text-xs">
-        <div className="flex items-center gap-1.5 text-slate-500 font-semibold mr-1">
-          <Filter size={14} className="text-slate-400" />
-          <span>Filters:</span>
+      {/* Filter Selectors Bar */}
+      <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-200 text-xs">
+        <div className="flex items-center gap-1.5 text-slate-600 font-semibold mr-1">
+          <Filter size={14} className="text-slate-500" />
+          <span>Filter by:</span>
         </div>
 
         {/* Category Dropdown */}
         <select
           value={filters.category}
           onChange={(e) => onFilterChange('category', e.target.value)}
-          className="bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="bg-slate-50 border border-slate-300 text-slate-800 rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600"
         >
           <option value="All">All Categories</option>
           {TASK_CATEGORIES.map((cat) => (
@@ -96,7 +96,7 @@ export default function TaskFilterBar({
         <select
           value={filters.district}
           onChange={(e) => onFilterChange('district', e.target.value)}
-          className="bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="bg-slate-50 border border-slate-300 text-slate-800 rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600"
         >
           <option value="All">All Districts</option>
           {SRI_LANKA_DISTRICTS.map((dst) => (
@@ -110,7 +110,7 @@ export default function TaskFilterBar({
         <select
           value={filters.priority}
           onChange={(e) => onFilterChange('priority', e.target.value)}
-          className="bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="bg-slate-50 border border-slate-300 text-slate-800 rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600"
         >
           <option value="All">All Priorities</option>
           {TASK_PRIORITIES.map((p) => (
@@ -120,20 +120,20 @@ export default function TaskFilterBar({
           ))}
         </select>
 
-        {/* Reset button if filters active */}
+        {/* Reset Filter Button */}
         {hasActiveFilters && (
           <button
             type="button"
             onClick={onResetFilters}
-            className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-semibold transition"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold transition"
           >
             <RotateCcw size={12} />
-            <span>Reset</span>
+            <span>Reset filters</span>
           </button>
         )}
 
-        <div className="ml-auto text-slate-400 font-semibold text-[11px]">
-          Showing <span className="text-slate-700 font-bold">{totalCount}</span> tasks
+        <div className="ml-auto text-slate-500 font-medium text-xs">
+          Showing <span className="text-slate-900 font-bold">{totalCount}</span> {totalCount === 1 ? 'task' : 'tasks'}
         </div>
       </div>
     </div>

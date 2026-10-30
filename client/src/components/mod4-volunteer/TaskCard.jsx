@@ -4,7 +4,6 @@ import {
   Calendar,
   Users,
   ShieldCheck,
-  ArrowRight,
 } from 'lucide-react';
 import TaskStatusBadge from './TaskStatusBadge';
 
@@ -35,14 +34,14 @@ export default function TaskCard({ task, userApplication = null }) {
         day: 'numeric',
         year: 'numeric',
       })
-    : 'Immediate / Ongoing';
+    : 'Immediate / Continuous';
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group">
-      {/* Top Banner with Category & Badges */}
-      <div className="p-5 pb-4">
+    <article className="bg-white rounded-xl border border-slate-300 flex flex-col justify-between overflow-hidden shadow-xs hover:border-slate-400 transition-colors">
+      <div className="p-5">
+        {/* Category & Status Bar */}
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+          <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
             {category}
           </span>
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
@@ -52,8 +51,13 @@ export default function TaskCard({ task, userApplication = null }) {
         </div>
 
         {/* Task Title */}
-        <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
-          {title}
+        <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">
+          <Link
+            to={`/tasks/${_id}`}
+            className="hover:text-blue-700 focus:underline focus:outline-none"
+          >
+            {title}
+          </Link>
         </h3>
 
         {/* Description Snippet */}
@@ -61,84 +65,84 @@ export default function TaskCard({ task, userApplication = null }) {
           {description}
         </p>
 
-        {/* Location & Schedule Info */}
-        <div className="mt-4 space-y-1.5 pt-3 border-t border-slate-100 text-xs text-slate-600">
-          <div className="flex items-center gap-2 text-slate-700">
-            <MapPin size={14} className="text-red-500 shrink-0" />
-            <span className="font-semibold text-slate-800">{district}:</span>
-            <span className="truncate">{location}</span>
+        {/* Location & Schedule Details */}
+        <div className="mt-4 pt-3 border-t border-slate-200 space-y-1.5 text-xs">
+          <div className="flex items-start gap-2 text-slate-800">
+            <MapPin size={14} className="text-slate-500 shrink-0 mt-0.5" />
+            <div className="leading-tight">
+              <span className="font-semibold">{district} District: </span>
+              <span className="text-slate-600">{location}</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 text-slate-600">
-            <Calendar size={14} className="text-blue-600 shrink-0" />
-            <span>Scheduled: <strong className="text-slate-700">{formattedDate}</strong></span>
+            <Calendar size={14} className="text-slate-500 shrink-0" />
+            <span>Date: <span className="font-medium text-slate-900">{formattedDate}</span></span>
           </div>
         </div>
 
-        {/* Volunteer Capacity Progress Meter */}
-        <div className="mt-4 pt-3 border-t border-slate-100">
+        {/* Volunteer Quota Meter */}
+        <div className="mt-4 pt-3 border-t border-slate-200">
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <div className="flex items-center gap-1.5 font-semibold text-slate-700">
-              <Users size={14} className="text-amber-600" />
+            <span className="flex items-center gap-1.5 font-medium text-slate-700">
+              <Users size={14} className="text-slate-500" />
               <span>Volunteers Required</span>
-            </div>
-            <span className="font-bold text-slate-900">
+            </span>
+            <span className="font-bold text-slate-900 tabular-nums">
               {assigned} / {required} assigned
             </span>
           </div>
 
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-slate-100 rounded h-2 overflow-hidden border border-slate-200">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
+              className={`h-full transition-all duration-300 ${
                 isFull
                   ? 'bg-slate-400'
-                  : percentage >= 75
-                  ? 'bg-amber-500'
-                  : 'bg-emerald-500'
+                  : percentage >= 80
+                  ? 'bg-amber-600'
+                  : 'bg-emerald-600'
               }`}
               style={{ width: `${percentage}%` }}
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+          <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1.5">
             <span>
               {isFull ? (
-                <strong className="text-slate-600">Capacity Full</strong>
+                <span className="font-medium text-slate-700">Quota Reached</span>
               ) : (
                 <>
-                  <strong className="text-emerald-700 font-bold">{availableSlots}</strong>{' '}
-                  slots available
+                  <span className="font-bold text-emerald-800">{availableSlots}</span> {availableSlots === 1 ? 'slot' : 'slots'} available
                 </>
               )}
             </span>
-            <span className="text-[10px] text-slate-400">{percentage}% filled</span>
+            <span className="tabular-nums font-medium text-slate-600">{percentage}% staffed</span>
           </div>
         </div>
 
-        {/* Volunteer's active application status alert if applied */}
+        {/* User Application Alert Banner if Applied */}
         {userApplication && (
-          <div className="mt-3 bg-amber-50/80 border border-amber-200 rounded-xl px-3 py-1.5 flex items-center justify-between text-xs">
-            <span className="text-amber-800 font-medium">Your Application:</span>
+          <div className="mt-3 bg-amber-50/90 border border-amber-300 rounded-lg p-2 flex items-center justify-between text-xs">
+            <span className="text-amber-900 font-medium">Your status:</span>
             <TaskStatusBadge status={userApplication.status} type="application" />
           </div>
         )}
       </div>
 
-      {/* Footer Safety Notice & Action CTA */}
-      <div className="bg-slate-50/80 px-5 py-3 border-t border-slate-100 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 font-medium">
-          <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
-          <span>Non-Hazardous Support</span>
+      {/* Card Footer */}
+      <div className="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 text-xs text-slate-600">
+          <ShieldCheck size={14} className="text-emerald-700 shrink-0" />
+          <span>Non-hazardous relief</span>
         </div>
 
         <Link
           to={`/tasks/${_id}`}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow"
+          className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-black text-white rounded-lg text-xs font-semibold transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-slate-900"
         >
-          <span>View Details</span>
-          <ArrowRight size={13} />
+          View Task
         </Link>
       </div>
-    </div>
+    </article>
   );
 }

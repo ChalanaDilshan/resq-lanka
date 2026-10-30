@@ -5,7 +5,6 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ArrowRight,
   User,
   Users,
   ShieldAlert,
@@ -63,7 +62,7 @@ export default function LoginPage() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  // Quick fill demo credentials for evaluation
+  // Quick fill demo credentials for testing
   const handleQuickFill = (roleKey) => {
     setErrorMessage(null);
     if (roleKey === 'administrator' || roleKey === 'coordinator') {
@@ -77,6 +76,9 @@ export default function LoginPage() {
       setPassword('password123');
     }
   };
+
+  const loggedUserIsAdmin = (u) =>
+    u.role === 'administrator' || u.role === 'coordinator';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,7 +102,7 @@ export default function LoginPage() {
 
         // Direct login fallback
         const loggedInUser = loginResponse.user || loginResponse;
-        setSuccessMessage(`Welcome back, ${loggedInUser.name}!`);
+        setSuccessMessage(`Welcome back, ${loggedInUser.name}.`);
 
         setTimeout(() => {
           const redirect =
@@ -111,7 +113,7 @@ export default function LoginPage() {
               ? '/supplies'
               : '/sos');
           navigate(redirect);
-        }, 600);
+        }, 500);
       } else {
         // Register mode
         const registeredUser = await register({
@@ -124,7 +126,7 @@ export default function LoginPage() {
         });
 
         setSuccessMessage(
-          `Account created successfully! Welcome, ${registeredUser.name}.`
+          `Account created successfully. Welcome, ${registeredUser.name}.`
         );
 
         setTimeout(() => {
@@ -134,14 +136,14 @@ export default function LoginPage() {
             const redirect = location.state?.from?.pathname || '/sos';
             navigate(redirect);
           }
-        }, 600);
+        }, 500);
       }
     } catch (err) {
       console.error('Auth operation failed:', err);
       setErrorMessage(
         err.response?.data?.message ||
           err.message ||
-          'Authentication failed. Please check your credentials and try again.'
+          'Authentication failed. Please verify your credentials and try again.'
       );
     } finally {
       setIsLoading(false);
@@ -160,7 +162,7 @@ export default function LoginPage() {
 
     try {
       const verifiedUser = await verifyOtp(tempToken, otpCode.trim());
-      setSuccessMessage(`Verified! Welcome back, ${verifiedUser.name}.`);
+      setSuccessMessage(`Verified. Welcome back, ${verifiedUser.name}.`);
 
       setTimeout(() => {
         const target = location.state?.from?.pathname;
@@ -176,7 +178,7 @@ export default function LoginPage() {
         } else {
           navigate('/sos');
         }
-      }, 600);
+      }, 500);
     } catch (err) {
       console.error('OTP verification failed:', err);
       setErrorMessage(
@@ -210,122 +212,115 @@ export default function LoginPage() {
     }
   };
 
-  const loggedUserIsAdmin = (u) =>
-    u.role === 'administrator' || u.role === 'coordinator';
-
   return (
-    <div className="min-h-[calc(100vh-5rem)] flex flex-col lg:flex-row bg-[#f8fafc]">
+    <div className="min-h-[calc(100vh-5rem)] flex flex-col lg:flex-row bg-slate-100">
       {/* =========================================================================
-          LEFT SIDE: DISASTER PLATFORM SHOWCASE (Hero Card)
+          LEFT SIDE: CIVIC DISASTER RELIEF SYSTEM OVERVIEW
          ========================================================================= */}
-      <div className="relative lg:w-1/2 min-h-[480px] lg:min-h-auto flex flex-col justify-between p-8 sm:p-12 lg:p-16 text-white overflow-hidden bg-slate-950">
-        {/* Disaster Photo Background */}
+      <aside
+        aria-label="Disaster Relief Network Overview"
+        className="relative lg:w-1/2 min-h-[440px] lg:min-h-auto flex flex-col justify-between p-8 sm:p-12 lg:p-16 text-white overflow-hidden bg-slate-900 border-b lg:border-b-0 lg:border-r border-slate-800"
+      >
+        {/* Disaster Relief Photo Background - Prominently Visible */}
         <div
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroDisasterBg})` }}
         />
-        {/* Dark Cinematic Overlay */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/80 to-slate-900/85" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/60" />
+        {/* Protective Gradient Overlay ensuring image is clearly visible while keeping text crisp */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-950/85 via-slate-950/65 to-slate-900/40" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/40" />
 
         {/* Content Top */}
         <div className="relative z-20 space-y-4 max-w-xl">
-          {/* Tracking Subtitle Pill */}
-          <div className="inline-block">
-            <span className="text-[10.5px] sm:text-xs font-semibold uppercase tracking-[0.24em] text-slate-300 drop-shadow">
-              Community Disaster Response Platform
-            </span>
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900/80 backdrop-blur-xs text-slate-200 border border-white/20 text-xs font-semibold">
+            <ShieldCheck size={14} className="text-emerald-400" />
+            <span>Sri Lanka Community Disaster Relief Coordination</span>
           </div>
 
-          {/* Main Title: ResQ-Lanka */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none drop-shadow-md">
-            <span className="text-white">ResQ</span>
-            <span className="text-[#ef4444]">-Lanka</span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-md">
+            ResQ-Lanka Secure Access
           </h1>
 
-          {/* Catchphrase */}
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight drop-shadow">
-            Stronger Communities. Safer Lives.
-          </h2>
-
-          {/* Subtitle Description */}
-          <p className="text-xs sm:text-sm text-slate-200/90 font-normal leading-relaxed pt-1 drop-shadow">
-            A unified platform for emergency reporting, safe shelters, relief donations and volunteer coordination
-            during floods, earthquakes and other natural disasters in Sri Lanka.
+          <p className="text-sm text-slate-100 leading-relaxed drop-shadow-sm">
+            Unified access portal for citizens in affected districts, certified relief volunteers,
+            and authorized evacuation shelter coordinators across Sri Lanka.
           </p>
 
-          {/* 4 Action Badges */}
-          <div className="pt-4 space-y-3">
-            <div className="flex items-center gap-3.5 group">
-              <div className="w-10 h-10 rounded-xl bg-[#ef4444] text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-red-500/30">
-                <ShieldAlert size={20} />
+          {/* Three Operational Guarantees with subtle glassmorphic backdrop */}
+          <div className="pt-4 space-y-2.5 border-t border-white/20">
+            <div className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-950/50 backdrop-blur-xs border border-white/10">
+              <div className="w-8 h-8 rounded bg-red-600/90 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                <ShieldAlert size={16} />
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Report Emergencies</h4>
-                <p className="text-[11.5px] text-slate-300">
-                  Submit an SOS request if you or someone needs urgent rescue or assistance.
+              <div className="text-xs">
+                <h2 className="font-semibold text-white drop-shadow-xs">Emergency SOS Reporting</h2>
+                <p className="text-slate-200/90 mt-0.5 leading-relaxed">
+                  Submit critical rescue requests with GPS coordinates or landmarks. Telephone numbers are masked for family privacy.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 group">
-              <div className="w-10 h-10 rounded-xl bg-[#2563eb] text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/30">
-                <Building2 size={20} />
+            <div className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-950/50 backdrop-blur-xs border border-white/10">
+              <div className="w-8 h-8 rounded bg-blue-600/90 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                <Building2 size={16} />
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Find Safe Shelters</h4>
-                <p className="text-[11.5px] text-slate-300">
-                  View nearby verified shelters with real-time capacity and occupancy tracking.
+              <div className="text-xs">
+                <h2 className="font-semibold text-white drop-shadow-xs">Safe Evacuation Shelters</h2>
+                <p className="text-slate-200/90 mt-0.5 leading-relaxed">
+                  Real-time occupancy tracking and high-ground flood elevation safety ratings across government relief centers.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 group">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981] text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-500/30">
-                <Users size={20} />
+            <div className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-950/50 backdrop-blur-xs border border-white/10">
+              <div className="w-8 h-8 rounded bg-emerald-600/90 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                <Users size={16} />
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Support with Donations</h4>
-                <p className="text-[11.5px] text-slate-300">
-                  See urgent shelter supply requests and pledge aid to affected families.
+              <div className="text-xs">
+                <h2 className="font-semibold text-white drop-shadow-xs">Humanitarian Supplies &amp; Volunteers</h2>
+                <p className="text-slate-200/90 mt-0.5 leading-relaxed">
+                  Live inventory shortfall logging and supervised, non-hazardous community relief task assignments.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Quotation */}
-        <div className="relative z-20 mt-8 pt-4 border-l-2 border-[#ef4444] pl-3.5">
-          <p className="text-xs text-slate-300 italic font-medium">
-            "Together we can build a safer, stronger Sri Lanka for a more resilient tomorrow."
-          </p>
+        {/* Civic Hotline Strip */}
+        <div className="relative z-20 mt-8 pt-4 border-t border-white/20 flex items-center gap-4 text-xs text-slate-300 drop-shadow-sm">
+          <span>National Emergency:</span>
+          <span className="text-white font-semibold">117 (DMC)</span>
+          <span className="text-slate-400">•</span>
+          <span className="text-white font-semibold">1990 (Ambulance)</span>
+          <span className="text-slate-400">•</span>
+          <span className="text-white font-semibold">119 (Police)</span>
         </div>
-      </div>
+      </aside>
 
       {/* =========================================================================
-          RIGHT SIDE: AUTH FORM CARD
+          RIGHT SIDE: AUTHENTICATION FORM CARD
          ========================================================================= */}
-      <div className="lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12">
-        <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100 flex flex-col justify-between">
+      <main className="lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12">
+        <div className="w-full max-w-md bg-white rounded-xl p-6 sm:p-8 shadow-xs border border-slate-300 flex flex-col justify-between">
           <div>
-            {/* Center Logo */}
+            {/* Logo */}
             <div className="flex justify-center mb-5">
               <ResQLogo />
             </div>
 
             {/* Mode Switcher Tabs */}
             {!otpStep ? (
-              <div className="flex bg-slate-100 p-1 rounded-2xl mb-6">
+              <div className="flex bg-slate-100 p-1 rounded-lg mb-5 border border-slate-200">
                 <button
                   type="button"
                   onClick={() => {
                     setErrorMessage(null);
                     navigate('/login');
                   }}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded transition-colors ${
                     mode === 'login'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Sign In
@@ -336,63 +331,72 @@ export default function LoginPage() {
                     setErrorMessage(null);
                     navigate('/register');
                   }}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded transition-colors ${
                     mode === 'register'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Create Account
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 mb-4 py-1.5 px-3 bg-red-50 border border-red-200 text-red-700 rounded-full w-fit mx-auto text-xs font-bold">
-                <ShieldCheck size={14} className="text-red-600" />
-                <span>Two-Factor Authentication (2FA)</span>
+              <div className="flex items-center justify-center gap-1.5 mb-4 py-1 px-3 bg-slate-100 border border-slate-300 text-slate-800 rounded w-fit mx-auto text-xs font-semibold">
+                <ShieldCheck size={14} className="text-emerald-700" />
+                <span>Two-Factor Authentication</span>
               </div>
             )}
 
             {/* Header Titles */}
             <div className="text-center mb-5">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 {otpStep
                   ? 'Security Verification'
                   : mode === 'login'
-                  ? 'Welcome Back!'
-                  : 'Join ResQ-Lanka'}
+                  ? 'Sign in to ResQ-Lanka'
+                  : 'Register Responder Account'}
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-600 mt-1">
                 {otpStep
-                  ? 'Enter the 6-digit code sent to your email to authenticate'
+                  ? 'Enter the 6-digit verification code sent to your email'
                   : mode === 'login'
-                  ? 'Sign in to access your dashboard and relief tools'
-                  : 'Register as a citizen or community relief volunteer'}
+                  ? 'Enter your credentials to access your relief dashboard'
+                  : 'Register as an affected citizen or community relief volunteer'}
               </p>
             </div>
 
             {/* Emergency Intent Alert */}
             {isEmergencyRedirect && !otpStep && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-start gap-2.5 animate-fadeIn">
-                <ShieldAlert size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+              <div
+                role="alert"
+                className="mb-4 p-3 bg-red-50 border border-red-300 text-red-900 rounded-lg text-xs flex items-start gap-2.5"
+              >
+                <ShieldAlert size={16} className="text-red-700 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold block text-red-900">Emergency Report Verification</span>
-                  <span>To submit an SOS rescue request, please authenticate your account. A 2FA verification code will be sent to your email.</span>
+                  <span className="font-bold block text-red-950">Emergency Verification Required</span>
+                  <span>To submit an Emergency SOS request, authenticate your profile. A two-factor security code will be dispatched to your email.</span>
                 </div>
               </div>
             )}
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
-                <AlertCircle size={16} className="text-red-600 flex-shrink-0" />
+              <div
+                role="alert"
+                className="mb-4 p-3 bg-red-50 border border-red-300 text-red-900 rounded-lg text-xs flex items-center gap-2"
+              >
+                <AlertCircle size={15} className="text-red-700 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
             {/* Success Toast */}
             {successMessage && (
-              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
-                <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0" />
+              <div
+                role="status"
+                className="mb-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-lg text-xs flex items-center gap-2"
+              >
+                <CheckCircle2 size={15} className="text-emerald-700 shrink-0" />
                 <span>{successMessage}</span>
               </div>
             )}
@@ -400,49 +404,45 @@ export default function LoginPage() {
             {/* OTP Verification Form */}
             {otpStep ? (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div className="text-center p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-2">
-                    <KeyRound size={22} className="stroke-[2.5]" />
-                  </div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">Security Verification Code</h3>
-                  <p className="text-xs text-slate-600 mt-1">
-                    Please enter the 6-digit code sent to:
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-center space-y-1">
+                  <KeyRound size={20} className="mx-auto text-slate-700" />
+                  <h3 className="font-bold text-slate-900 text-xs">Two-Factor Authentication PIN</h3>
+                  <p className="text-xs text-slate-600">
+                    A 6-digit security code was dispatched to:
                   </p>
-                  <p className="text-xs font-bold text-red-600 mt-0.5 font-mono">{email}</p>
+                  <p className="text-xs font-semibold text-slate-900 font-mono">{email}</p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5 text-center">
-                    6-Digit Verification PIN
+                  <label htmlFor="otp-input" className="block text-xs font-semibold text-slate-700 mb-1.5 text-center">
+                    Enter 6-Digit PIN
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      maxLength={6}
-                      pattern="[0-9]*"
-                      autoFocus
-                      required
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      placeholder="••••••"
-                      className="w-full text-center py-3 bg-slate-50 border-2 border-slate-200 focus:border-red-500 focus:bg-white rounded-xl text-2xl font-mono font-bold tracking-[0.5em] text-slate-900 focus:outline-none transition shadow-inner"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-400 text-center mt-1.5">
-                    For local testing, check your server terminal console for the generated code.
+                  <input
+                    id="otp-input"
+                    type="text"
+                    maxLength={6}
+                    pattern="[0-9]*"
+                    autoFocus
+                    required
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    className="w-full text-center py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 focus:bg-white rounded-lg text-2xl font-mono font-bold tracking-widest text-slate-900 focus:outline-none transition-colors"
+                  />
+                  <p className="text-[11px] text-slate-500 text-center mt-1">
+                    For local testing, check your backend server console for the generated code.
                   </p>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading || otpCode.length !== 6}
-                  className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-md shadow-red-500/25 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg text-xs sm:text-sm transition-colors cursor-pointer"
                 >
-                  <span>{isLoading ? 'Verifying Code...' : 'Verify & Continue'}</span>
-                  <ArrowRight size={16} className="stroke-[2.5]" />
+                  {isLoading ? 'Verifying Code...' : 'Verify Security Code'}
                 </button>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
                   <button
                     type="button"
                     onClick={() => {
@@ -450,9 +450,9 @@ export default function LoginPage() {
                       setOtpCode('');
                       setErrorMessage(null);
                     }}
-                    className="text-slate-500 hover:text-slate-700 font-medium flex items-center gap-1 cursor-pointer"
+                    className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1 cursor-pointer"
                   >
-                    <ArrowLeft size={14} />
+                    <ArrowLeft size={13} />
                     <span>Change Credentials</span>
                   </button>
 
@@ -460,9 +460,9 @@ export default function LoginPage() {
                     type="button"
                     disabled={resendCooldown > 0 || isResending}
                     onClick={handleResendOtp}
-                    className="text-red-600 hover:text-red-700 font-bold disabled:text-slate-400 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
+                    className="text-slate-800 hover:text-black font-semibold disabled:text-slate-400 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
                   >
-                    <RefreshCw size={13} className={isResending ? 'animate-spin' : ''} />
+                    <RefreshCw size={12} className={isResending ? 'animate-spin' : ''} />
                     <span>
                       {resendCooldown > 0
                         ? `Resend in ${resendCooldown}s`
@@ -481,35 +481,35 @@ export default function LoginPage() {
                     <>
                       {/* Full Name */}
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
                           Full Name
                         </label>
                         <div className="relative">
-                          <User size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
+                          <User size={15} className="absolute left-3 top-3 text-slate-400" />
                           <input
                             type="text"
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Kasun Perera"
-                            className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
                           />
                         </div>
                       </div>
 
-                      {/* Register Role Selection (Citizen or Volunteer ONLY) */}
+                      {/* Account Role Selection */}
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                          Account Type
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Account Role
                         </label>
                         <div className="grid grid-cols-2 gap-2">
                           <button
                             type="button"
                             onClick={() => setRegisterRole('citizen')}
-                            className={`p-2 rounded-xl border text-center transition flex items-center justify-center gap-2 text-xs font-bold ${
+                            className={`p-2 rounded-lg border text-center transition-colors flex items-center justify-center gap-2 text-xs font-semibold ${
                               registerRole === 'citizen'
-                                ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                                ? 'border-slate-900 bg-slate-900 text-white'
+                                : 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100'
                             }`}
                           >
                             <User size={14} />
@@ -518,10 +518,10 @@ export default function LoginPage() {
                           <button
                             type="button"
                             onClick={() => setRegisterRole('volunteer')}
-                            className={`p-2 rounded-xl border text-center transition flex items-center justify-center gap-2 text-xs font-bold ${
+                            className={`p-2 rounded-lg border text-center transition-colors flex items-center justify-center gap-2 text-xs font-semibold ${
                               registerRole === 'volunteer'
-                                ? 'border-amber-500 bg-amber-50 text-amber-700'
-                                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                                ? 'border-slate-900 bg-slate-900 text-white'
+                                : 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100'
                             }`}
                           >
                             <Users size={14} />
@@ -534,29 +534,29 @@ export default function LoginPage() {
 
                   {/* Email Address */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Email Address
                     </label>
                     <div className="relative">
-                      <Mail size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
+                      <Mail size={15} className="absolute left-3 top-3 text-slate-400" />
                       <input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email address"
-                        className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                        placeholder="name@example.com"
+                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
                       />
                     </div>
                   </div>
 
                   {/* Password */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Password
                     </label>
                     <div className="relative">
-                      <Lock size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
+                      <Lock size={15} className="absolute left-3 top-3 text-slate-400" />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         required
@@ -565,17 +565,17 @@ export default function LoginPage() {
                         placeholder={
                           mode === 'register'
                             ? 'Minimum 6 characters'
-                            : 'Enter your password'
+                            : 'Enter password'
                         }
-                        className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                        className="w-full pl-9 pr-9 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
+                        className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700"
                         aria-label="Toggle password visibility"
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>
                   </div>
@@ -583,32 +583,32 @@ export default function LoginPage() {
                   {mode === 'register' && (
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
                           Phone (Optional)
                         </label>
                         <div className="relative">
-                          <Phone size={14} className="absolute left-3 top-3 text-slate-400" />
+                          <Phone size={13} className="absolute left-2.5 top-2.5 text-slate-400" />
                           <input
                             type="text"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="077 123 4567"
-                            className="w-full pl-8 pr-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500"
+                            className="w-full pl-8 pr-2 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-slate-900"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
                           District
                         </label>
                         <div className="relative">
-                          <MapPin size={14} className="absolute left-3 top-3 text-slate-400" />
+                          <MapPin size={13} className="absolute left-2.5 top-2.5 text-slate-400" />
                           <input
                             type="text"
                             value={district}
                             onChange={(e) => setDistrict(e.target.value)}
                             placeholder="Ampara"
-                            className="w-full pl-8 pr-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500"
+                            className="w-full pl-8 pr-2 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-slate-900"
                           />
                         </div>
                       </div>
@@ -619,79 +619,69 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full mt-2 py-3 bg-[#2563eb] hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-md shadow-blue-500/25 flex items-center justify-center gap-2"
+                    className="w-full mt-2 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-semibold rounded-lg text-xs sm:text-sm transition-colors flex items-center justify-center cursor-pointer"
                   >
-                    <span>
-                      {isLoading
-                        ? mode === 'login'
-                          ? 'Signing in...'
-                          : 'Creating account...'
-                        : mode === 'login'
-                        ? 'Login to Platform'
-                        : 'Complete Registration'}
-                    </span>
-                    <ArrowRight size={16} className="stroke-[2.5]" />
+                    {isLoading
+                      ? mode === 'login'
+                        ? 'Signing in...'
+                        : 'Creating account...'
+                      : mode === 'login'
+                      ? 'Sign In'
+                      : 'Complete Registration'}
                   </button>
                 </form>
 
-                {/* Separator */}
-                <div className="relative my-5 text-center">
+                {/* Quick Role Fill Section */}
+                <div className="relative my-4 text-center">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200" />
                   </div>
-                  <span className="relative px-3 bg-white text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Quick Dev Credentials
+                  <span className="relative px-2.5 bg-white text-xs font-medium text-slate-500">
+                    Evaluation Quick-Fill
                   </span>
                 </div>
 
-                {/* 3 Quick-fill Buttons matching evaluation requirements */}
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => handleQuickFill('citizen')}
-                    className="p-2.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100/70 text-center transition flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
                   >
-                    <div className="w-6 h-6 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center">
-                      <User size={13} className="stroke-[2.5]" />
-                    </div>
-                    <div className="text-[11px] font-bold text-slate-900 leading-tight">
+                    <User size={14} className="text-slate-700" />
+                    <span className="text-xs font-semibold text-slate-900 leading-tight">
                       Citizen
-                    </div>
-                    <div className="text-[9px] text-slate-500 leading-tight">
-                      Report Help
-                    </div>
+                    </span>
+                    <span className="text-[10px] text-slate-500 leading-tight">
+                      Public SOS
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleQuickFill('volunteer')}
-                    className="p-2.5 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100/70 text-center transition flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
                   >
-                    <div className="w-6 h-6 rounded-full bg-amber-200 text-amber-700 flex items-center justify-center">
-                      <Users size={13} className="stroke-[2.5]" />
-                    </div>
-                    <div className="text-[11px] font-bold text-slate-900 leading-tight">
+                    <Users size={14} className="text-slate-700" />
+                    <span className="text-xs font-semibold text-slate-900 leading-tight">
                       Volunteer
-                    </div>
-                    <div className="text-[9px] text-slate-500 leading-tight">
-                      Support Tasks
-                    </div>
+                    </span>
+                    <span className="text-[10px] text-slate-500 leading-tight">
+                      Relief Tasks
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleQuickFill('administrator')}
-                    className="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100/70 text-center transition flex flex-col items-center gap-1 cursor-pointer"
+                    className="p-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-center transition-colors flex flex-col items-center gap-1 cursor-pointer"
                   >
-                    <div className="w-6 h-6 rounded-full bg-emerald-200 text-emerald-800 flex items-center justify-center">
-                      <Building2 size={13} className="stroke-[2.5]" />
-                    </div>
-                    <div className="text-[11px] font-bold text-slate-900 leading-tight">
-                      Administrator
-                    </div>
-                    <div className="text-[9px] text-slate-500 leading-tight">
-                      Full Authority
-                    </div>
+                    <Building2 size={14} className="text-slate-700" />
+                    <span className="text-xs font-semibold text-slate-900 leading-tight">
+                      Coordinator
+                    </span>
+                    <span className="text-[10px] text-slate-500 leading-tight">
+                      Admin Panel
+                    </span>
                   </button>
                 </div>
               </>
@@ -700,19 +690,19 @@ export default function LoginPage() {
 
           {/* Bottom link toggle */}
           {!otpStep && (
-            <div className="mt-6 text-center text-xs text-slate-600">
+            <div className="mt-5 pt-3 border-t border-slate-200 text-center text-xs text-slate-600">
               {mode === 'login' ? (
                 <span>
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <button
                     type="button"
                     onClick={() => {
                       setErrorMessage(null);
                       navigate('/register');
                     }}
-                    className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+                    className="font-semibold text-blue-700 hover:underline cursor-pointer"
                   >
-                    Register Now
+                    Register here
                   </button>
                 </span>
               ) : (
@@ -724,16 +714,16 @@ export default function LoginPage() {
                       setErrorMessage(null);
                       navigate('/login');
                     }}
-                    className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+                    className="font-semibold text-blue-700 hover:underline cursor-pointer"
                   >
-                    Sign In
+                    Sign in here
                   </button>
                 </span>
               )}
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
