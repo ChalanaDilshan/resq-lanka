@@ -49,7 +49,10 @@ export const fetchSOSRequests = async (filters = {}) => {
     if (filters.urgency && filters.urgency !== 'All') params.urgency = filters.urgency;
     if (filters.search && filters.search.trim()) params.search = filters.search.trim();
 
-    const response = await axios.get(API_BASE_URL, { params });
+    const response = await axios.get(API_BASE_URL, {
+      params,
+      headers: getAuthHeaders(),
+    });
     const result = response.data;
     if (Array.isArray(result)) return result;
     if (Array.isArray(result?.data)) return result.data;
@@ -68,7 +71,9 @@ export const fetchSOSRequests = async (filters = {}) => {
  */
 export const fetchSOSById = async (id) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${id}`);
+    const response = await axios.get(`${API_BASE_URL}/${id}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data?.data || response.data;
   } catch (error) {
     const message =
