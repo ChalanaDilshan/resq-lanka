@@ -50,7 +50,13 @@ export const createSOS = async (req, res) => {
     }
 
     // 3. Validate coordinates safely without injecting fake defaults
-    let safeCoords = { lat: null, lng: null, hasCoordinates: false };
+    let safeCoords = {
+      lat: null,
+      lng: null,
+      hasCoordinates: false,
+      isGPSVerified: false,
+      accuracyMeters: null,
+    };
     if (
       coordinates &&
       typeof coordinates.lat === 'number' &&
@@ -64,10 +70,22 @@ export const createSOS = async (req, res) => {
         coordinates.lng >= -180 &&
         coordinates.lng <= 180
       ) {
+        // Sri Lanka bounding box: ~5.8 to 10.0 N, ~79.5 to 82.2 E
+        const isWithinSriLanka =
+          coordinates.lat >= 5.8 &&
+          coordinates.lat <= 10.0 &&
+          coordinates.lng >= 79.5 &&
+          coordinates.lng <= 82.2;
+
         safeCoords = {
           lat: coordinates.lat,
           lng: coordinates.lng,
           hasCoordinates: true,
+          isGPSVerified: isWithinSriLanka && Boolean(coordinates.isGPSVerified || coordinates.hasCoordinates),
+          accuracyMeters:
+            typeof coordinates.accuracyMeters === 'number'
+              ? Math.round(coordinates.accuracyMeters)
+              : null,
         };
       }
     }

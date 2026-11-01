@@ -84,6 +84,14 @@ const sosRequestSchema = new mongoose.Schema(
         type: Boolean,
         default: false,
       },
+      isGPSVerified: {
+        type: Boolean,
+        default: false,
+      },
+      accuracyMeters: {
+        type: Number,
+        default: null,
+      },
     },
     contactNumber: {
       type: String,
