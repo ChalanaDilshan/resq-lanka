@@ -1,4 +1,3 @@
-
 import express from 'express';
 import {
   getSupplyItems,
@@ -30,9 +29,9 @@ router.post(
   createSupplyItem
 );
 
-// Pledges
+// Pledges - Requires authenticated user session (registered donor)
 router.get('/pledges', optionalAuth, getAllPledges);
-router.post('/:id/pledge', makeDonorPledge);
+router.post('/:id/pledge', authenticate, makeDonorPledge);
 
 router.patch(
   '/pledges/:pledgeId/status',

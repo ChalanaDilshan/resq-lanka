@@ -115,12 +115,11 @@ export default function LoginPage() {
         );
 
         setTimeout(() => {
-          if (registeredUser.role === 'volunteer') {
-            navigate('/supplies');
-          } else {
-            const redirect = location.state?.from?.pathname || '/sos';
-            navigate(redirect);
-          }
+          const redirect =
+            location.state?.from?.pathname ||
+            (typeof location.state?.from === 'string' ? location.state.from : null) ||
+            (registeredUser.role === 'volunteer' ? '/supplies' : '/sos');
+          navigate(redirect);
         }, 500);
       }
     } catch (err) {

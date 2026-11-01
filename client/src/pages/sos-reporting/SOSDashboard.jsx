@@ -427,6 +427,23 @@ export default function SOSDashboard() {
                     <p className="text-xs font-semibold mt-1.5 text-slate-800 flex items-center gap-1">
                       <Phone size={11} /> Tel: {selectedIncident.contactNumber}
                     </p>
+                    {selectedIncident.coordinates && selectedIncident.coordinates.lat && (
+                      <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                        <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                          <ShieldCheck size={12} />
+                          <span>GPS Locked</span>
+                        </span>
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${selectedIncident.coordinates.lat},${selectedIncident.coordinates.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-700 font-bold hover:underline inline-flex items-center gap-0.5"
+                        >
+                          <span>Directions</span>
+                          <ExternalLink size={10} />
+                        </a>
+                      </div>
+                    )}
 
                     {isResponder && (
                       <div className="mt-2.5 pt-2 border-t border-slate-200 flex gap-1">
@@ -544,13 +561,40 @@ export default function SOSDashboard() {
 
                 {req.coordinates &&
                   req.coordinates.hasCoordinates !== false &&
-                  req.coordinates.lat && (
-                    <div className="text-[11px] text-slate-400 mb-3 flex items-center gap-1">
-                      <ShieldCheck size={13} className="text-emerald-600" />
-                      <span>
-                        Verified GPS: {req.coordinates.lat.toFixed(4)},{' '}
-                        {req.coordinates.lng.toFixed(4)}
-                      </span>
+                  req.coordinates.lat ? (
+                    <div className="text-[11px] bg-slate-50 border border-slate-200/90 rounded-lg p-2.5 mb-3 space-y-1.5">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="flex items-center gap-1 text-emerald-800 font-bold">
+                          <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
+                          <span>
+                            {req.coordinates.isGPSVerified ? 'Verified GPS Satellite Point' : 'Pinned Map Location'}
+                          </span>
+                        </span>
+                        {req.coordinates.accuracyMeters && (
+                          <span className="text-[10px] text-slate-500 font-mono">
+                            ±{req.coordinates.accuracyMeters}m
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 font-mono text-slate-700">
+                        <span>
+                          {req.coordinates.lat.toFixed(5)}, {req.coordinates.lng.toFixed(5)}
+                        </span>
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${req.coordinates.lat},${req.coordinates.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-sans font-bold text-blue-700 hover:text-blue-900 inline-flex items-center gap-0.5 hover:underline"
+                        >
+                          <span>Rescue Route</span>
+                          <ExternalLink size={10} />
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200/80 rounded-lg p-2 mb-3 flex items-center gap-1.5">
+                      <MapPin size={13} className="text-slate-400 shrink-0" />
+                      <span>Approximate Landmark (Phone callback recommended)</span>
                     </div>
                   )}
               </div>
