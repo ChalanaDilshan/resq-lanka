@@ -11,6 +11,10 @@ import {
   AlertTriangle,
   ClipboardList,
   PlusCircle,
+  ExternalLink,
+  Phone,
+  LayoutDashboard,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { fetchSOSRequests } from '../../services/sosService';
