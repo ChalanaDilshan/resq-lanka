@@ -109,8 +109,14 @@ export default function AdministratorDashboard() {
 
     loadData();
 
+    // Auto-poll live emergency incidents every 10 seconds for real-time dispatch
+    const interval = setInterval(() => {
+      loadData();
+    }, 10000);
+
     return () => {
       isCancelled = true;
+      clearInterval(interval);
     };
   }, [user, reloadTrigger]);
 
@@ -310,6 +316,7 @@ export default function AdministratorDashboard() {
                       <th className="pb-3">Hazard / Ref</th>
                       <th className="pb-3">Urgency</th>
                       <th className="pb-3">Location</th>
+                      <th className="pb-3">Contact</th>
                       <th className="pb-3">Status</th>
                       <th className="pb-3 text-right">Time</th>
                     </tr>
@@ -332,8 +339,29 @@ export default function AdministratorDashboard() {
                             {inc.urgency}
                           </span>
                         </td>
-                        <td className="py-3 text-slate-600 max-w-[200px] truncate">
-                          {inc.locationText}
+                        <td className="py-3 text-slate-600 max-w-[200px]">
+                          <div className="truncate">{inc.locationText}</div>
+                          {inc.coordinates?.lat && (
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${inc.coordinates.lat},${inc.coordinates.lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] font-bold text-blue-700 hover:underline inline-flex items-center gap-0.5 mt-0.5"
+                            >
+                              <span>Map Route</span>
+                              <ExternalLink size={9} />
+                            </a>
+                          )}
+                        </td>
+                        <td className="py-3 font-mono text-slate-800 text-[11px] whitespace-nowrap">
+                          {inc.contactNumber?.includes('*') ? (
+                            <span className="text-slate-400">{inc.contactNumber}</span>
+                          ) : (
+                            <a href={`tel:${inc.contactNumber}`} className="text-blue-700 font-bold hover:underline flex items-center gap-1">
+                              <Phone size={10} />
+                              <span>{inc.contactNumber}</span>
+                            </a>
+                          )}
                         </td>
                         <td className="py-3">
                           <span

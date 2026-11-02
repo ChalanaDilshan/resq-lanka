@@ -58,22 +58,56 @@ export default function SOSRequestForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState(null);
-  const [locating, setLocating] = useState(false);
-  const [gpsAccuracy, setGpsAccuracy] = useState(null);
-  const [gpsStatus, setGpsStatus] = useState('idle'); // idle | detecting | acquired | failed
-  const [gpsNotice, setGpsNotice] = useState(null);
   const mapRef = useRef(null);
 
-  // Attempt automatic GPS lock on initial mount if permission already granted
+  // Automatically collect location when client visits this page
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
-          if (permissionStatus.state === 'granted') {
-            handleDetectLocation();
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const userCoords = {
+            lat,
+            lng,
+            hasCoordinates: true,
+            isGPSVerified: true,
+            accuracyMeters: position.coords.accuracy ? Math.round(position.coords.accuracy) : null,
+          };
+
+          setFormData((prev) => ({
+            ...prev,
+            coordinates: userCoords,
+          }));
+          setMapCenter({ lat, lng });
+          setMapZoom(16);
+          setIsLocationPinned(true);
+
+          if (mapRef.current) {
+            mapRef.current.panTo({ lat, lng });
+            mapRef.current.setZoom(16);
           }
-        }).catch(() => {});
-      }
+
+          // Auto reverse-geocode address if available
+          if (typeof window !== 'undefined' && window.google?.maps?.Geocoder) {
+            const geocoder = new window.google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+              if (status === 'OK' && results && results[0]) {
+                setFormData((prev) => ({
+                  ...prev,
+                  coordinates: userCoords,
+                  locationText: prev.locationText ? prev.locationText : results[0].formatted_address,
+                }));
+              }
+            });
+          }
+        },
+        (err) => {
+          // If location is denied or unavailable, silent fallback allows user to manually mark the map
+          console.log('Automatic location skipped:', err.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
     }
   }, []);
 
@@ -92,6 +126,7 @@ export default function SOSRequestForm() {
     mapRef.current = map;
   }, []);
 
+  // Manual map marking & pin dragging fallback
   const handleMapClick = useCallback((e) => {
     if (e.latLng) {
       const lat = e.latLng.lat();
@@ -101,20 +136,18 @@ export default function SOSRequestForm() {
         lng,
         hasCoordinates: true,
         isGPSVerified: true,
-        accuracyMeters: gpsAccuracy || null,
       };
       setFormData((prev) => ({
         ...prev,
         coordinates: coords,
         locationText:
           prev.locationText ||
-          `Map Coordinates (${lat.toFixed(5)}, ${lng.toFixed(5)})`,
+          `Map Coordinates (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
       }));
       setIsLocationPinned(true);
-      setGpsStatus('acquired');
       setErrors((prev) => ({ ...prev, locationText: null }));
     }
-  }, [gpsAccuracy]);
+  }, []);
 
   const handleMarkerDragEnd = useCallback((e) => {
     if (e.latLng) {
@@ -127,96 +160,11 @@ export default function SOSRequestForm() {
           lng,
           hasCoordinates: true,
           isGPSVerified: true,
-          accuracyMeters: gpsAccuracy || null,
         },
       }));
       setIsLocationPinned(true);
-      setGpsStatus('acquired');
     }
-  }, [gpsAccuracy]);
-
-  const handleDetectLocation = () => {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      setGpsStatus('failed');
-      setGpsNotice('Geolocation is not supported by your device browser. Please type your landmark description below or click on the map to pin your location.');
-      return;
-    }
-    setLocating(true);
-    setGpsStatus('detecting');
-    setGpsNotice(null);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const accuracy = position.coords.accuracy ? Math.round(position.coords.accuracy) : null;
-        const userCoords = {
-          lat,
-          lng,
-          hasCoordinates: true,
-          isGPSVerified: true,
-          accuracyMeters: accuracy,
-        };
-
-        setGpsAccuracy(accuracy);
-        setGpsStatus('acquired');
-        setGpsNotice(null);
-
-        // Reverse geocode if Google Maps Geocoder is available
-        if (typeof window !== 'undefined' && window.google?.maps?.Geocoder) {
-          const geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status === 'OK' && results && results[0]) {
-              const formatted = results[0].formatted_address;
-              setFormData((prev) => ({
-                ...prev,
-                coordinates: userCoords,
-                locationText:
-                  prev.locationText && !prev.locationText.startsWith('GPS Coordinates') && !prev.locationText.startsWith('GPS Location')
-                    ? prev.locationText
-                    : formatted,
-              }));
-            } else {
-              setFormData((prev) => ({
-                ...prev,
-                coordinates: userCoords,
-                locationText:
-                  prev.locationText ||
-                  `GPS Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`,
-              }));
-            }
-          });
-        } else {
-          setFormData((prev) => ({
-            ...prev,
-            coordinates: userCoords,
-            locationText:
-              prev.locationText ||
-              `GPS Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`,
-          }));
-        }
-
-        setMapCenter({ lat, lng });
-        setMapZoom(16);
-        setIsLocationPinned(true);
-        if (mapRef.current) {
-          mapRef.current.panTo({ lat, lng });
-          mapRef.current.setZoom(16);
-        }
-        setLocating(false);
-        setErrors((prev) => ({ ...prev, locationText: null }));
-      },
-      (err) => {
-        console.warn('Geolocation acquisition error:', err.message);
-        setGpsStatus('failed');
-        setLocating(false);
-        setGpsNotice(
-          'Automatic GPS signal was not acquired. Manual fallback is active: you can type your landmark description below or click directly on the map to pin your location.'
-        );
-      },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-    );
-  };
+  }, []);
 
   const validate = () => {
     const newErrors = {};
@@ -565,93 +513,25 @@ export default function SOSRequestForm() {
                   </p>
                 </div>
 
-                {/* ROW 3: Map Location Picker with Automatic GPS Detection */}
-                <div className="space-y-2.5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-1">
-                    <div className="flex items-start sm:items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 border border-red-200 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                        <MapPin size={17} className="stroke-[2.5]" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs sm:text-sm font-bold text-slate-900">
-                            Incident Location &amp; Satellite GPS
-                          </span>
-                          {isLocationPinned && formData.coordinates?.isGPSVerified ? (
-                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                              <ShieldCheck size={11} />
-                              <span>GPS Locked</span>
-                            </span>
-                          ) : (
-                            <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
-                              Required for Direct Dispatch
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-500 font-normal mt-0.5 leading-snug">
-                          {isLocationPinned && formData.coordinates
-                            ? `Pinned spot: (${formData.coordinates.lat.toFixed(5)}, ${formData.coordinates.lng.toFixed(5)})${gpsAccuracy ? ` • Precision ~±${gpsAccuracy}m` : ''}`
-                            : 'Use 1-tap satellite GPS detection or click anywhere on the map.'}
-                        </p>
-                      </div>
+                {/* ROW 3: Incident Location Map */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin size={17} className="text-red-500 stroke-[2.5]" />
+                      <span className="text-xs sm:text-sm font-bold text-slate-800">
+                        Incident Location
+                      </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleDetectLocation}
-                      disabled={locating}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-xs cursor-pointer active:scale-95 disabled:opacity-60 shrink-0 ${
-                        isLocationPinned && formData.coordinates?.isGPSVerified
-                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                          : 'bg-slate-900 hover:bg-slate-800 text-white'
-                      }`}
-                    >
-                      <LocateFixed size={14} className={locating ? 'animate-spin' : ''} />
-                      <span>
-                        {locating
-                          ? 'Acquiring GPS Signal...'
-                          : isLocationPinned && formData.coordinates?.isGPSVerified
-                          ? 'Re-Detect GPS Location'
-                          : 'Auto-Detect My Location (1-Tap GPS)'}
+                    {isLocationPinned && formData.coordinates && (
+                      <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md inline-flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-emerald-600" />
+                        <span>Pinned ({formData.coordinates.lat.toFixed(4)}, {formData.coordinates.lng.toFixed(4)})</span>
                       </span>
-                    </button>
+                    )}
                   </div>
 
-                  {/* High Confidence GPS Locked Notice */}
-                  {isLocationPinned && formData.coordinates?.isGPSVerified && (
-                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2 animate-fadeIn">
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck size={16} className="text-emerald-700 shrink-0" />
-                        <div>
-                          <span className="font-bold">Satellite GPS Confirmed: </span>
-                          <span className="font-mono font-semibold">
-                            {formData.coordinates.lat.toFixed(5)}, {formData.coordinates.lng.toFixed(5)}
-                          </span>
-                          {gpsAccuracy && (
-                            <span className="text-[11px] text-emerald-800 ml-1">
-                              (±{gpsAccuracy}m precision)
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-semibold text-emerald-800 bg-white/80 border border-emerald-200 px-2 py-0.5 rounded self-start sm:self-center">
-                        Coordinates attached for rescue route
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Manual Fallback / Geolocation Notice if GPS unavailable */}
-                  {gpsNotice && (
-                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-950 flex items-start gap-2 animate-fadeIn">
-                      <AlertTriangle size={15} className="text-amber-700 shrink-0 mt-0.5" />
-                      <div className="space-y-0.5">
-                        <p className="font-bold">Manual Location Fallback Active</p>
-                        <p className="text-[11px] text-amber-900 leading-relaxed">{gpsNotice}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Interactive Map */}
+                  {/* Map View */}
                   <div className="rounded-2xl border border-slate-200 overflow-hidden relative shadow-inner bg-slate-100 h-[225px]">
                     {loadError ? (
                       <div className="h-full flex flex-col items-center justify-center p-4 text-center bg-slate-50">
@@ -671,7 +551,7 @@ export default function SOSRequestForm() {
                         options={{
                           disableDefaultUI: true,
                           zoomControl: true,
-                          gestureHandling: 'cooperative',
+                          gestureHandling: "cooperative",
                         }}
                       >
                         {isLocationPinned && formData.coordinates && (
@@ -689,8 +569,8 @@ export default function SOSRequestForm() {
                       </div>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-400 italic">
-                    Tip: You can drag the red map pin or click anywhere on the map to fine-tune your exact building or roof.
+                  <p className="text-[11px] text-slate-400">
+                    Click anywhere on the map or drag the pin to mark your location.
                   </p>
                 </div>
 
