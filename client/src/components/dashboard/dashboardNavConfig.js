@@ -7,6 +7,7 @@ import {
   Bell,
   ClipboardList,
   PlusCircle,
+  UserCheck,
 } from 'lucide-react';
 
 /**
@@ -79,6 +80,12 @@ export const DASHBOARD_NAV_CONFIG = {
       path: '/dashboard/administrator',
       icon: LayoutDashboard,
       description: 'High-level operational metrics across all 5 modules',
+    },
+    {
+      label: 'Volunteer Vetting Queue',
+      path: '/dashboard/administrator?tab=volunteers',
+      icon: UserCheck,
+      description: 'Review Sri Lankan NIC verification & attendance',
     },
     {
       label: 'SOS Incident Feed',

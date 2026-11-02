@@ -158,3 +158,4 @@ export function validateSriLankanNIC(nic) {
 }
 
 export default validateSriLankanNIC;
+

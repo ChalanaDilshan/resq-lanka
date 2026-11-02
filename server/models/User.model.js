@@ -81,6 +81,36 @@ const userSchema = new mongoose.Schema(
         default: false,
       },
     },
+    volunteerStatus: {
+      type: String,
+      enum: {
+        values: ['Pending_Review', 'Verified', 'Flagged', 'Suspended'],
+        message: '{VALUE} is not a valid volunteer status',
+      },
+      default: 'Pending_Review',
+    },
+    volunteerReliability: {
+      tasksCompleted: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      noShows: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      notes: {
+        type: String,
+        trim: true,
+        maxlength: [500, 'Reliability note cannot exceed 500 characters'],
+        default: '',
+      },
+      lastEvaluatedAt: {
+        type: Date,
+        default: null,
+      },
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -122,6 +152,13 @@ userSchema.methods.toSafeObject = function () {
     district: this.district,
     nicNumber: this.nicNumber || null,
     nicDetails: this.nicDetails || null,
+    volunteerStatus: this.volunteerStatus || 'Pending_Review',
+    volunteerReliability: this.volunteerReliability || {
+      tasksCompleted: 0,
+      noShows: 0,
+      notes: '',
+      lastEvaluatedAt: null,
+    },
     isActive: this.isActive,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
