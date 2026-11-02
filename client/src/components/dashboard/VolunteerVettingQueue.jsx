@@ -4,19 +4,16 @@ import {
   Search,
   ShieldCheck,
   AlertTriangle,
-  CheckCircle,
   XCircle,
   Phone,
   Mail,
   MapPin,
   RefreshCw,
   Clock,
-  Filter,
   UserCheck,
   UserX,
   Flag,
   FileText,
-  Calendar,
   Award,
 } from 'lucide-react';
 import {
@@ -155,31 +152,31 @@ export default function VolunteerVettingQueue() {
     switch (status) {
       case 'Verified':
         return {
-          bg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          bg: 'bg-emerald-50 text-emerald-900 border-emerald-300 font-bold',
           icon: ShieldCheck,
           label: 'NIC Verified & Approved',
         };
       case 'Pending_Review':
         return {
-          bg: 'bg-amber-50 text-amber-800 border-amber-200',
+          bg: 'bg-amber-50 text-amber-900 border-amber-300 font-bold',
           icon: Clock,
           label: 'Pending Review',
         };
       case 'Flagged':
         return {
-          bg: 'bg-orange-50 text-orange-800 border-orange-200',
+          bg: 'bg-orange-50 text-orange-950 border-orange-300 font-bold',
           icon: Flag,
           label: 'Flagged / Attendance Risk',
         };
       case 'Suspended':
         return {
-          bg: 'bg-rose-50 text-rose-800 border-rose-200',
+          bg: 'bg-rose-50 text-rose-950 border-rose-300 font-bold',
           icon: XCircle,
           label: 'Suspended Account',
         };
       default:
         return {
-          bg: 'bg-slate-100 text-slate-700 border-slate-200',
+          bg: 'bg-slate-100 text-slate-800 border-slate-300 font-semibold',
           icon: Users,
           label: status || 'Unreviewed',
         };
@@ -187,60 +184,60 @@ export default function VolunteerVettingQueue() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       {/* Telemetry Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider">
               Total Volunteers
             </span>
-            <Users size={16} />
+            <Users size={15} />
           </div>
           <p className="text-2xl font-black text-slate-900">{summary.totalVolunteers}</p>
-          <p className="text-[10px] text-slate-500 mt-1">Registered roster</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">Registered personnel roster</p>
         </div>
 
-        <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between text-amber-700 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-amber-800 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
               Pending Review
             </span>
-            <Clock size={16} />
+            <Clock size={15} />
           </div>
-          <p className="text-2xl font-black text-amber-900">{summary.pendingReview}</p>
-          <p className="text-[10px] text-amber-700 mt-1">Awaiting coordinator verification</p>
+          <p className="text-2xl font-black text-slate-900">{summary.pendingReview}</p>
+          <p className="text-[11px] font-medium text-amber-800 mt-0.5">Awaiting coordinator check</p>
         </div>
 
-        <div className="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between text-emerald-700 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-emerald-800 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
               NIC Verified
             </span>
-            <ShieldCheck size={16} />
+            <ShieldCheck size={15} />
           </div>
-          <p className="text-2xl font-black text-emerald-900">{summary.verifiedCount}</p>
-          <p className="text-[10px] text-emerald-700 mt-1">Authenticated Sri Lankan citizens</p>
+          <p className="text-2xl font-black text-slate-900">{summary.verifiedCount}</p>
+          <p className="text-[11px] font-medium text-emerald-800 mt-0.5">Authenticated citizens</p>
         </div>
 
-        <div className="p-4 bg-rose-50/70 border border-rose-200/80 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between text-rose-700 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-rose-800 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
               Flagged / Suspended
             </span>
-            <Flag size={16} />
+            <Flag size={15} />
           </div>
-          <p className="text-2xl font-black text-rose-900">
+          <p className="text-2xl font-black text-slate-900">
             {summary.flaggedCount + summary.suspendedCount}
           </p>
-          <p className="text-[10px] text-rose-700 mt-1">
+          <p className="text-[11px] font-medium text-rose-800 mt-0.5">
             {summary.flaggedCount} flagged, {summary.suspendedCount} suspended
           </p>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs space-y-3">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Search Box */}
           <div className="relative flex-1">
@@ -250,7 +247,7 @@ export default function VolunteerVettingQueue() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by Volunteer Name, Email, Phone, or Sri Lankan NIC..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
             />
           </div>
 
@@ -259,7 +256,7 @@ export default function VolunteerVettingQueue() {
             <select
               value={districtFilter}
               onChange={(e) => setDistrictFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-slate-900 transition-colors cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-slate-900 transition-colors cursor-pointer"
             >
               {DISTRICT_LIST.map((dist) => (
                 <option key={dist} value={dist}>
@@ -277,7 +274,7 @@ export default function VolunteerVettingQueue() {
               loadVolunteers();
             }}
             disabled={refreshing || loading}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg border border-slate-300 transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
           >
             <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
             <span>{refreshing ? 'Updating...' : 'Refresh'}</span>
@@ -322,7 +319,7 @@ export default function VolunteerVettingQueue() {
                 className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
                   active
                     ? 'bg-slate-900 text-white'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
                 }`}
               >
                 <span>{tab.label}</span>
@@ -344,20 +341,20 @@ export default function VolunteerVettingQueue() {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-900 rounded-xl text-xs flex items-center gap-2">
-          <AlertTriangle size={15} className="text-red-600 shrink-0" />
+        <div className="p-3.5 bg-red-50 border border-red-200 text-red-900 rounded-xl text-xs flex items-center gap-2">
+          <AlertTriangle size={15} className="text-red-700 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Volunteer Directory Listing */}
       {loading ? (
-        <div className="py-12 text-center text-xs text-slate-400 bg-white border border-slate-200 rounded-2xl">
-          <RefreshCw size={20} className="animate-spin mx-auto text-slate-400 mb-2" />
+        <div className="py-12 text-center text-xs text-slate-400 bg-white border border-slate-200 rounded-xl">
+          <RefreshCw size={18} className="animate-spin mx-auto text-slate-400 mb-2" />
           <span>Loading volunteer vetting records...</span>
         </div>
       ) : volunteers.length === 0 ? (
-        <div className="p-8 text-center bg-white border border-slate-200 rounded-2xl space-y-2">
+        <div className="p-8 text-center bg-white border border-slate-200 rounded-xl space-y-2">
           <Users size={28} className="mx-auto text-slate-300" />
           <h4 className="font-bold text-slate-800 text-sm">No Volunteers Matching Filter</h4>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -365,7 +362,7 @@ export default function VolunteerVettingQueue() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {volunteers.map((vol) => {
             const statusConfig = getStatusBadge(vol.volunteerStatus);
             const StatusIcon = statusConfig.icon;
@@ -385,25 +382,25 @@ export default function VolunteerVettingQueue() {
             return (
               <div
                 key={vol._id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs transition hover:border-slate-300 space-y-4"
+                className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs transition hover:border-slate-300 space-y-3.5"
               >
                 {/* Top Row: Name, Status Badge, Application Counts */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <span className="font-black text-slate-900 text-sm sm:text-base">
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">
                       {vol.name}
                     </span>
 
                     {/* Vetting Status Badge */}
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${statusConfig.bg}`}
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] border ${statusConfig.bg}`}
                     >
                       <StatusIcon size={12} />
                       <span>{statusConfig.label}</span>
                     </span>
 
                     {/* Active applied tasks count */}
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
                       {vol.appliedTasksCount || 0} Task Application(s)
                     </span>
                   </div>
@@ -419,20 +416,20 @@ export default function VolunteerVettingQueue() {
                 </div>
 
                 {/* Middle Grid: NIC Demographics vs Contact vs Reliability */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
                   {/* Column 1: Government National Identity Card (NIC) Demographics */}
-                  <div className="p-3 bg-slate-50/70 border border-slate-200/70 rounded-xl space-y-2">
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
                         <Award size={12} className="text-slate-600" />
                         <span>Identity Verification</span>
                       </span>
                       {vol.nicNumber ? (
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-300">
                           {vol.nicDetails?.format || 'VALID'} NIC
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                        <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-300">
                           NIC Missing
                         </span>
                       )}
@@ -446,11 +443,11 @@ export default function VolunteerVettingQueue() {
                         {vol.nicDetails?.isValidated && (
                           <div className="text-[11px] text-slate-600 space-y-0.5">
                             <p>
-                              <span className="font-semibold">Gender: </span>
+                              <span className="font-semibold text-slate-700">Gender: </span>
                               {vol.nicDetails.gender || 'Not specified'}
                             </p>
                             <p>
-                              <span className="font-semibold">Born: </span>
+                              <span className="font-semibold text-slate-700">Born: </span>
                               {vol.nicDetails.dobDisplay || vol.nicDetails.birthYear} (
                               ~{vol.nicDetails.approximateAge} yrs)
                             </p>
@@ -465,7 +462,7 @@ export default function VolunteerVettingQueue() {
                   </div>
 
                   {/* Column 2: Contact Details & Location */}
-                  <div className="p-3 bg-slate-50/70 border border-slate-200/70 rounded-xl space-y-2">
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
                     <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
                       <Phone size={12} className="text-slate-600" />
                       <span>Contact &amp; District</span>
@@ -502,7 +499,7 @@ export default function VolunteerVettingQueue() {
                   </div>
 
                   {/* Column 3: Reliability & Attendance Telemetry */}
-                  <div className="p-3 bg-slate-50/70 border border-slate-200/70 rounded-xl space-y-2">
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase text-slate-500 flex items-center gap-1">
                         <Award size={12} className="text-slate-600" />
@@ -510,12 +507,12 @@ export default function VolunteerVettingQueue() {
                       </span>
                       {reliabilityScore !== null && (
                         <span
-                          className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                          className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
                             reliabilityScore >= 80
-                              ? 'bg-emerald-100 text-emerald-900'
+                              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
                               : reliabilityScore >= 50
-                              ? 'bg-amber-100 text-amber-900'
-                              : 'bg-rose-100 text-rose-900'
+                              ? 'bg-amber-50 text-amber-900 border-amber-300'
+                              : 'bg-rose-50 text-rose-900 border-rose-300'
                           }`}
                         >
                           {reliabilityScore}% Reliability
@@ -524,19 +521,19 @@ export default function VolunteerVettingQueue() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 p-1.5 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
-                        <span className="text-[10px] font-bold text-emerald-800 uppercase block">
+                      <div className="flex-1 p-1 bg-white rounded border border-slate-200 text-center">
+                        <span className="text-[9px] font-bold text-emerald-800 uppercase block">
                           Completed
                         </span>
-                        <span className="text-sm font-black text-emerald-900">
+                        <span className="text-sm font-black text-slate-900">
                           {reliability.tasksCompleted}
                         </span>
                       </div>
-                      <div className="flex-1 p-1.5 bg-rose-50 rounded-lg border border-rose-100 text-center">
-                        <span className="text-[10px] font-bold text-rose-800 uppercase block">
+                      <div className="flex-1 p-1 bg-white rounded border border-slate-200 text-center">
+                        <span className="text-[9px] font-bold text-rose-800 uppercase block">
                           No-Shows
                         </span>
-                        <span className="text-sm font-black text-rose-900">
+                        <span className="text-sm font-black text-slate-900">
                           {reliability.noShows}
                         </span>
                       </div>
@@ -548,7 +545,7 @@ export default function VolunteerVettingQueue() {
                         type="button"
                         onClick={() => handleReliabilityAction(vol._id, 'incrementCompleted')}
                         disabled={isBusy}
-                        className="flex-1 py-1 text-[10px] font-bold bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 hover:border-emerald-300 rounded transition cursor-pointer"
+                        className="flex-1 py-1 text-[10px] font-bold bg-white hover:bg-emerald-50 text-emerald-800 border border-slate-300 rounded transition cursor-pointer"
                         title="Record successfully completed task"
                       >
                         +1 Completed
@@ -557,7 +554,7 @@ export default function VolunteerVettingQueue() {
                         type="button"
                         onClick={() => handleReliabilityAction(vol._id, 'incrementNoShow')}
                         disabled={isBusy}
-                        className="flex-1 py-1 text-[10px] font-bold bg-white hover:bg-rose-50 text-rose-700 border border-slate-200 hover:border-rose-300 rounded transition cursor-pointer"
+                        className="flex-1 py-1 text-[10px] font-bold bg-white hover:bg-rose-50 text-rose-800 border border-slate-300 rounded transition cursor-pointer"
                         title="Record unexcused no-show (auto-flags at 3 absences)"
                       >
                         +1 No-Show
@@ -568,12 +565,12 @@ export default function VolunteerVettingQueue() {
 
                 {/* Coordinator Note Section */}
                 {reliability.notes && !isEditingNote && (
-                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs flex items-start justify-between gap-2">
+                  <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs flex items-start justify-between gap-2">
                     <div className="flex items-start gap-1.5">
                       <FileText size={13} className="text-slate-400 shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-bold text-slate-700">Coordinator Notes: </span>
-                        <span className="text-slate-600">{reliability.notes}</span>
+                        <span className="font-bold text-slate-800">Coordinator Evaluation: </span>
+                        <span className="text-slate-700">{reliability.notes}</span>
                       </div>
                     </div>
                     <button
@@ -591,7 +588,7 @@ export default function VolunteerVettingQueue() {
 
                 {/* Inline Note Editor */}
                 {isEditingNote && (
-                  <div className="p-3 bg-slate-50 border border-slate-300 rounded-xl space-y-2">
+                  <div className="p-3 bg-slate-50 border border-slate-300 rounded-lg space-y-2">
                     <label className="block text-[11px] font-bold text-slate-700">
                       Coordinator Evaluation Note for {vol.name}:
                     </label>
@@ -600,7 +597,7 @@ export default function VolunteerVettingQueue() {
                       value={noteDraft}
                       onChange={(e) => setNoteDraft(e.target.value)}
                       placeholder="e.g. Reliable driver with light truck, punctual during Akkaraipattu dry ration distribution..."
-                      className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-slate-900"
+                      className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-slate-900"
                     />
                     <div className="flex items-center justify-end gap-2 text-xs">
                       <button
@@ -614,7 +611,7 @@ export default function VolunteerVettingQueue() {
                         type="button"
                         onClick={() => handleSaveNote(vol._id)}
                         disabled={isBusy}
-                        className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg cursor-pointer"
+                        className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-md cursor-pointer"
                       >
                         Save Note
                       </button>
@@ -632,7 +629,7 @@ export default function VolunteerVettingQueue() {
                           setEditingNoteFor(vol._id);
                           setNoteDraft('');
                         }}
-                        className="px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition cursor-pointer"
+                        className="px-2 py-1 rounded text-[11px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition cursor-pointer"
                       >
                         + Add Coordinator Note
                       </button>
@@ -646,7 +643,7 @@ export default function VolunteerVettingQueue() {
                         type="button"
                         onClick={() => handleStatusChange(vol._id, 'Verified')}
                         disabled={isBusy}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white font-bold rounded-lg transition shadow-xs cursor-pointer"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white font-bold rounded-md transition shadow-xs cursor-pointer"
                         title="Approve and verify volunteer for relief deployment"
                       >
                         <UserCheck size={13} />
@@ -660,7 +657,7 @@ export default function VolunteerVettingQueue() {
                         type="button"
                         onClick={() => handleStatusChange(vol._id, 'Flagged')}
                         disabled={isBusy}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-orange-50 text-orange-700 border border-orange-200 hover:border-orange-300 font-bold rounded-lg transition cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-orange-50 text-orange-800 border border-orange-300 font-bold rounded-md transition cursor-pointer"
                         title="Flag account for suspicious attendance or coordinator review"
                       >
                         <Flag size={12} />
@@ -674,7 +671,7 @@ export default function VolunteerVettingQueue() {
                         type="button"
                         onClick={() => handleStatusChange(vol._id, 'Suspended')}
                         disabled={isBusy}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 hover:border-rose-300 font-bold rounded-lg transition cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 font-bold rounded-md transition cursor-pointer"
                         title="Suspend volunteer from applying for disaster relief tasks"
                       >
                         <UserX size={12} />
