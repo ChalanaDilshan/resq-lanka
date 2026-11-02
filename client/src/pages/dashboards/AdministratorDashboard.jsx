@@ -26,12 +26,29 @@ import VolunteerVettingQueue from '../../components/dashboard/VolunteerVettingQu
 
 export default function AdministratorDashboard() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tabFromQuery = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(
+    tabFromQuery === 'volunteers' ? 'volunteers' : 'overview'
+  );
+
+  useEffect(() => {
+    if (tabFromQuery === 'volunteers' || tabFromQuery === 'overview') {
+      setActiveTab(tabFromQuery);
+    }
+  }, [tabFromQuery]);
+
+  const handleTabSelect = (tab) => {
+    setActiveTab(tab);
+    setSearchParams(tab === 'volunteers' ? { tab: 'volunteers' } : {});
+  };
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  // Telemetry across the 5 modules
+  // Cross-module telemetry
   const [recentSOS, setRecentSOS] = useState([]);
   const [pendingSOSCount, setPendingSOSCount] = useState(0);
   const [criticalSOSCount, setCriticalSOSCount] = useState(0);
@@ -128,50 +145,50 @@ export default function AdministratorDashboard() {
   const getUrgencyBadge = (urgency) => {
     switch (urgency) {
       case 'Critical':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-50 text-red-900 border-red-300 font-bold';
       case 'High':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-orange-50 text-orange-900 border-orange-300 font-bold';
       case 'Medium':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-amber-50 text-amber-900 border-amber-300 font-semibold';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-50 text-blue-900 border-blue-300 font-semibold';
     }
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Resolved':
-        return 'bg-emerald-100 text-emerald-800';
+        return 'bg-emerald-50 text-emerald-800 border border-emerald-200';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-50 text-blue-800 border border-blue-200';
       case 'Cancelled':
-        return 'bg-slate-100 text-slate-600';
+        return 'bg-slate-100 text-slate-600 border border-slate-200';
       default:
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-amber-50 text-amber-800 border border-amber-200';
     }
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-emerald-200 border border-white/10">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>National Operations Command &bull; Multi-Module Telemetry</span>
+    <div className="space-y-6">
+      {/* Authoritative Civic Operations Command Header */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 text-white shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                National Disaster Operations Center &bull; Live Telemetry
+              </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Ayubowan, {user?.name || 'Administrator'} &bull; Operations Command
-            </h2>
-            <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
-              Consolidated real-time disaster response overview across SOS dispatch, shelter capacities, relief inventory, volunteer tasks, and official notices.
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Operations Command &bull; {user?.name || 'Administrator'}
+            </h1>
+            <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+              Consolidated real-time disaster response overview across SOS dispatch, shelter capacities, relief inventory, volunteer task force, and official bulletins.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -179,417 +196,493 @@ export default function AdministratorDashboard() {
                 setReloadTrigger((v) => v + 1);
               }}
               disabled={refreshing || loading}
-              className="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-2xl border border-white/20 transition flex items-center gap-2 shadow-xs"
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-              <span>{refreshing ? 'Refreshing...' : 'Live Refresh'}</span>
+              <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+              <span>{refreshing ? 'Updating...' : 'Live Refresh'}</span>
             </button>
           </div>
         </div>
 
-        {/* Operational Overview KPI Cards across the 5 Modules */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-6 mt-6 border-t border-white/15">
-          {/* Mod 1: SOS Incidents */}
-          <Link
-            to="/sos-dashboard"
-            className="p-3.5 bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl border border-white/10 transition group text-left"
+        {/* Primary Workspace Navigation Tabs */}
+        <div className="flex flex-wrap items-center gap-2 pt-4">
+          <button
+            type="button"
+            onClick={() => handleTabSelect('overview')}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'overview'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
           >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold uppercase text-red-300">SOS Pending</span>
-              <ShieldAlert size={14} className="text-red-400 group-hover:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black text-white">{pendingSOSCount}</p>
-            <p className="text-[10px] text-red-200 mt-1">{criticalSOSCount} critical urgency</p>
-          </Link>
+            <LayoutDashboard size={14} />
+            <span>Operations Command Overview</span>
+          </button>
 
-          {/* Mod 2: Shelter Capacity */}
-          <Link
-            to="/shelters"
-            className="p-3.5 bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl border border-white/10 transition group text-left"
+          <button
+            type="button"
+            onClick={() => handleTabSelect('volunteers')}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'volunteers'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
           >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold uppercase text-emerald-300">Shelter Vacancy</span>
-              <Building2 size={14} className="text-emerald-400 group-hover:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black text-white">
-              {shelterStats?.availableSpaces ?? '...'}
-            </p>
-            <p className="text-[10px] text-emerald-200 mt-1">
-              {shelterStats?.totalShelters ?? 0} active shelters
-            </p>
-          </Link>
-
-          {/* Mod 3: Supply Requests & Pledges */}
-          <Link
-            to="/coordinator"
-            className="p-3.5 bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl border border-white/10 transition group text-left"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold uppercase text-teal-300">Pledges to Verify</span>
-              <PackageCheck size={14} className="text-teal-400 group-hover:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black text-white">{pendingPledges.length}</p>
-            <p className="text-[10px] text-teal-200 mt-1">
-              {supplyStats?.totalRequests ?? 0} requested items
-            </p>
-          </Link>
-
-          {/* Mod 4: Volunteer Tasks */}
-          <Link
-            to="/tasks"
-            className="p-3.5 bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl border border-white/10 transition group text-left"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold uppercase text-amber-300">Open Tasks</span>
-              <Users size={14} className="text-amber-400 group-hover:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black text-white">{taskStats?.openTasks ?? '...'}</p>
-            <p className="text-[10px] text-amber-200 mt-1">
-              {taskStats?.availableSlots ?? 0} volunteers needed
-            </p>
-          </Link>
-
-          {/* Mod 5: Active Notices */}
-          <Link
-            to="/alerts"
-            className="p-3.5 bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl border border-white/10 transition group text-left col-span-2 md:col-span-1"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold uppercase text-rose-300">Active Alerts</span>
-              <Bell size={14} className="text-rose-400 group-hover:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black text-white">{noticeStats?.totalActive ?? '...'}</p>
-            <p className="text-[10px] text-rose-200 mt-1">
-              {noticeStats?.verifiedOfficialCount ?? 0} official bulletins
-            </p>
-          </Link>
+            <UserCheck size={14} />
+            <span>Volunteer Vetting &amp; Review Queue</span>
+          </button>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs flex items-center justify-between">
+        <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-900 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-amber-600 shrink-0" />
-            <span>{error}</span>
+            <AlertTriangle size={15} className="text-red-700 shrink-0" />
+            <span className="font-medium">{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setReloadTrigger((v) => v + 1)}
-            className="font-bold underline hover:text-amber-900"
+            className="font-bold underline hover:text-red-950 cursor-pointer"
           >
             Retry
           </button>
         </div>
       )}
 
-      {/* Main Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column (2 Cols): SOS Incidents & Supplies Summary */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Module 1: SOS Incidents Recent Feed */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-red-50 text-red-600 rounded-xl border border-red-100">
-                  <ShieldAlert size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    SOS Incident Response Queue
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Incoming community distress calls requiring dispatch or resolution
-                  </p>
-                </div>
+      {/* Main Content Area */}
+      {activeTab === 'volunteers' ? (
+        <VolunteerVettingQueue />
+      ) : (
+        <div className="space-y-6">
+          {/* High-Contrast Operational Metric Row */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {/* Mod 1: SOS Pending */}
+            <Link
+              to="/sos-dashboard"
+              className="p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition group text-left"
+            >
+              <div className="flex items-center justify-between text-slate-500 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-red-700">
+                  SOS Pending
+                </span>
+                <ShieldAlert size={15} className="text-red-600" />
               </div>
-              <Link
-                to="/sos-dashboard"
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
-              >
-                <span>Full Dispatch Console</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
+              <p className="text-2xl font-black text-slate-900">{pendingSOSCount}</p>
+              <p className="text-[11px] font-medium text-red-700 mt-0.5">
+                {criticalSOSCount} critical urgency
+              </p>
+            </Link>
 
-            {loading ? (
-              <div className="py-8 text-center text-xs text-slate-400">Loading incidents...</div>
-            ) : recentSOS.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      <th className="pb-3">Hazard / Ref</th>
-                      <th className="pb-3">Urgency</th>
-                      <th className="pb-3">Location</th>
-                      <th className="pb-3">Contact</th>
-                      <th className="pb-3">Status</th>
-                      <th className="pb-3 text-right">Time</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {recentSOS.map((inc) => (
-                      <tr key={inc._id} className="hover:bg-slate-50 transition">
-                        <td className="py-3 font-bold text-slate-900">
-                          {inc.hazardType}
-                          <span className="block text-[10px] font-medium text-slate-400">
-                            #{inc._id.slice(-6).toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="py-3">
-                          <span
-                            className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${getUrgencyBadge(
-                              inc.urgency
-                            )}`}
-                          >
-                            {inc.urgency}
-                          </span>
-                        </td>
-                        <td className="py-3 text-slate-600 max-w-[200px]">
-                          <div className="truncate">{inc.locationText}</div>
-                          {inc.coordinates?.lat && (
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${inc.coordinates.lat},${inc.coordinates.lng}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[10px] font-bold text-blue-700 hover:underline inline-flex items-center gap-0.5 mt-0.5"
-                            >
-                              <span>Map Route</span>
-                              <ExternalLink size={9} />
-                            </a>
-                          )}
-                        </td>
-                        <td className="py-3 font-mono text-slate-800 text-[11px] whitespace-nowrap">
-                          {inc.contactNumber?.includes('*') ? (
-                            <span className="text-slate-400">{inc.contactNumber}</span>
-                          ) : (
-                            <a href={`tel:${inc.contactNumber}`} className="text-blue-700 font-bold hover:underline flex items-center gap-1">
-                              <Phone size={10} />
-                              <span>{inc.contactNumber}</span>
-                            </a>
-                          )}
-                        </td>
-                        <td className="py-3">
-                          <span
-                            className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${getStatusBadge(
-                              inc.status
-                            )}`}
-                          >
-                            {inc.status}
-                          </span>
-                        </td>
-                        <td className="py-3 text-right text-slate-400 whitespace-nowrap">
-                          {new Date(inc.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {/* Mod 2: Shelter Vacancies */}
+            <Link
+              to="/shelters"
+              className="p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition group text-left"
+            >
+              <div className="flex items-center justify-between text-slate-500 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                  Shelter Vacancy
+                </span>
+                <Building2 size={15} className="text-emerald-700" />
               </div>
-            ) : (
-              <div className="p-6 bg-slate-50 rounded-2xl text-center text-xs text-slate-500">
-                No open emergency incidents in queue.
-              </div>
-            )}
-          </section>
+              <p className="text-2xl font-black text-slate-900">
+                {shelterStats?.availableSpaces ?? '...'}
+              </p>
+              <p className="text-[11px] font-medium text-emerald-700 mt-0.5">
+                {shelterStats?.totalShelters ?? 0} active shelters
+              </p>
+            </Link>
 
-          {/* Module 3: Relief Supplies & Pledges Summary */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-teal-50 text-teal-600 rounded-xl border border-teal-100">
-                  <ClipboardList size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    Relief Inventory &amp; Donor Pledges
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Distinction between pledged aid and physically received stock
-                  </p>
-                </div>
+            {/* Mod 3: Supply Requests & Pledges */}
+            <Link
+              to="/coordinator"
+              className="p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition group text-left"
+            >
+              <div className="flex items-center justify-between text-slate-500 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800">
+                  Pledges to Verify
+                </span>
+                <PackageCheck size={15} className="text-teal-700" />
               </div>
-              <Link
-                to="/coordinator"
-                className="text-xs font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1"
-              >
-                <span>Manage Inventory</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
+              <p className="text-2xl font-black text-slate-900">{pendingPledges.length}</p>
+              <p className="text-[11px] font-medium text-teal-700 mt-0.5">
+                {supplyStats?.totalRequests ?? 0} requested items
+              </p>
+            </Link>
 
-            {supplyStats && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                <div className="p-3 bg-slate-50 border border-slate-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-slate-400">Target Units</p>
-                  <p className="text-lg font-black text-slate-800">{supplyStats.totalTargetUnits}</p>
-                </div>
-                <div className="p-3 bg-amber-50/70 border border-amber-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-amber-700">Pledged Units</p>
-                  <p className="text-lg font-black text-amber-800">{supplyStats.totalPledgedUnits}</p>
-                  <p className="text-[10px] text-amber-600 font-semibold">{supplyStats.percentPledged}% Pledged</p>
-                </div>
-                <div className="p-3 bg-emerald-50/70 border border-emerald-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-emerald-700">Received Stock</p>
-                  <p className="text-lg font-black text-emerald-800">{supplyStats.totalReceivedUnits}</p>
-                  <p className="text-[10px] text-emerald-600 font-semibold">{supplyStats.percentFulfilled}% In Stock</p>
-                </div>
-                <div className="p-3 bg-blue-50/70 border border-blue-200/70 rounded-2xl text-center">
-                  <p className="text-[10px] font-bold uppercase text-blue-700">Pending Review</p>
-                  <p className="text-lg font-black text-blue-800">{pendingPledges.length}</p>
-                </div>
+            {/* Mod 4: Volunteer Tasks */}
+            <Link
+              to="/tasks"
+              className="p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition group text-left"
+            >
+              <div className="flex items-center justify-between text-slate-500 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                  Open Tasks
+                </span>
+                <Users size={15} className="text-amber-700" />
               </div>
-            )}
+              <p className="text-2xl font-black text-slate-900">
+                {taskStats?.openTasks ?? '...'}
+              </p>
+              <p className="text-[11px] font-medium text-amber-700 mt-0.5">
+                {taskStats?.availableSlots ?? 0} volunteers needed
+              </p>
+            </Link>
 
-            {/* Pending Pledges Awaiting Verification */}
-            {pendingPledges.length > 0 ? (
-              <div className="space-y-2">
-                <p className="text-xs font-bold text-slate-700">Pledges Awaiting Verification:</p>
-                {pendingPledges.slice(0, 3).map((p) => (
-                  <div
-                    key={p._id}
-                    className="p-3 bg-slate-50 border border-slate-200/70 rounded-xl flex items-center justify-between text-xs"
-                  >
+            {/* Mod 5: Active Notices */}
+            <Link
+              to="/alerts"
+              className="p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition group text-left col-span-2 md:col-span-1"
+            >
+              <div className="flex items-center justify-between text-slate-500 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
+                  Active Alerts
+                </span>
+                <Bell size={15} className="text-rose-700" />
+              </div>
+              <p className="text-2xl font-black text-slate-900">
+                {noticeStats?.totalActive ?? '...'}
+              </p>
+              <p className="text-[11px] font-medium text-rose-700 mt-0.5">
+                {noticeStats?.verifiedOfficialCount ?? 0} official bulletins
+              </p>
+            </Link>
+          </div>
+
+          {/* Two-Column Operational Detail Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column (2 Cols): SOS Incidents & Supplies Summary */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Module 1: SOS Incidents Recent Feed */}
+              <section className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                      <ShieldAlert size={18} />
+                    </div>
                     <div>
-                      <span className="font-bold text-slate-800">{p.itemName}</span>
-                      <span className="text-[11px] text-slate-500 block">
-                        Donor: {p.donorName} &bull; {p.pledgedQuantity} {p.unit}
+                      <h2 className="text-sm sm:text-base font-bold text-slate-900">
+                        SOS Incident Response Queue
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        Incoming community distress calls requiring dispatch or resolution
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/sos-dashboard"
+                    className="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1"
+                  >
+                    <span>Full Dispatch Console</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
+
+                {loading ? (
+                  <div className="py-8 text-center text-xs text-slate-400">Loading incidents...</div>
+                ) : recentSOS.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          <th className="pb-3">Hazard / Ref</th>
+                          <th className="pb-3">Urgency</th>
+                          <th className="pb-3">Location</th>
+                          <th className="pb-3">Contact</th>
+                          <th className="pb-3">Status</th>
+                          <th className="pb-3 text-right">Time</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {recentSOS.map((inc) => (
+                          <tr key={inc._id} className="hover:bg-slate-50 transition">
+                            <td className="py-3 font-bold text-slate-900">
+                              {inc.hazardType}
+                              <span className="block text-[10px] font-medium text-slate-400">
+                                #{inc._id.slice(-6).toUpperCase()}
+                              </span>
+                            </td>
+                            <td className="py-3">
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded border ${getUrgencyBadge(
+                                  inc.urgency
+                                )}`}
+                              >
+                                {inc.urgency}
+                              </span>
+                            </td>
+                            <td className="py-3 text-slate-600 max-w-[200px]">
+                              <div className="truncate">{inc.locationText}</div>
+                              {inc.coordinates?.lat && (
+                                <a
+                                  href={`https://www.google.com/maps/dir/?api=1&destination=${inc.coordinates.lat},${inc.coordinates.lng}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] font-bold text-blue-700 hover:underline inline-flex items-center gap-0.5 mt-0.5"
+                                >
+                                  <span>Map Route</span>
+                                  <ExternalLink size={9} />
+                                </a>
+                              )}
+                            </td>
+                            <td className="py-3 font-mono text-slate-800 text-[11px] whitespace-nowrap">
+                              {inc.contactNumber?.includes('*') ? (
+                                <span className="text-slate-400">{inc.contactNumber}</span>
+                              ) : (
+                                <a
+                                  href={`tel:${inc.contactNumber}`}
+                                  className="text-blue-700 font-bold hover:underline flex items-center gap-1"
+                                >
+                                  <Phone size={10} />
+                                  <span>{inc.contactNumber}</span>
+                                </a>
+                              )}
+                            </td>
+                            <td className="py-3">
+                              <span
+                                className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${getStatusBadge(
+                                  inc.status
+                                )}`}
+                              >
+                                {inc.status}
+                              </span>
+                            </td>
+                            <td className="py-3 text-right text-slate-400 whitespace-nowrap">
+                              {new Date(inc.createdAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-6 bg-slate-50 rounded-lg text-center text-xs text-slate-500 border border-slate-200">
+                    No open emergency incidents in queue.
+                  </div>
+                )}
+              </section>
+
+              {/* Module 3: Relief Supplies & Pledges Summary */}
+              <section className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-teal-50 text-teal-700 rounded-lg border border-teal-200">
+                      <ClipboardList size={18} />
+                    </div>
+                    <div>
+                      <h2 className="text-sm sm:text-base font-bold text-slate-900">
+                        Relief Inventory &amp; Donor Pledges
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        Distinction between pledged aid and physically received stock
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/coordinator"
+                    className="text-xs font-bold text-teal-800 hover:underline flex items-center gap-1"
+                  >
+                    <span>Manage Inventory</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
+
+                {supplyStats && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                      <p className="text-[10px] font-bold uppercase text-slate-500">Target Units</p>
+                      <p className="text-lg font-black text-slate-900">{supplyStats.totalTargetUnits}</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                      <p className="text-[10px] font-bold uppercase text-amber-800">Pledged Units</p>
+                      <p className="text-lg font-black text-slate-900">{supplyStats.totalPledgedUnits}</p>
+                      <p className="text-[10px] text-amber-800 font-semibold">{supplyStats.percentPledged}% Pledged</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                      <p className="text-[10px] font-bold uppercase text-emerald-800">Received Stock</p>
+                      <p className="text-lg font-black text-slate-900">{supplyStats.totalReceivedUnits}</p>
+                      <p className="text-[10px] text-emerald-800 font-semibold">{supplyStats.percentFulfilled}% In Stock</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                      <p className="text-[10px] font-bold uppercase text-blue-800">Pending Review</p>
+                      <p className="text-lg font-black text-slate-900">{pendingPledges.length}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pending Pledges Awaiting Verification */}
+                {pendingPledges.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold text-slate-700">Pledges Awaiting Verification:</p>
+                    {pendingPledges.slice(0, 3).map((p) => (
+                      <div
+                        key={p._id}
+                        className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs"
+                      >
+                        <div>
+                          <span className="font-bold text-slate-900">{p.itemName}</span>
+                          <span className="text-[11px] text-slate-500 block">
+                            Donor: {p.donorName} &bull; {p.pledgedQuantity} {p.unit}
+                          </span>
+                        </div>
+                        <Link
+                          to="/coordinator"
+                          className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-teal-800 font-bold rounded-md text-xs shadow-2xs"
+                        >
+                          Verify
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">All registered donor pledges are verified.</p>
+                )}
+              </section>
+            </div>
+
+            {/* Right Column: Shelters, Tasks, Notices */}
+            <div className="space-y-6">
+              {/* Module 2: Shelter Capacity Snapshot */}
+              <section className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <Building2 size={16} className="text-blue-700" />
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Shelter Capacity Status
+                    </h3>
+                  </div>
+                  <Link to="/shelters" className="text-xs font-bold text-blue-700 hover:underline">
+                    Shelter Board
+                  </Link>
+                </div>
+
+                {shelterStats && (
+                  <div className="space-y-2">
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold text-slate-800">Total Capacity</p>
+                        <p className="text-[10px] text-slate-500">Across {shelterStats.totalShelters} centers</p>
+                      </div>
+                      <span className="text-base font-black text-slate-900">{shelterStats.totalCapacity}</span>
+                    </div>
+
+                    <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold text-emerald-950">Available Vacancies</p>
+                        <p className="text-[10px] text-emerald-800">Open beds for evacuees</p>
+                      </div>
+                      <span className="text-base font-black text-emerald-900">
+                        {shelterStats.availableSpaces}
                       </span>
                     </div>
-                    <Link
-                      to="/coordinator"
-                      className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-teal-700 font-bold rounded-lg text-xs"
+
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold text-slate-800">Occupancy Rate</p>
+                        <p className="text-[10px] text-slate-500">National shelter load</p>
+                      </div>
+                      <span className="text-base font-black text-slate-900">
+                        {shelterStats.overallOccupancyRate}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* Module 4: Volunteer Operations Snapshot */}
+              <section className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <Users size={16} className="text-amber-700" />
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Volunteer Task Force
+                    </h3>
+                  </div>
+                  <Link
+                    to="/tasks/new"
+                    className="text-xs font-bold text-amber-800 hover:underline flex items-center gap-1"
+                  >
+                    <PlusCircle size={12} />
+                    <span>Post Task</span>
+                  </Link>
+                </div>
+
+                {taskStats && (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                      <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">Total Tasks</p>
+                        <p className="text-base font-black text-slate-900">{taskStats.totalTasks}</p>
+                      </div>
+                      <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p className="text-[10px] text-amber-800 font-bold uppercase">Open Tasks</p>
+                        <p className="text-base font-black text-amber-900">{taskStats.openTasks}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
+                      <span className="text-slate-600">Volunteers Required:</span>
+                      <span className="font-extrabold text-slate-900">{taskStats.totalVolunteersRequired}</span>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
+                      <span className="text-slate-600">Volunteers Assigned:</span>
+                      <span className="font-extrabold text-slate-900">{taskStats.totalVolunteersAssigned}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleTabSelect('volunteers')}
+                      className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition flex items-center justify-center gap-1.5 cursor-pointer mt-1"
                     >
-                      Verify
-                    </Link>
+                      <UserCheck size={13} />
+                      <span>Review Volunteer Vetting Queue</span>
+                    </button>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-slate-500">All registered donor pledges are verified.</p>
-            )}
-          </section>
+                )}
+              </section>
+
+              {/* Module 5: Emergency Notices Snapshot */}
+              <section className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <Bell size={16} className="text-rose-700" />
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Emergency Bulletins
+                    </h3>
+                  </div>
+                  <Link
+                    to="/alerts/new"
+                    className="text-xs font-bold text-rose-800 hover:underline flex items-center gap-1"
+                  >
+                    <PlusCircle size={12} />
+                    <span>Post Alert</span>
+                  </Link>
+                </div>
+
+                {noticeStats && (
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg flex items-center justify-between">
+                      <span className="text-rose-950 font-bold">Critical Severity Alerts:</span>
+                      <span className="font-black text-rose-900 text-sm">{noticeStats.criticalAlerts}</span>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                      <span className="text-slate-600">Districts Under Advisory:</span>
+                      <span className="font-extrabold text-slate-900">{noticeStats.affectedDistrictsCount}</span>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                      <span className="text-slate-600">Verified Official Bulletins:</span>
+                      <span className="font-extrabold text-emerald-800">{noticeStats.verifiedOfficialCount}</span>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
+          </div>
         </div>
-
-        {/* Right Column: Shelters, Tasks, Notices */}
-        <div className="space-y-8">
-          {/* Module 2: Shelter Capacity Snapshot */}
-          <section className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Building2 size={18} className="text-blue-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">Shelter Status Summary</h3>
-              </div>
-              <Link to="/shelters" className="text-xs font-bold text-blue-600 hover:underline">
-                Shelter Board
-              </Link>
-            </div>
-
-            {shelterStats && (
-              <div className="space-y-3">
-                <div className="p-3.5 bg-slate-50 rounded-2xl flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Total Capacity</p>
-                    <p className="text-[11px] text-slate-500">Across {shelterStats.totalShelters} centers</p>
-                  </div>
-                  <span className="text-base font-black text-slate-900">{shelterStats.totalCapacity}</span>
-                </div>
-
-                <div className="p-3.5 bg-emerald-50/70 rounded-2xl flex items-center justify-between border border-emerald-100">
-                  <div>
-                    <p className="text-xs font-bold text-emerald-900">Available Vacancies</p>
-                    <p className="text-[11px] text-emerald-700">Currently open for evacuees</p>
-                  </div>
-                  <span className="text-base font-black text-emerald-800">
-                    {shelterStats.availableSpaces}
-                  </span>
-                </div>
-
-                <div className="p-3.5 bg-slate-50 rounded-2xl flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Occupancy Rate</p>
-                    <p className="text-[11px] text-slate-500">National shelter load</p>
-                  </div>
-                  <span className="text-base font-black text-slate-900">
-                    {shelterStats.overallOccupancyRate}%
-                  </span>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Module 4: Volunteer Tasks Snapshot */}
-          <section className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users size={18} className="text-amber-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">Volunteer Operations</h3>
-              </div>
-              <Link to="/tasks/new" className="text-xs font-bold text-amber-700 hover:underline flex items-center gap-1">
-                <PlusCircle size={13} />
-                <span>Post Task</span>
-              </Link>
-            </div>
-
-            {taskStats && (
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="p-3 bg-slate-50 rounded-xl">
-                    <p className="text-[10px] text-slate-400 font-bold uppercase">Total Tasks</p>
-                    <p className="text-base font-black text-slate-800">{taskStats.totalTasks}</p>
-                  </div>
-                  <div className="p-3 bg-amber-50 rounded-xl">
-                    <p className="text-[10px] text-amber-700 font-bold uppercase">Open Tasks</p>
-                    <p className="text-base font-black text-amber-800">{taskStats.openTasks}</p>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs">
-                  <span className="text-slate-600">Volunteers Required:</span>
-                  <span className="font-extrabold text-slate-800">{taskStats.totalVolunteersRequired}</span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs">
-                  <span className="text-slate-600">Volunteers Assigned:</span>
-                  <span className="font-extrabold text-slate-800">{taskStats.totalVolunteersAssigned}</span>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Module 5: Emergency Notices Snapshot */}
-          <section className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Bell size={18} className="text-rose-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">Emergency Alerts</h3>
-              </div>
-              <Link to="/alerts/new" className="text-xs font-bold text-rose-700 hover:underline flex items-center gap-1">
-                <PlusCircle size={13} />
-                <span>Post Alert</span>
-              </Link>
-            </div>
-
-            {noticeStats && (
-              <div className="space-y-2 text-xs">
-                <div className="p-3 bg-rose-50/70 border border-rose-100 rounded-xl flex items-center justify-between">
-                  <span className="text-rose-900 font-bold">Critical Severity Alerts:</span>
-                  <span className="font-black text-rose-800 text-sm">{noticeStats.criticalAlerts}</span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between">
-                  <span className="text-slate-600">Districts Under Advisory:</span>
-                  <span className="font-extrabold text-slate-800">{noticeStats.affectedDistrictsCount}</span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between">
-                  <span className="text-slate-600">Verified Official Alerts:</span>
-                  <span className="font-extrabold text-emerald-700">{noticeStats.verifiedOfficialCount}</span>
-                </div>
-              </div>
-            )}
-          </section>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
