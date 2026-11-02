@@ -38,6 +38,15 @@ async function seedDatabase() {
         role: 'volunteer',
         phone: '+94 77 123 4567',
         district: 'Ampara District',
+        nicNumber: '198514502341',
+        nicDetails: {
+          format: 'NEW',
+          birthYear: 1985,
+          gender: 'Male',
+          approximateAge: 41,
+          dobDisplay: 'May 25, 1985',
+          isValidated: true,
+        },
       },
       {
         name: 'Kasun Bandara (Citizen)',

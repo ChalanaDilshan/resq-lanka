@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail,
@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Phone,
   MapPin,
+  CreditCard,
   KeyRound,
   ShieldCheck,
   RefreshCw,
@@ -21,6 +22,7 @@ import {
 import ResQLogo from '../../components/shared/ResQLogo';
 import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
 import { useAuth } from '../../context/AuthContext';
+import { validateSriLankanNIC } from '../../utils/nicValidator';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -45,6 +47,13 @@ export default function LoginPage() {
   const [phone, setPhone] = useState('');
   const [district, setDistrict] = useState('Ampara District');
   const [registerRole, setRegisterRole] = useState('citizen');
+  const [nicNumber, setNicNumber] = useState('');
+
+  // Real-time Sri Lankan NIC validation for instant demographic feedback
+  const nicStatus = useMemo(() => {
+    if (!nicNumber || !nicNumber.trim()) return null;
+    return validateSriLankanNIC(nicNumber);
+  }, [nicNumber]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +110,19 @@ export default function LoginPage() {
         }, 500);
       } else {
         // Register mode
+        if (registerRole === 'volunteer') {
+          if (!nicNumber || !nicNumber.trim()) {
+            setErrorMessage('National Identity Card (NIC) number is mandatory for volunteer registration to prevent fake registrations.');
+            setIsLoading(false);
+            return;
+          }
+          if (nicStatus && !nicStatus.isValid) {
+            setErrorMessage(nicStatus.error);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         const registeredUser = await register({
           name,
           email,
@@ -108,6 +130,7 @@ export default function LoginPage() {
           role: registerRole,
           phone,
           district,
+          nicNumber: nicNumber.trim().toUpperCase(),
         });
 
         setSuccessMessage(
@@ -513,6 +536,72 @@ export default function LoginPage() {
                           </button>
                         </div>
                       </div>
+
+                      {/* Sri Lankan National Identity Card (NIC) Field */}
+                      {registerRole === 'volunteer' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="block text-xs font-semibold text-slate-700">
+                              National Identity Card (NIC) <span className="text-red-500">*</span>
+                            </label>
+                            <span className="text-[10px] font-medium text-slate-500">
+                              9 digits + V/X or 12 digits
+                            </span>
+                          </div>
+                          <div className="relative">
+                            <CreditCard size={15} className="absolute left-3 top-2.5 text-slate-400" />
+                            <input
+                              type="text"
+                              required
+                              value={nicNumber}
+                              onChange={(e) => setNicNumber(e.target.value.toUpperCase())}
+                              placeholder="e.g. 942501234V or 199514501234"
+                              maxLength={12}
+                              className={`w-full pl-9 pr-8 py-2 bg-slate-50 border rounded-lg text-xs sm:text-sm font-mono text-slate-900 focus:outline-none transition-colors ${
+                                nicStatus
+                                  ? nicStatus.isValid
+                                    ? 'border-emerald-500 bg-emerald-50/20 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600'
+                                    : 'border-amber-400 bg-amber-50/20 focus:border-amber-500'
+                                  : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                              }`}
+                            />
+                            {nicStatus?.isValid && (
+                              <CheckCircle2
+                                size={15}
+                                className="absolute right-3 top-2.5 text-emerald-600"
+                              />
+                            )}
+                          </div>
+
+                          {/* Real-time demographic verification pill */}
+                          {nicStatus && (
+                            <div
+                              className={`mt-1.5 px-2.5 py-1.5 rounded-lg text-[11px] flex items-start gap-1.5 animate-fadeIn ${
+                                nicStatus.isValid
+                                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-950'
+                                  : 'bg-amber-50 border border-amber-200 text-amber-950'
+                              }`}
+                            >
+                              {nicStatus.isValid ? (
+                                <>
+                                  <ShieldCheck size={13} className="text-emerald-700 shrink-0 mt-0.5" />
+                                  <div className="leading-tight">
+                                    <span className="font-bold">Verified Citizen: </span>
+                                    <span>{nicStatus.gender}, Born {nicStatus.dobDisplay} (~{nicStatus.approximateAge} yrs)</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <AlertCircle size={13} className="text-amber-700 shrink-0 mt-0.5" />
+                                  <div className="leading-tight">
+                                    <span>{nicStatus.error}</span>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
 

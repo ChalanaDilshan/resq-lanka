@@ -13,7 +13,8 @@
     "test:shelters": "node scripts/testShelterInvariants.js",
     "test:tasks": "node scripts/testTaskInvariants.js",
     "test:notices": "node scripts/testNoticeInvariants.js",
-    "test": "node scripts/testSOSInvariants.js && node scripts/testSupplyInvariants.js && node scripts/testShelterInvariants.js && node scripts/testTaskInvariants.js && node scripts/testNoticeInvariants.js"
+    "test": "node scripts/testSOSInvariants.js && node scripts/testSupplyInvariants.js && node scripts/testShelterInvariants.js && node scripts/testTaskInvariants.js && node scripts/testNoticeInvariants.js && node scripts/testUserNICInvariants.js",
+    "test:nic": "node scripts/testUserNICInvariants.js"
   },
   "keywords": [],
   "author": "",

@@ -44,6 +44,43 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: 'Ampara District',
     },
+    nicNumber: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      unique: true,
+      sparse: true, // Only indexes documents with a defined nicNumber, allowing optional citizen registration
+      index: true,
+      default: undefined,
+    },
+    nicDetails: {
+      format: {
+        type: String,
+        enum: ['OLD', 'NEW', null],
+        default: null,
+      },
+      birthYear: {
+        type: Number,
+        default: null,
+      },
+      gender: {
+        type: String,
+        enum: ['Male', 'Female', null],
+        default: null,
+      },
+      approximateAge: {
+        type: Number,
+        default: null,
+      },
+      dobDisplay: {
+        type: String,
+        default: null,
+      },
+      isValidated: {
+        type: Boolean,
+        default: false,
+      },
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -83,6 +120,8 @@ userSchema.methods.toSafeObject = function () {
     role: this.role,
     phone: this.phone,
     district: this.district,
+    nicNumber: this.nicNumber || null,
+    nicDetails: this.nicDetails || null,
     isActive: this.isActive,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
