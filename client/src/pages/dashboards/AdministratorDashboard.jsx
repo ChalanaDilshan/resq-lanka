@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   ShieldAlert,
   Building2,
@@ -18,6 +18,7 @@ import { fetchShelterStats } from '../../services/shelterService';
 import { fetchSupplyStats, fetchAllPledges } from '../../services/supplyService';
 import { getTaskStats } from '../../services/taskService';
 import { getNoticeStats } from '../../services/noticeService';
+import VolunteerVettingQueue from '../../components/dashboard/VolunteerVettingQueue';
 
 export default function AdministratorDashboard() {
   const { user } = useAuth();

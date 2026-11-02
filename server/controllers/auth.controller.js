@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
 import { generateOtp, sendOtpEmail } from '../services/emailService.js';
+import { validateSriLankanNIC } from '../services/nicValidator.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'resq_lanka_secure_dev_jwt_secret_key_2026_swt';
 const JWT_EXPIRES_IN = '7d';
@@ -29,7 +30,7 @@ const generateTempToken = (userId, email) => {
  */
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role = 'citizen', phone, district } = req.body;
+    const { name, email, password, role = 'citizen', phone, district, nicNumber } = req.body;
 
     // Validation
     if (!name || !name.trim()) {

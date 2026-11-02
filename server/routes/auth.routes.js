@@ -7,7 +7,12 @@ import {
   getMe,
   logout,
 } from '../controllers/auth.controller.js';
-import { authenticate } from '../middleware/auth.middleware.js';
+import {
+  getVolunteers,
+  updateVolunteerStatus,
+  updateVolunteerReliability,
+} from '../controllers/volunteerAdmin.controller.js';
+import { authenticate, requireRole } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -20,5 +25,25 @@ router.post('/logout', logout);
 
 // Protected routes
 router.get('/me', authenticate, getMe);
+
+// Administrator / Coordinator Volunteer Vetting & Review Queue
+router.get(
+  '/volunteers',
+  authenticate,
+  requireRole('administrator', 'coordinator'),
+  getVolunteers
+);
+router.patch(
+  '/volunteers/:id/status',
+  authenticate,
+  requireRole('administrator', 'coordinator'),
+  updateVolunteerStatus
+);
+router.patch(
+  '/volunteers/:id/reliability',
+  authenticate,
+  requireRole('administrator', 'coordinator'),
+  updateVolunteerReliability
+);
 
 export default router;

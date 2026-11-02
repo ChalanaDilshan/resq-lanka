@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Loader2,
   Check,
+  ShieldCheck,
   X,
 } from 'lucide-react';
 import TaskStatusBadge from './TaskStatusBadge';
@@ -118,11 +119,17 @@ export default function TaskApplicantRoster({
               >
                 {/* Volunteer profile summary */}
                 <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold text-slate-900 text-sm">
                       {app.volunteer?.name || 'Registered Volunteer'}
                     </span>
                     <TaskStatusBadge status={app.status} type="application" />
+                    {app.volunteer?.nicNumber && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <ShieldCheck size={11} className="text-emerald-700" />
+                        <span>NIC: {app.volunteer.nicNumber}</span>
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
@@ -142,6 +149,11 @@ export default function TaskApplicantRoster({
                       <span className="flex items-center gap-1">
                         <MapPin size={12} className="text-slate-400" />
                         <span>{app.volunteer.district}</span>
+                      </span>
+                    )}
+                    {app.volunteer?.nicDetails?.dobDisplay && (
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        • {app.volunteer.nicDetails.gender}, Born {app.volunteer.nicDetails.dobDisplay} (~{app.volunteer.nicDetails.approximateAge}y)
                       </span>
                     )}
                   </div>

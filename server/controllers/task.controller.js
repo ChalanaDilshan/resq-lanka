@@ -293,7 +293,7 @@ export const getTaskById = async (req, res) => {
       // If user is administrator or coordinator, allow viewing applicant roster
       if (['administrator', 'coordinator'].includes(req.user.role)) {
         applications = await TaskApplication.find({ task: task._id })
-          .populate('volunteer', 'name email phone district')
+          .populate('volunteer', 'name email phone district nicNumber nicDetails')
           .populate('reviewedBy', 'name email')
           .sort({ createdAt: -1 });
       }
@@ -712,7 +712,7 @@ export const getTaskApplications = async (req, res) => {
     }
 
     const applications = await TaskApplication.find({ task: id })
-      .populate('volunteer', 'name email phone district')
+      .populate('volunteer', 'name email phone district nicNumber nicDetails')
       .populate('reviewedBy', 'name email')
       .sort({ createdAt: -1 });
 
