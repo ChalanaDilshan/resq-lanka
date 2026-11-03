@@ -1,17 +1,17 @@
-# ResQ-Lanka — Community Disaster Response & Relief Coordination System
+# ResQ-Lanka - Community Disaster Response & Relief Coordination System
 
 **Academic Context:** SWT22022 Practical for Internet Application Development (Group J, SEUSL)
 **Stack:** React 19 + Vite (Frontend) | Node.js + Express 5 + MongoDB (Backend)
 
 ---
 
-## 📌 Project Overview
+##  Project Overview
 
 **ResQ-Lanka** is an end-to-end community disaster response and relief coordination system designed for natural disasters and humanitarian crises in Sri Lanka (e.g., floods, landslides, and extreme weather events). The platform provides centralized incident reporting, real-time safe shelter directory tracking, verified relief donation coordination, structured volunteer task allocation, and official emergency bulletins.
 
 ---
 
-## 👥 Module Ownership & Team Accountability
+##  Module Ownership & Team Accountability
 
 | Module | Scope / Domain | Owner & Registration No. |
 | :--- | :--- | :--- |
@@ -24,7 +24,7 @@
 
 ---
 
-## 🏗️ Repository Architecture
+##  Repository Architecture
 
 ```text
 resq-lanka/
@@ -52,7 +52,7 @@ resq-lanka/
 
 ---
 
-## ⚡ Quickstart Guide
+##  Quickstart Guide
 
 ### 1. Prerequisites
 * **Node.js** v18+ or v20+
@@ -107,7 +107,7 @@ npm run dev:client
 
 ---
 
-## 🔑 Demo Login Credentials
+##  Demo Login Credentials
 
 | Role | Email | Password | Scope |
 | :--- | :--- | :--- | :--- |
@@ -117,7 +117,7 @@ npm run dev:client
 
 ---
 
-## 🧪 Automated Invariant Tests
+##  Automated Invariant Tests
 
 All core modules include automated invariant testing:
 ```bash
