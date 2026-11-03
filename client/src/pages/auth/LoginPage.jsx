@@ -102,7 +102,7 @@ export default function LoginPage() {
           const redirect =
             location.state?.from?.pathname ||
             (loggedInUser.role === 'administrator' || loggedUserIsAdmin(loggedInUser)
-              ? '/coordinator'
+              ? '/dashboard/administrator'
               : loggedInUser.role === 'volunteer'
               ? '/supplies'
               : '/sos');
@@ -179,7 +179,7 @@ export default function LoginPage() {
           verifiedUser.role === 'administrator' ||
           loggedUserIsAdmin(verifiedUser)
         ) {
-          navigate('/coordinator');
+          navigate('/dashboard/administrator');
         } else if (verifiedUser.role === 'volunteer') {
           navigate('/supplies');
         } else {
