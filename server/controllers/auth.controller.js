@@ -72,6 +72,57 @@ export const register = async (req, res) => {
       });
     }
 
+    // Sri Lankan NIC Validation & Governance
+    let cleanNIC = undefined;
+    let nicDetails = {
+      format: null,
+      birthYear: null,
+      gender: null,
+      approximateAge: null,
+      dobDisplay: null,
+      isValidated: false,
+    };
+
+    if (requestedRole === 'volunteer') {
+      if (!nicNumber || !nicNumber.trim()) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'National Identity Card (NIC) number is mandatory for volunteer registration to prevent fraudulent accounts.',
+        });
+      }
+    }
+
+    if (nicNumber && nicNumber.trim()) {
+      const nicValidation = validateSriLankanNIC(nicNumber);
+      if (!nicValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: nicValidation.error || 'Invalid Sri Lankan National Identity Card (NIC) number.',
+        });
+      }
+
+      cleanNIC = nicValidation.cleanNIC;
+
+      // Enforce NIC Uniqueness in Database
+      const existingNicUser = await User.findOne({ nicNumber: cleanNIC });
+      if (existingNicUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'An account with this National Identity Card (NIC) number already exists.',
+        });
+      }
+
+      nicDetails = {
+        format: nicValidation.format,
+        birthYear: nicValidation.birthYear,
+        gender: nicValidation.gender,
+        approximateAge: nicValidation.approximateAge,
+        dobDisplay: nicValidation.dobDisplay,
+        isValidated: true,
+      };
+    }
+
     // Create user
     const newUser = await User.create({
       name: name.trim(),
@@ -80,6 +131,9 @@ export const register = async (req, res) => {
       role: requestedRole,
       phone: phone ? phone.trim() : '',
       district: district ? district.trim() : 'Ampara District',
+      nicNumber: cleanNIC,
+      nicDetails,
+      volunteerStatus: requestedRole === 'volunteer' ? 'Pending_Review' : undefined,
     });
 
     const token = generateToken(newUser._id, newUser.role);
