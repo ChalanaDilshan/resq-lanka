@@ -268,7 +268,7 @@ export default function AdministratorDashboard() {
                 </span>
                 <ShieldAlert size={15} className="text-red-600" />
               </div>
-              <p className="text-2xl font-black text-slate-900">{pendingSOSCount}</p>
+              <p className="text-2xl font-black text-slate-900 tabular-nums font-mono">{pendingSOSCount}</p>
               <p className="text-[11px] font-medium text-red-700 mt-0.5">
                 {criticalSOSCount} critical urgency
               </p>
@@ -285,7 +285,7 @@ export default function AdministratorDashboard() {
                 </span>
                 <Building2 size={15} className="text-emerald-700" />
               </div>
-              <p className="text-2xl font-black text-slate-900">
+              <p className="text-2xl font-black text-slate-900 tabular-nums font-mono">
                 {shelterStats?.availableSpaces ?? '...'}
               </p>
               <p className="text-[11px] font-medium text-emerald-700 mt-0.5">
@@ -304,7 +304,7 @@ export default function AdministratorDashboard() {
                 </span>
                 <PackageCheck size={15} className="text-teal-700" />
               </div>
-              <p className="text-2xl font-black text-slate-900">{pendingPledges.length}</p>
+              <p className="text-2xl font-black text-slate-900 tabular-nums font-mono">{pendingPledges.length}</p>
               <p className="text-[11px] font-medium text-teal-700 mt-0.5">
                 {supplyStats?.totalRequests ?? 0} requested items
               </p>
@@ -321,7 +321,7 @@ export default function AdministratorDashboard() {
                 </span>
                 <Users size={15} className="text-amber-700" />
               </div>
-              <p className="text-2xl font-black text-slate-900">
+              <p className="text-2xl font-black text-slate-900 tabular-nums font-mono">
                 {taskStats?.openTasks ?? '...'}
               </p>
               <p className="text-[11px] font-medium text-amber-700 mt-0.5">
@@ -340,7 +340,7 @@ export default function AdministratorDashboard() {
                 </span>
                 <Bell size={15} className="text-rose-700" />
               </div>
-              <p className="text-2xl font-black text-slate-900">
+              <p className="text-2xl font-black text-slate-900 tabular-nums font-mono">
                 {noticeStats?.totalActive ?? '...'}
               </p>
               <p className="text-[11px] font-medium text-rose-700 mt-0.5">
@@ -498,12 +498,12 @@ export default function AdministratorDashboard() {
                     </div>
                     <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
                       <p className="text-[10px] font-bold uppercase text-amber-800">Pledged Units</p>
-                      <p className="text-lg font-black text-slate-900">{supplyStats.totalPledgedUnits}</p>
+                      <p className="text-lg font-black text-slate-900 tabular-nums font-mono">{supplyStats.totalPledgedUnits}</p>
                       <p className="text-[10px] text-amber-800 font-semibold">{supplyStats.percentPledged}% Pledged</p>
                     </div>
                     <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
                       <p className="text-[10px] font-bold uppercase text-emerald-800">Received Stock</p>
-                      <p className="text-lg font-black text-slate-900">{supplyStats.totalReceivedUnits}</p>
+                      <p className="text-lg font-black text-slate-900 tabular-nums font-mono">{supplyStats.totalReceivedUnits}</p>
                       <p className="text-[10px] text-emerald-800 font-semibold">{supplyStats.percentFulfilled}% In Stock</p>
                     </div>
                     <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
@@ -566,7 +566,7 @@ export default function AdministratorDashboard() {
                         <p className="font-bold text-slate-800">Total Capacity</p>
                         <p className="text-[10px] text-slate-500">Across {shelterStats.totalShelters} centers</p>
                       </div>
-                      <span className="text-base font-black text-slate-900">{shelterStats.totalCapacity}</span>
+                      <span className="text-base font-black text-slate-900 tabular-nums font-mono">{shelterStats.totalCapacity}</span>
                     </div>
 
                     <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 flex items-center justify-between text-xs">

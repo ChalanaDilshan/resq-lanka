@@ -19,6 +19,7 @@ import {
   HeartHandshake,
 } from 'lucide-react';
 import ResQLogo from './ResQLogo';
+import NationalEmergencyBar from './NationalEmergencyBar';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar() {
@@ -94,7 +95,9 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 ios-glass border-b border-slate-200/70 shadow-xs transition-all">
+      <header className="sticky top-0 z-50 transition-all">
+        <NationalEmergencyBar />
+        <div className="ios-glass border-b border-slate-200/70 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center group py-1.5 ios-press" onClick={closeMobileMenu}>
             <ResQLogo />
@@ -151,28 +154,31 @@ export default function Navbar() {
                   type="button"
                   onClick={() => setUserDropdownOpen((open) => !open)}
                   aria-expanded={userDropdownOpen}
-                  className="flex items-center gap-2 pl-2 pr-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition ios-press"
+                  className="flex items-center gap-2.5 pl-1.5 pr-3 py-1 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-full transition shadow-xs ios-press group"
                 >
-                  <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs ${
-                      activeRole === 'coordinator' || activeRole === 'administrator'
-                        ? 'bg-emerald-600 text-white'
-                        : activeRole === 'volunteer'
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-blue-600 text-white'
-                    }`}
-                  >
-                    {(user?.name || activeRole || 'U').charAt(0).toUpperCase()}
+                  <div className="relative">
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
+                        activeRole === 'coordinator' || activeRole === 'administrator'
+                          ? 'bg-emerald-600 text-white'
+                          : activeRole === 'volunteer'
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-blue-600 text-white'
+                      }`}
+                    >
+                      {(user?.name || activeRole || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
                   </div>
                   <div className="text-left text-xs">
                     <div className="font-bold text-slate-800 leading-tight truncate max-w-[110px]">
                       {user?.name || 'User'}
                     </div>
-                    <div className="text-[10px] font-semibold text-slate-400 capitalize">
-                      {activeRole === 'administrator' ? 'Admin' : activeRole}
+                    <div className="text-[10px] font-medium text-slate-500 capitalize flex items-center gap-1">
+                      <span>{activeRole === 'administrator' ? 'System Admin' : activeRole}</span>
                     </div>
                   </div>
-                  <ChevronDown size={14} className="text-slate-400" />
+                  <ChevronDown size={13} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
                 </button>
 
                 {userDropdownOpen && (
@@ -325,9 +331,11 @@ export default function Navbar() {
           </div>
         </div>
 
+        </div>
+
         {/* Mobile Grouped Inset Menu Drawer */}
         {mobileMenuOpen && (
-          <div className="sm:hidden fixed inset-x-0 top-16 z-50 ios-glass border-b border-slate-200/80 px-4 pt-3 pb-6 shadow-2xl animate-ios-sheet">
+          <div className="sm:hidden absolute top-full inset-x-0 z-50 ios-glass border-b border-slate-200/80 px-4 pt-3 pb-6 shadow-2xl animate-ios-sheet">
             <div className="bg-slate-50/90 rounded-2xl border border-slate-200/80 p-1.5 space-y-0.5 mb-3 shadow-xs">
               {navLinks.map((link) => {
                 const IconComponent = link.icon;
