@@ -198,3 +198,138 @@
 .delay-3 { animation-delay: 180ms; }
 .delay-4 { animation-delay: 240ms; }
 .delay-5 { animation-delay: 300ms; }
+
+
+/* =========================================================================
+   NATIVE iOS FEEL & MOBILE-FRIENDLY UTILITIES
+   ========================================================================= */
+
+:root {
+  --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ios-spring: cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+  overscroll-behavior-y: none;
+}
+
+/* Safe area insets padding for notched iPhones & Dynamic Island */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+.bottom-safe {
+  bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* iOS Spring & Bottom Sheet Animations */
+@keyframes iosSheet {
+  from {
+    opacity: 0.6;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes iosScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes iosFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-ios-sheet {
+  animation: iosSheet 0.38s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-ios-scale {
+  animation: iosScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-ios-fade {
+  animation: iosFadeIn 0.22s ease-out forwards;
+}
+
+/* Tactile iOS Press Effects */
+.ios-press {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
+  user-select: none;
+}
+.ios-press:active {
+  transform: scale(0.96);
+  opacity: 0.88;
+}
+
+.ios-press-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+}
+.ios-press-card:active {
+  transform: scale(0.982);
+}
+
+/* Apple Frosted Glass Materials */
+.ios-glass {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.ios-glass-dark {
+  background-color: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* iOS Segmented / Pill Switch Controls */
+.ios-segmented-btn {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 9999px;
+  user-select: none;
+}
+.ios-segmented-btn:active {
+  transform: scale(0.95);
+}
+
+/* Prevent unwanted Safari auto-zoom on mobile inputs while maintaining readability */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

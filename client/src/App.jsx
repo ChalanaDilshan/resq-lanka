@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/shared/Navbar';
+import MobileTabBar from './components/shared/MobileTabBar';
 
 import HomePage from './pages/home/HomePage';
 import AboutPage from './pages/about/AboutPage';
@@ -34,7 +35,7 @@ function App() {
         <div className="min-h-screen bg-[#f8fafc] flex flex-col text-slate-800 antialiased selection:bg-red-500 selection:text-white">
           <Navbar />
 
-          <main className="flex-grow flex flex-col">
+          <main className="flex-grow flex flex-col pb-20 sm:pb-0">
             <Routes>
               {/* Home & General */}
               <Route path="/" element={<HomePage />} />
@@ -131,6 +132,9 @@ function App() {
               <Route path="*" element={<HomePage />} />
             </Routes>
           </main>
+
+          {/* Native iOS Bottom Tab Bar on Mobile */}
+          <MobileTabBar />
         </div>
       </AuthProvider>
     </Router>
