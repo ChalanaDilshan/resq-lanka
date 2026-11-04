@@ -1249,9 +1249,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
             <p>© 2026 ResQ-Lanka. Together for a Safer Sri Lanka. All Rights Reserved.</p>
-            <p className="text-[11px] text-slate-500">Built with React 19, Tailwind CSS & Vite</p>
           </div>
         </div>
       </footer>
