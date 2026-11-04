@@ -283,7 +283,7 @@ export default function HomePage() {
           Dynamic hover lift, shadow glow, and staggered entry
          ========================================================================= */}
       <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {/* Card 1: Report Emergency */}
           <Link
             to="/sos"
@@ -1262,8 +1262,9 @@ export default function HomePage() {
 
       {/* Shelter Detail Modal */}
       {selectedShelter && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden relative animate-modal-pop">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-md animate-ios-fade">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 w-full max-w-lg overflow-hidden relative max-h-[90vh] overflow-y-auto animate-ios-sheet sm:animate-modal-pop">
+            <div className="w-10 h-1 bg-white/60 rounded-full mx-auto my-2.5 sm:hidden absolute top-0 left-0 right-0 z-20 pointer-events-none" />
             <button
               type="button"
               onClick={() => setSelectedShelter(null)}
@@ -1425,8 +1426,9 @@ export default function HomePage() {
 
       {/* Emergency Alert Detail Modal */}
       {selectedAlert && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg p-6 relative animate-modal-pop">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-md animate-ios-fade">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 w-full max-w-lg p-5 sm:p-6 relative max-h-[88vh] overflow-y-auto animate-ios-sheet sm:animate-modal-pop">
+            <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3 sm:hidden" />
             <button
               type="button"
               onClick={() => setSelectedAlert(null)}
@@ -1499,8 +1501,9 @@ export default function HomePage() {
 
       {/* Support with Donations Modal */}
       {donationModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg p-6 relative animate-modal-pop">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-md animate-ios-fade">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 w-full max-w-lg p-5 sm:p-6 relative max-h-[88vh] overflow-y-auto animate-ios-sheet sm:animate-modal-pop">
+            <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3 sm:hidden" />
             <button
               type="button"
               onClick={() => setDonationModalOpen(false)}
@@ -1568,8 +1571,9 @@ export default function HomePage() {
 
       {/* Volunteer Registration Modal */}
       {volunteerModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg p-6 relative animate-modal-pop">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-md animate-ios-fade">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-t sm:border border-slate-200 w-full max-w-lg p-5 sm:p-6 relative max-h-[88vh] overflow-y-auto animate-ios-sheet sm:animate-modal-pop">
+            <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3 sm:hidden" />
             <button
               type="button"
               onClick={() => setVolunteerModalOpen(false)}
