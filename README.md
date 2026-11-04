@@ -1,4 +1,4 @@
-# ResQ-Lanka — Community Disaster Response & Relief Coordination System
+# ResQ-Lanka - Community Disaster Response & Relief Coordination System
 
 **Academic Context:** SWT22022 Practical for Internet Application Development (Group J, SEUSL)
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 🏗️ Project Overview
+##  Project Overview
 
 **ResQ-Lanka** is an end-to-end community disaster response and relief coordination system designed for natural disasters and humanitarian crises in Sri Lanka (e.g., floods, landslides, and extreme weather events).
 
@@ -55,7 +55,7 @@ resq-lanka/
 
 ---
 
-## ⚡ Quickstart Guide
+##  Quickstart Guide
 
 ### 1. Prerequisites
 
@@ -119,7 +119,7 @@ npm run dev:client
 
 ---
 
-## 🔑 Demo Login Credentials
+##  Demo Login Credentials
 
 | Role | Email | Password | Scope |
 | :--- | :--- | :--- | :--- |
@@ -129,7 +129,7 @@ npm run dev:client
 
 ---
 
-## 🧪 Automated Invariant Tests
+##  Automated Invariant Tests
 
 All five core modules include automated invariant testing.
 
