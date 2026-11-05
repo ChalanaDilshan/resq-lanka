@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { getToken } from './authService';
+import { API_AUTH_URL } from './apiConfig';
 
-const AUTH_API_URL =
-  import.meta.env.VITE_API_AUTH_URL || 'http://localhost:5000/api/auth';
+const AUTH_API_URL = API_AUTH_URL;
 
 const getAuthHeaders = () => {
   const token = getToken();

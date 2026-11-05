@@ -3,7 +3,9 @@ import shelterAmpara from '../assets/shelter_ampara.jpg';
 import shelterAkkaraipattu from '../assets/shelter_akkaraipattu.jpg';
 import shelterKalmunai from '../assets/shelter_kalmunai.jpg';
 
-const API_BASE_URL = import.meta.env.VITE_API_SHELTER_URL || 'http://localhost:5000/api/shelters';
+import { API_SHELTER_URL } from './apiConfig';
+
+const API_BASE_URL = API_SHELTER_URL;
 const STORAGE_KEY = 'resq_shelters_directory_data_v2';
 
 // Baseline verified shelters categorized by hazard type

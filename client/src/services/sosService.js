@@ -1,14 +1,7 @@
 import axios from 'axios';
+import { API_SOS_URL } from './apiConfig';
 
-const getSOSBaseUrl = () => {
-  if (import.meta.env.VITE_API_SOS_URL) {
-    return import.meta.env.VITE_API_SOS_URL;
-  }
-  const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-  return base.endsWith('/sos') ? base : `${base}/sos`;
-};
-
-const API_BASE_URL = getSOSBaseUrl();
+const API_BASE_URL = API_SOS_URL;
 
 const TOKEN_KEY = 'resq_jwt_token';
 
