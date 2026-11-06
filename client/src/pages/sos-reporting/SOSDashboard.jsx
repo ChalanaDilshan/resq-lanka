@@ -17,6 +17,8 @@ import {
   Phone,
   ShieldCheck,
   Lock,
+  ExternalLink,
+  MapPin,
 } from 'lucide-react';
 import { fetchSOSRequests, updateSOSStatus } from '../../services/sosService';
 import { formatTimeAgo } from '../../utils/timeAgo';
