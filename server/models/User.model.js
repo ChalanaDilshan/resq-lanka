@@ -115,6 +115,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     otpCode: {
       type: String,
       select: false,
@@ -160,6 +164,7 @@ userSchema.methods.toSafeObject = function () {
       lastEvaluatedAt: null,
     },
     isActive: this.isActive,
+    isEmailVerified: this.isEmailVerified ?? false,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
   };

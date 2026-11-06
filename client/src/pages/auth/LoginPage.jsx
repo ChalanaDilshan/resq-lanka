@@ -123,7 +123,7 @@ export default function LoginPage() {
           }
         }
 
-        const registeredUser = await register({
+        const registerResponse = await register({
           name,
           email,
           password,
@@ -133,6 +133,18 @@ export default function LoginPage() {
           nicNumber: nicNumber.trim().toUpperCase(),
         });
 
+        // If backend requires 2FA OTP verification for newly registered account
+        if (registerResponse?.requiresOtp) {
+          setTempToken(registerResponse.tempToken);
+          setOtpStep(true);
+          setResendCooldown(60);
+          setSuccessMessage(
+            `Account created! A 6-digit verification code has been dispatched to ${registerResponse.email || email}.`
+          );
+          return;
+        }
+
+        const registeredUser = registerResponse.user || registerResponse;
         setSuccessMessage(
           `Account created successfully. Welcome, ${registeredUser.name}.`
         );
@@ -169,7 +181,11 @@ export default function LoginPage() {
 
     try {
       const verifiedUser = await verifyOtp(tempToken, otpCode.trim());
-      setSuccessMessage(`Verified. Welcome back, ${verifiedUser.name}.`);
+      setSuccessMessage(
+        mode === 'register'
+          ? `Account successfully verified and activated! Welcome, ${verifiedUser.name}.`
+          : `Verified. Welcome back, ${verifiedUser.name}.`
+      );
 
       setTimeout(() => {
         const target = location.state?.from?.pathname;
@@ -413,7 +429,9 @@ export default function LoginPage() {
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-center space-y-1">
                   <KeyRound size={20} className="mx-auto text-slate-700" />
-                  <h3 className="font-bold text-slate-900 text-xs">Two-Factor Authentication PIN</h3>
+                  <h3 className="font-bold text-slate-900 text-xs">
+                    {mode === 'register' ? 'Account Activation PIN' : 'Two-Factor Authentication PIN'}
+                  </h3>
                   <p className="text-xs text-slate-600">
                     A 6-digit security code was dispatched to:
                   </p>

@@ -131,6 +131,9 @@ export function AuthProvider({ children }) {
    */
   const register = async (userData) => {
     const result = await registerUser(userData);
+    if (result.requiresOtp) {
+      return result;
+    }
     if (result.user) {
       setUser(result.user);
       return result.user;

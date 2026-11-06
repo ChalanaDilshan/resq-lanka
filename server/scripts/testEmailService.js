@@ -115,6 +115,25 @@ await test('7. sendWelcomeEmail handles simulation mode cleanly without throwing
   }
 });
 
+await test('8. sendOtpEmail handles registration purpose cleanly in simulation mode', async () => {
+  const origPass = process.env.EMAIL_PASS;
+  delete process.env.EMAIL_PASS;
+  try {
+    const otp = generateOtp();
+    const res = await sendOtpEmail({
+      to: 'newresponder@test.lk',
+      name: 'Nimal Jayasuriya',
+      otp,
+      purpose: 'register',
+    });
+    assert.strictEqual(res.success, true);
+    assert.strictEqual(res.simulated, true);
+    assert.strictEqual(res.otp, otp);
+  } finally {
+    if (origPass) process.env.EMAIL_PASS = origPass;
+  }
+});
+
 console.log('\n=================================================');
 console.log(`Email Service Tests: Total Passed: ${passed} | Total Failed: ${failed}`);
 console.log('=================================================\n');
@@ -122,3 +141,4 @@ console.log('=================================================\n');
 if (failed > 0) {
   process.exit(1);
 }
+
