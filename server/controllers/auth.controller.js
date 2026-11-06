@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
 import { generateOtp, sendOtpEmail, sendWelcomeEmail } from '../services/emailService.js';
@@ -141,6 +142,7 @@ export const register = async (req, res) => {
       existingUser.volunteerStatus = requestedRole === 'volunteer' ? 'Pending_Review' : undefined;
       existingUser.otpCode = otp;
       existingUser.otpExpiresAt = otpExpiresAt;
+      existingUser.otpAttempts = 0;
       await existingUser.save();
       activeUser = existingUser;
     } else {
@@ -158,6 +160,7 @@ export const register = async (req, res) => {
         isEmailVerified: false,
         otpCode: otp,
         otpExpiresAt,
+        otpAttempts: 0,
       });
     }
 
@@ -234,6 +237,7 @@ export const login = async (req, res) => {
     const otp = generateOtp();
     user.otpCode = otp;
     user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpAttempts = 0;
     await user.save();
 
     // Send OTP to user's email via resqlanka@gmail.com (with terminal console fallback in dev)
@@ -262,6 +266,11 @@ export const login = async (req, res) => {
     });
   }
 };
+
+/**
+ * Maximum failed OTP attempts before the code is permanently invalidated.
+ */
+const MAX_OTP_ATTEMPTS = 5;
 
 /**
  * Verify 6-digit OTP code and issue final JWT session token
@@ -295,7 +304,7 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
-    const user = await User.findById(decoded.id).select('+otpCode +otpExpiresAt');
+    const user = await User.findById(decoded.id).select('+otpCode +otpExpiresAt +otpAttempts');
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -310,6 +319,18 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
+    // Rate-limiting check: Invalidate OTP if max attempts already reached
+    if ((user.otpAttempts || 0) >= MAX_OTP_ATTEMPTS) {
+      user.otpCode = undefined;
+      user.otpExpiresAt = undefined;
+      user.otpAttempts = 0;
+      await user.save();
+      return res.status(429).json({
+        success: false,
+        message: 'Too many failed verification attempts. This verification code has been invalidated for security. Please request a new code.',
+      });
+    }
+
     if (new Date() > user.otpExpiresAt) {
       return res.status(400).json({
         success: false,
@@ -317,14 +338,32 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
-    const isDevMasterPin =
-      (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) &&
-      otp.toString().trim() === '123456';
+    // Constant-time comparison to prevent timing side-channel attacks
+    const enteredOtp = String(otp).trim();
+    const storedOtp = String(user.otpCode).trim();
+    const isMatch =
+      enteredOtp.length === storedOtp.length &&
+      crypto.timingSafeEqual(Buffer.from(enteredOtp), Buffer.from(storedOtp));
 
-    if (user.otpCode !== otp.toString().trim() && !isDevMasterPin) {
+    if (!isMatch) {
+      user.otpAttempts = (user.otpAttempts || 0) + 1;
+
+      if (user.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        user.otpCode = undefined;
+        user.otpExpiresAt = undefined;
+        user.otpAttempts = 0;
+        await user.save();
+        return res.status(429).json({
+          success: false,
+          message: 'Too many failed verification attempts. This verification code has been invalidated for security. Please request a new code.',
+        });
+      }
+
+      await user.save();
+      const remaining = MAX_OTP_ATTEMPTS - user.otpAttempts;
       return res.status(400).json({
         success: false,
-        message: 'Invalid verification code. Please check and try again.',
+        message: `Invalid verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`,
       });
     }
 
@@ -334,9 +373,10 @@ export const verifyOtp = async (req, res) => {
       user.isEmailVerified = true;
     }
 
-    // OTP verified successfully! Clear OTP fields
+    // OTP verified successfully! Clear OTP fields and reset attempt counter
     user.otpCode = undefined;
     user.otpExpiresAt = undefined;
+    user.otpAttempts = 0;
     await user.save();
 
     // If newly registered account, dispatch the official Account Created Welcome email via resqlanka@gmail.com
@@ -406,6 +446,7 @@ export const resendOtp = async (req, res) => {
     const otp = generateOtp();
     user.otpCode = otp;
     user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpAttempts = 0;
     await user.save();
 
     await sendOtpEmail({

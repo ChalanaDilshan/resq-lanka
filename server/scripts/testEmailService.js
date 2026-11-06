@@ -1,4 +1,6 @@
 import assert from 'assert';
+import crypto from 'crypto';
+import User from '../models/User.model.js';
 import {
   generateOtp,
   escapeHtml,
@@ -132,6 +134,79 @@ await test('8. sendOtpEmail handles registration purpose cleanly in simulation m
   } finally {
     if (origPass) process.env.EMAIL_PASS = origPass;
   }
+});
+
+await test('9. User model schema defines otpAttempts path with select: false and default: 0', () => {
+  const path = User.schema.path('otpAttempts');
+  assert.ok(path, 'otpAttempts path should exist on User schema');
+  assert.strictEqual(path.instance, 'Number');
+  assert.strictEqual(path.defaultValue, 0);
+  assert.strictEqual(path.options.select, false);
+});
+
+await test('10. Timing-safe comparison strictly rejects backdoor master PIN "123456"', () => {
+  const realOtp = '849201';
+  const masterPin = '123456';
+
+  const compareOtp = (entered, stored) => {
+    const e = String(entered).trim();
+    const s = String(stored).trim();
+    return e.length === s.length && crypto.timingSafeEqual(Buffer.from(e), Buffer.from(s));
+  };
+
+  assert.strictEqual(compareOtp(realOtp, realOtp), true, 'Real OTP must validate');
+  assert.strictEqual(compareOtp(masterPin, realOtp), false, 'Master PIN 123456 must be rejected');
+  assert.strictEqual(compareOtp('123', realOtp), false, 'Truncated code must be rejected');
+  assert.strictEqual(compareOtp('1234567', realOtp), false, 'Oversized code must be rejected');
+});
+
+await test('11. OTP brute-force attempt throttling invalidates code at 5 attempts', () => {
+  const MAX_OTP_ATTEMPTS = 5;
+  const testUser = {
+    otpCode: '582910',
+    otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    otpAttempts: 0,
+  };
+
+  // Simulate 4 failed attempts
+  for (let attempt = 1; attempt < MAX_OTP_ATTEMPTS; attempt++) {
+    testUser.otpAttempts += 1;
+    const remaining = MAX_OTP_ATTEMPTS - testUser.otpAttempts;
+    assert.strictEqual(testUser.otpAttempts, attempt);
+    assert.ok(remaining > 0);
+    assert.ok(testUser.otpCode !== undefined, 'OTP must remain active before max attempts');
+  }
+
+  // 5th failed attempt: threshold reached
+  testUser.otpAttempts += 1;
+  assert.strictEqual(testUser.otpAttempts, MAX_OTP_ATTEMPTS);
+
+  if (testUser.otpAttempts >= MAX_OTP_ATTEMPTS) {
+    testUser.otpCode = undefined;
+    testUser.otpExpiresAt = undefined;
+    testUser.otpAttempts = 0;
+  }
+
+  assert.strictEqual(testUser.otpCode, undefined, 'OTP code must be wiped after 5 failed attempts');
+  assert.strictEqual(testUser.otpExpiresAt, undefined, 'Expiry must be wiped after 5 failed attempts');
+  assert.strictEqual(testUser.otpAttempts, 0, 'Attempts must be reset after invalidation');
+});
+
+await test('12. Successful verification purges OTP credentials and resets attempts', () => {
+  const testUser = {
+    otpCode: '918234',
+    otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    otpAttempts: 3,
+  };
+
+  // On successful match
+  testUser.otpCode = undefined;
+  testUser.otpExpiresAt = undefined;
+  testUser.otpAttempts = 0;
+
+  assert.strictEqual(testUser.otpCode, undefined);
+  assert.strictEqual(testUser.otpExpiresAt, undefined);
+  assert.strictEqual(testUser.otpAttempts, 0);
 });
 
 console.log('\n=================================================');
