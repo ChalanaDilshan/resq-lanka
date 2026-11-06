@@ -16,7 +16,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
+import heroDisasterBg from '../../assets/hero_disaster_bg.webp';
 
 export default function AboutPage() {
   const [activeTab, setActiveTab] = useState('citizen');

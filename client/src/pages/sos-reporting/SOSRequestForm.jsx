@@ -21,7 +21,7 @@ import {
 import { Link } from 'react-router-dom';
 import { createSOSRequest } from '../../services/sosService';
 import { useAuth } from '../../context/AuthContext';
-import themeBg from '../../assets/theme_bg.jpg';
+import themeBg from '../../assets/theme_bg.webp';
 
 const mapContainerStyle = {
   width: '100%',

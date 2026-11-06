@@ -23,10 +23,11 @@ import {
   Layers,
 } from 'lucide-react';
 
-import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
-import shelterAmpara from '../../assets/shelter_ampara.jpg';
-import shelterAkkaraipattu from '../../assets/shelter_akkaraipattu.jpg';
-import shelterKalmunai from '../../assets/shelter_kalmunai.jpg';
+import heroDisasterBg from '../../assets/hero_disaster_bg.webp';
+import heroDisasterBgMobile from '../../assets/hero_disaster_bg_mobile.webp';
+import shelterAmpara from '../../assets/shelter_ampara.webp';
+import shelterAkkaraipattu from '../../assets/shelter_akkaraipattu.webp';
+import shelterKalmunai from '../../assets/shelter_kalmunai.webp';
 import { fetchSOSRequests } from '../../services/sosService';
 import { fetchShelters, fetchShelterStats } from '../../services/shelterService';
 import { getNotices } from '../../services/noticeService';
@@ -214,14 +215,20 @@ export default function HomePage() {
           Disaster Landscape, Overlay, Title, Subtitle, Dual CTAs
          ========================================================================= */}
       <section className="relative w-full overflow-hidden bg-slate-950 text-white">
-        {/* Background Disaster Imagery with Dark Overlay */}
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-center transition-transform duration-1000 scale-105"
-          style={{ backgroundImage: `url(${heroDisasterBg})` }}
-        />
+        {/* Background Disaster Imagery with Responsive Picture for Ultra-Fast LCP */}
+        <picture>
+          <source media="(max-width: 640px)" srcSet={heroDisasterBgMobile} type="image/webp" />
+          <img
+            src={heroDisasterBg}
+            alt="ResQ-Lanka Emergency Response Background"
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 z-0 w-full h-full object-cover transition-transform duration-1000 scale-105 pointer-events-none"
+          />
+        </picture>
         {/* Cinematic Vignette Overlay */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-950/85 via-slate-900/75 to-slate-950/85" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-slate-950/95" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-950/85 via-slate-900/75 to-slate-950/85 pointer-events-none" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-slate-950/95 pointer-events-none" />
 
         {/* Hero Content */}
         <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 sm:pt-20 sm:pb-28 text-center flex flex-col items-center">
@@ -802,6 +809,8 @@ export default function HomePage() {
                         <img
                           src={getShelterImage(shelter)}
                           alt={shelter.name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />
@@ -1267,6 +1276,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setSelectedShelter(null)}
+              aria-label="Close shelter details"
               className="absolute top-4 right-4 z-10 p-1.5 bg-black/40 hover:bg-black/60 text-white rounded-full transition cursor-pointer"
             >
               <X size={18} />
@@ -1277,6 +1287,8 @@ export default function HomePage() {
               <img
                 src={getShelterImage(selectedShelter)}
                 alt={selectedShelter.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />

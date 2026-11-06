@@ -20,7 +20,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import ResQLogo from '../../components/shared/ResQLogo';
-import heroDisasterBg from '../../assets/hero_disaster_bg.jpg';
+import heroDisasterBg from '../../assets/hero_disaster_bg.webp';
 import { useAuth } from '../../context/AuthContext';
 import { validateSriLankanNIC } from '../../utils/nicValidator';
 

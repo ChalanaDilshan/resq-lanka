@@ -1,7 +1,7 @@
 import axios from 'axios';
-import shelterAmpara from '../assets/shelter_ampara.jpg';
-import shelterAkkaraipattu from '../assets/shelter_akkaraipattu.jpg';
-import shelterKalmunai from '../assets/shelter_kalmunai.jpg';
+import shelterAmpara from '../assets/shelter_ampara.webp';
+import shelterAkkaraipattu from '../assets/shelter_akkaraipattu.webp';
+import shelterKalmunai from '../assets/shelter_kalmunai.webp';
 
 import { API_SHELTER_URL } from './apiConfig';
 

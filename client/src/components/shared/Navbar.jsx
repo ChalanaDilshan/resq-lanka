@@ -154,6 +154,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => setUserDropdownOpen((open) => !open)}
                   aria-expanded={userDropdownOpen}
+                  aria-label="User account menu"
                   className="flex items-center gap-2.5 pl-1.5 pr-3 py-1 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-full transition shadow-xs ios-press group"
                 >
                   <div className="relative">
