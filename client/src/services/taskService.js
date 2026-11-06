@@ -1,7 +1,7 @@
 import axios from 'axios';
+import { API_TASK_URL } from './apiConfig';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_TASK_URL || 'http://localhost:5000/api/tasks';
+const API_BASE_URL = API_TASK_URL;
 const TOKEN_KEY = 'resq_jwt_token';
 
 // Helper to get authenticated header for privileged actions

@@ -1,7 +1,7 @@
 import axios from 'axios';
+import { API_NOTICE_URL } from './apiConfig';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_NOTICE_URL || 'http://localhost:5000/api/notices';
+const API_BASE_URL = API_NOTICE_URL;
 const TOKEN_KEY = 'resq_jwt_token';
 
 // Helper to get authenticated header for privileged actions

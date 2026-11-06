@@ -18,10 +18,9 @@ Thumbs.db
 # Dependency directories
 node_modules/
 
-# Environment files — NEVER commit real secrets
+# Environment files — NEVER commit real secrets or environment configs
 .env
-.env.local
-.env.*.local
+.env.*
 !.env.example
 
 # Build output

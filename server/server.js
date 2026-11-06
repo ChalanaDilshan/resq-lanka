@@ -15,10 +15,36 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// CORS Configuration: support local development, production Vercel frontend, and environment variables
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://resq-lanka.vercel.app',
+  ...(process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/+$/, ''))
+    : []),
+  ...(process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((url) => url.trim().replace(/\/+$/, ''))
+    : []),
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = origin.replace(/\/+$/, '');
+      if (
+        allowedOrigins.includes(normalizedOrigin) ||
+        normalizedOrigin.endsWith('.vercel.app')
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS not allowed for origin: ${origin}`));
+    },
     credentials: true,
   })
 );
