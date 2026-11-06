@@ -63,12 +63,12 @@ export const register = async (req, res) => {
       });
     }
 
-    // Check duplicate email
+    // Check duplicate email (or handle pending unverified re-registration)
     const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
-    if (existingUser) {
+    if (existingUser && existingUser.isEmailVerified) {
       return res.status(400).json({
         success: false,
-        message: 'An account with this email already exists.',
+        message: 'An account with this email already exists. Please sign in instead.',
       });
     }
 
@@ -104,9 +104,9 @@ export const register = async (req, res) => {
 
       cleanNIC = nicValidation.cleanNIC;
 
-      // Enforce NIC Uniqueness in Database
+      // Enforce NIC Uniqueness in Database (excluding the current unverified user)
       const existingNicUser = await User.findOne({ nicNumber: cleanNIC });
-      if (existingNicUser) {
+      if (existingNicUser && (!existingUser || existingNicUser._id.toString() !== existingUser._id.toString())) {
         return res.status(400).json({
           success: false,
           message: 'An account with this National Identity Card (NIC) number already exists.',
@@ -123,35 +123,61 @@ export const register = async (req, res) => {
       };
     }
 
-    // Create user
-    const newUser = await User.create({
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
-      password,
-      role: requestedRole,
-      phone: phone ? phone.trim() : '',
-      district: district ? district.trim() : 'Ampara District',
-      nicNumber: cleanNIC,
-      nicDetails,
-      volunteerStatus: requestedRole === 'volunteer' ? 'Pending_Review' : undefined,
+    // Generate 6-digit OTP verification code & set 10 minute expiry
+    const otp = generateOtp();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    let activeUser;
+
+    if (existingUser && !existingUser.isEmailVerified) {
+      // Refresh pending unverified user registration details & OTP
+      existingUser.name = name.trim();
+      existingUser.password = password; // Pre-save hook will hash modified password
+      existingUser.role = requestedRole;
+      existingUser.phone = phone ? phone.trim() : '';
+      existingUser.district = district ? district.trim() : 'Ampara District';
+      existingUser.nicNumber = cleanNIC;
+      existingUser.nicDetails = nicDetails;
+      existingUser.volunteerStatus = requestedRole === 'volunteer' ? 'Pending_Review' : undefined;
+      existingUser.otpCode = otp;
+      existingUser.otpExpiresAt = otpExpiresAt;
+      await existingUser.save();
+      activeUser = existingUser;
+    } else {
+      // Create new user with isEmailVerified: false and active OTP
+      activeUser = await User.create({
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
+        password,
+        role: requestedRole,
+        phone: phone ? phone.trim() : '',
+        district: district ? district.trim() : 'Ampara District',
+        nicNumber: cleanNIC,
+        nicDetails,
+        volunteerStatus: requestedRole === 'volunteer' ? 'Pending_Review' : undefined,
+        isEmailVerified: false,
+        otpCode: otp,
+        otpExpiresAt,
+      });
+    }
+
+    // Send Registration OTP to user's email via resqlanka@gmail.com
+    await sendOtpEmail({
+      to: activeUser.email,
+      name: activeUser.name,
+      otp,
+      purpose: 'register',
     });
 
-    const token = generateToken(newUser._id, newUser.role);
-
-    // Dispatch welcome email asynchronously from resqlanka@gmail.com
-    sendWelcomeEmail({
-      to: newUser.email,
-      name: newUser.name,
-      role: newUser.role,
-    }).catch((err) => {
-      console.error('Failed to dispatch registration welcome email:', err.message);
-    });
+    // Issue short-lived temporary token for OTP verification (10 minutes)
+    const tempToken = generateTempToken(activeUser._id, activeUser.email);
 
     return res.status(201).json({
       success: true,
-      message: 'Registration successful.',
-      token,
-      user: newUser.toSafeObject(),
+      requiresOtp: true,
+      tempToken,
+      email: activeUser.email,
+      message: `Account created! A 6-digit verification code has been dispatched to ${activeUser.email}.`,
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -215,7 +241,7 @@ export const login = async (req, res) => {
       to: user.email,
       name: user.name,
       otp,
-      purpose: 'login',
+      purpose: user.isEmailVerified ? 'login' : 'register',
     });
 
     // Issue short-lived temporary token for step 2 OTP verification
@@ -302,17 +328,36 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
+    // Check if this is the initial verification of a newly created account
+    const isFirstVerification = !user.isEmailVerified;
+    if (isFirstVerification) {
+      user.isEmailVerified = true;
+    }
+
     // OTP verified successfully! Clear OTP fields
     user.otpCode = undefined;
     user.otpExpiresAt = undefined;
     await user.save();
+
+    // If newly registered account, dispatch the official Account Created Welcome email via resqlanka@gmail.com
+    if (isFirstVerification) {
+      sendWelcomeEmail({
+        to: user.email,
+        name: user.name,
+        role: user.role,
+      }).catch((err) => {
+        console.error('Failed to dispatch registration welcome email:', err.message);
+      });
+    }
 
     // Generate full authenticated JWT token
     const token = generateToken(user._id, user.role);
 
     return res.status(200).json({
       success: true,
-      message: 'Verification successful. Welcome to ResQ-Lanka!',
+      message: isFirstVerification
+        ? 'Account successfully verified and activated! Welcome to ResQ-Lanka.'
+        : 'Verification successful. Welcome back to ResQ-Lanka!',
       token,
       user: user.toSafeObject(),
     });
@@ -367,7 +412,7 @@ export const resendOtp = async (req, res) => {
       to: user.email,
       name: user.name,
       otp,
-      purpose: 'login',
+      purpose: user.isEmailVerified ? 'login' : 'register',
     });
 
     return res.status(200).json({
