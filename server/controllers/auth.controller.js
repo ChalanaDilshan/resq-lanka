@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
-import { generateOtp, sendOtpEmail } from '../services/emailService.js';
+import { generateOtp, sendOtpEmail, sendWelcomeEmail } from '../services/emailService.js';
 import { validateSriLankanNIC } from '../services/nicValidator.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'resq_lanka_secure_dev_jwt_secret_key_2026_swt';
@@ -138,6 +138,15 @@ export const register = async (req, res) => {
 
     const token = generateToken(newUser._id, newUser.role);
 
+    // Dispatch welcome email asynchronously from resqlanka@gmail.com
+    sendWelcomeEmail({
+      to: newUser.email,
+      name: newUser.name,
+      role: newUser.role,
+    }).catch((err) => {
+      console.error('Failed to dispatch registration welcome email:', err.message);
+    });
+
     return res.status(201).json({
       success: true,
       message: 'Registration successful.',
@@ -201,11 +210,12 @@ export const login = async (req, res) => {
     user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    // Send OTP to user's email (with terminal console fallback in dev)
+    // Send OTP to user's email via resqlanka@gmail.com (with terminal console fallback in dev)
     await sendOtpEmail({
       to: user.email,
       name: user.name,
       otp,
+      purpose: 'login',
     });
 
     // Issue short-lived temporary token for step 2 OTP verification
@@ -357,6 +367,7 @@ export const resendOtp = async (req, res) => {
       to: user.email,
       name: user.name,
       otp,
+      purpose: 'login',
     });
 
     return res.status(200).json({
