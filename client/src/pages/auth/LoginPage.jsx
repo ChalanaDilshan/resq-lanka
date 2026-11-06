@@ -437,7 +437,7 @@ export default function LoginPage() {
                     className="w-full text-center py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 focus:bg-white rounded-lg text-2xl font-mono font-bold tracking-widest text-slate-900 focus:outline-none transition-colors"
                   />
                   <p className="text-[11px] text-slate-500 text-center mt-1">
-                    For local testing, check your backend server console for the generated code.
+                    Security code dispatched from <span className="font-semibold text-slate-700">resqlanka@gmail.com</span>. Please check your inbox or spam folder.
                   </p>
                 </div>
 
